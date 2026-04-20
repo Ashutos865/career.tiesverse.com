@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TIESVERSE | Application</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg: #0a0a0a;
+                --card-bg: #111111;
+                --border: #222222;
+                --text: #ffffff;
+                --text-dim: #888888;
+                --accent: #FE7A00;
+            }
+
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background-color: var(--bg);
+                color: var(--text);
+                font-family: "Inter", sans-serif;
+                min-height: 100vh;
+                position: relative;
+                overflow-x: hidden;
+            }
+
+            #particles {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: 1;
+                pointer-events: none;
+                opacity: 0.4;
+            }
+
+            /* ── HEADER ── */
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 32px 24px;
+                max-width: 900px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 10;
+            }
+
+            .logo {
+                font-family: "Inter", sans-serif;
+                font-size: 20px;
+                font-weight: 800;
+                color: var(--text);
+                text-decoration: none;
+            }
+            .logo .dot { color: var(--accent); }
+            .logo span { color: var(--accent); }
+            .logo small {
+                font-size: 9px;
+                font-weight: 600;
+                color: var(--text-dim);
+                display: block;
+                letter-spacing: 1px;
+                margin-top: -2px;
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 32px;
+                list-style: none;
+            }
+            .nav-links a {
+                color: var(--text);
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                transition: color 0.2s;
+            }
+            .nav-links a:hover { color: var(--accent); }
+            .nav-links .back-btn {
+                border: 1px solid var(--border);
+                color: var(--text-dim);
+                padding: 8px 20px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 1px;
+                border-radius: 4px;
+            }
+            .nav-links .back-btn:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
+
+            /* ── PAGE CONTENT & FORM CARD ── */
+            .page-content {
+                max-width: 760px;
+                margin: 0 auto;
+                padding: 20px 24px 80px;
+                position: relative;
+                z-index: 2;
+            }
+
+            .form-hero {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+            .form-hero h1 {
+                font-size: 28px;
+                font-weight: 700;
+                margin-bottom: 12px;
+                letter-spacing: -0.02em;
+            }
+            .form-hero p {
+                font-size: 14px;
+                color: var(--text-dim);
+            }
+
+            .main-form-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 48px;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            }
+
+            /* ── TYPOGRAPHY & LAYOUT ── */
+            .section-title {
+                font-size: 18px;
+                font-weight: 700;
+                color: var(--text);
+                margin-top: 48px;
+                margin-bottom: 24px;
+                letter-spacing: -0.01em;
+            }
+            .section-title:first-child { margin-top: 0; }
+
+            .grid-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+            .space-y > * + * { margin-top: 20px; }
+
+            /* ── INPUTS ── */
+            .field-label {
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text);
+                margin-bottom: 8px;
+                display: block;
+            }
+            .field-label .req { color: #ff4444; }
+
+            .form-input {
+                width: 100%;
+                background: #151515;
+                border: 1px solid #333;
+                border-radius: 6px;
+                padding: 12px 14px;
+                font-size: 14px;
+                color: var(--text);
+                outline: none;
+                transition: all 0.2s;
+                font-family: inherit;
+            }
+            .form-input:focus {
+                border-color: var(--accent);
+                background: #1a1a1a;
+            }
+            .form-input::placeholder { color: #555; }
+            textarea.form-input { resize: vertical; min-height: 80px; }
+
+            /* ── ROLE CHECKBOXES ── */
+            .role-check {
+                background: #151515;
+                border: 1px solid #333;
+                padding: 16px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                cursor: pointer;
+                transition: border 0.2s;
+            }
+            .role-check:hover { border-color: var(--accent); }
+            .role-check span { font-size: 14px; font-weight: 500; }
+
+            /* ── UPLOAD BOX ── */
+            .resume-upload-box {
+                border: 1px dashed #444;
+                border-radius: 8px;
+                padding: 40px 24px;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.01);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+                margin-top: 8px;
+            }
+            .resume-upload-box:hover {
+                border-color: var(--accent);
+                background: rgba(254, 122, 0, 0.03);
+            }
+            .resume-upload-box svg { width: 28px; height: 28px; color: var(--accent); }
+            .resume-upload-title { font-size: 14px; font-weight: 600; color: var(--text); }
+            .resume-upload-sub { font-size: 12px; color: var(--text-dim); }
+            .resume-upload-btn {
+                margin-top: 8px;
+                padding: 8px 16px;
+                border: 1px solid var(--accent);
+                border-radius: 20px;
+                color: var(--accent);
+                font-size: 12px;
+                font-weight: 600;
+                background: transparent;
+            }
+
+            /* ── BUTTONS ── */
+            .btn-submit {
+                width: 100%;
+                background: var(--accent);
+                color: #fff;
+                border: none;
+                padding: 16px;
+                font-size: 15px;
+                font-weight: 600;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: opacity 0.2s;
+                margin-top: 48px;
+            }
+            .btn-submit:hover { opacity: 0.9; }
+
+            .ack-box {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                margin-top: 32px;
+                padding: 16px;
+                background: rgba(254, 122, 0, 0.05);
+                border: 1px solid rgba(254, 122, 0, 0.2);
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            .ack-box span { font-size: 13px; color: #ccc; line-height: 1.5; }
+
+            .success-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 60px 40px;
+                text-align: center;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+            }
+            .success-icon {
+                width: 64px;
+                height: 64px;
+                background: rgba(254, 122, 0, 0.1);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+            }
+            .success-icon svg { width: 32px; height: 32px; color: var(--accent); }
+            .success-card h3 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+            .success-card p { font-size: 15px; color: var(--text-dim); margin-bottom: 32px; line-height: 1.6; }
+            .whatsapp-btn {
+                display: inline-block;
+                background: #25D366;
+                color: #fff;
+                text-decoration: none;
+                padding: 12px 24px;
+                border-radius: 24px;
+                font-size: 14px;
+                font-weight: 600;
+                transition: background 0.2s;
+            }
+            .whatsapp-btn:hover { background: #1ebe57; }
+            .back-link {
+                background: transparent;
+                border: none;
+                color: var(--text-dim);
+                font-size: 13px;
+                cursor: pointer;
+            }
+            .back-link:hover { color: var(--text); }
+
+            @media (max-width: 768px) {
+                .main-form-card { padding: 32px 20px; }
+                .grid-2 { grid-template-columns: 1fr; }
+            }
+        </style>
+    </head>
+
+    <body>
+        <canvas id="particles"></canvas>
+
+        <header class="header">
+            <a href="index.html" class="logo">
+                <div>
+                    <span class="dot">.</span>ties<span>verse</span
+                    ><small>Foundation</small>
+                </div>
+            </a>
+            <ul class="nav-links">
+                <li>
+                    <a href="index.html" class="back-btn">← All Positions</a>
+                </li>
+            </ul>
+        </header>
+
+                <div class="page-content">
+            <div id="form-content">
+                <div class="form-hero">
+                    <h1>Apply for Content/Creative</h1>
+                    <p>Bengaluru, India · Full Time · Remote Ok</p>
+                </div>
+
+                <div class="main-form-card">
+                    <form onsubmit="event.preventDefault(); deploy();">
+                        <div class="section-title">Creative Tracks</div>
+                        <div class="grid-2">
+                            <label class="role-check"><span>Content Writer</span><input type="checkbox" value="Content Writer" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>Video Editor</span><input type="checkbox" value="Video Editor" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>Graphic Designer</span><input type="checkbox" value="Graphic Designer" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>Social Media Manager</span><input type="checkbox" value="Social Media Manager" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                        </div>
+                        <input type="hidden" id="roleInput">
+
+                        <div class="section-title">Personal Information</div>
+                        <div class="grid-2">
+                            <div><label class="field-label">First name <span class="req">*</span></label><input type="text" id="content_name" class="form-input" placeholder="Enter first name" required></div>
+                            <div><label class="field-label">Last name</label><input type="text" id="content_last" class="form-input" placeholder="Enter last name"></div>
+                        </div>
+                        <div class="space-y" style="margin-top: 20px;">
+                            <div><label class="field-label">Email <span class="req">*</span></label><input type="email" id="content_mail" class="form-input" placeholder="Enter email" required></div>
+                            <div class="grid-2">
+                                <div><label class="field-label">Phone <span class="req">*</span></label><input type="tel" id="content_phone" class="form-input" placeholder="Add phone number" required></div>
+                                <div><label class="field-label">City <span class="req">*</span></label><input type="text" id="content_city" class="form-input" placeholder="Search city" required></div>
+                            </div>
+                        </div>
+
+                        <div class="section-title">Profile & Experience</div>
+                        <div class="space-y">
+                            <div><label class="field-label">LinkedIn URL <span class="req">*</span></label><input type="url" id="content_linkedin" class="form-input" placeholder="Enter LinkedIn url" required></div>
+                            <div><label class="field-label">Portfolio / Reels / Drive Link</label><input type="url" id="content_portfolio" class="form-input" placeholder="Enter portfolio url"></div>
+                            <div><label class="field-label">Summary <span class="req">*</span></label><textarea id="why_join_content" class="form-input" rows="3" placeholder="Enter summary (why do you want to join?)" required></textarea></div>
+                        </div>
+
+                        <!-- Dynamic Questions injected here -->
+                        <div id="dynamic-questions" class="space-y"></div>
+
+                        <div class="section-title">Resume</div>
+                        <label class="resume-upload-box" for="resume">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <div>
+                                <div class="resume-upload-title" id="resumeTitle">Upload your file or drag and drop here</div>
+                                <div class="resume-upload-sub">Supported formats: .pdf, .docx</div>
+                            </div>
+                            <div class="resume-upload-btn">Upload file</div>
+                        </label>
+                        <input type="file" id="resume" accept=".pdf,.doc,.docx" style="display: none" onchange="updateKulaResume()">
+
+                        <label class="ack-box">
+                            <input type="checkbox" id="acknowledge" style="accent-color:var(--accent);width:16px;height:16px;margin-top:2px;" required>
+                            <span>I understand this is a 3-month, unpaid internship focused on learning and portfolio building.</span>
+                        </label>
+
+                        <button type="submit" id="submitBtn" class="btn-submit">Apply for this position</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="success-msg" class="success-card" style="display: none; max-width: 600px; margin: 0 auto; margin-top: 40px;">
+                <div class="success-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+                <h3>Application Submitted</h3>
+                <p>Your application has been received. Check your email for confirmation and next steps.</p>
+                <a href="https://chat.whatsapp.com/CvRuM20vyEW25QV3iWqE6y" target="_blank" class="whatsapp-btn">Join Community Group</a><br>
+                <button onclick="location.href = 'index.html'" class="back-link" style="margin-top: 16px">← Return to jobs list</button>
+            </div>
+        </div>
+
+                <script>
+            let selectedTracks = [];
+            let qIdx = 0;
+            const roleFieldStore = [];
+            const SHEET_URL = "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
+
+            const ROLE_QUESTION_BANK = {
+                "Content Writer": [
+                    { label: "Link to your best writing sample", type: "url", req: true },
+                    { label: "Can you adapt your tone for LinkedIn vs Twitter?", type: "text", req: true }
+                ],
+                "Video Editor": [
+                    { label: "Link to a Reel/Short you edited", type: "url", req: true },
+                    { label: "Which editing software do you use?", type: "text", req: true }
+                ],
+                "Graphic Designer": [
+                    { label: "Link to your Behance / Design Portfolio", type: "url", req: true },
+                    { label: "Are you comfortable with Figma?", type: "text", req: true }
+                ],
+                "Social Media Manager": [
+                    { label: "Link to a page you managed (if any)", type: "url", req: false },
+                    { label: "Describe a viral campaign you loved", type: "textarea", req: true }
+                ]
+            };
+
+            function syncTracks() {
+                selectedTracks = Array.from(document.querySelectorAll(".track-chk:checked")).map(cb => cb.value);
+                document.getElementById("roleInput").value = selectedTracks.join(", ");
+                renderDynamicQuestions();
+            }
+
+            function renderDynamicQuestions() {
+                const c = document.getElementById("dynamic-questions");
+                c.innerHTML = "";
+                roleFieldStore.length = 0;
+                qIdx = 0;
+
+                selectedTracks.forEach((role) => {
+                    const qs = ROLE_QUESTION_BANK[role] || [];
+                    if (qs.length > 0) {
+                        const w = document.createElement("div");
+                        w.innerHTML = `<div class="section-title">${role} Assessment</div>`;
+                        const inner = document.createElement("div");
+                        inner.className = "space-y";
+                        qs.forEach((q) => {
+                            const id = "dq_" + qIdx++;
+                            roleFieldStore.push({ id, role, label: q.label, req: q.req });
+                            const star = q.req ? '<span class="req">*</span>' : "";
+                            const d = document.createElement("div");
+                            d.innerHTML = `<label class="field-label">${q.label} ${star}</label><input type="${q.type}" id="${id}" class="form-input" placeholder="${q.req ? '' : '(if any)'}" ${q.req ? "required" : ""}>`;
+                            inner.appendChild(d);
+                        });
+                        w.appendChild(inner);
+                        c.appendChild(w);
+                    }
+                });
+            }
+
+            function updateKulaResume() {
+                const input = document.getElementById("resume");
+                const title = document.getElementById("resumeTitle");
+                if (input.files.length > 0) {
+                    title.textContent = "📎 " + input.files[0].name;
+                    title.style.color = "var(--accent)";
+                } else {
+                    title.textContent = "Upload your file or drag and drop here";
+                    title.style.color = "var(--text)";
+                }
+            }
+
+            async function getResumeData() {
+                const input = document.getElementById("resume");
+                if (!input || !input.files.length) return { resume_name: "", resume_data: "" };
+                const file = input.files[0];
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve({ resume_name: file.name, resume_data: e.target.result });
+                    reader.onerror = () => resolve({ resume_name: file.name, resume_data: "" });
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async function deploy() {
+                if (selectedTracks.length === 0)
+                    return alert("Please select at least one creative track.");
+
+                const req = [
+                    "content_name",
+                    "content_mail",
+                    "content_phone",
+                    "content_city",
+                    "content_linkedin",
+                    "why_join_content",
+                ];
+                for (let id of req) {
+                    if (!document.getElementById(id).value)
+                        return alert("System Error: Missing mandatory fields.");
+                }
+                if (!document.getElementById("acknowledge").checked)
+                    return alert("System Error: Must acknowledge terms.");
+
+                for (let f of roleFieldStore) {
+                    if (f.req && !document.getElementById(f.id).value) {
+                        return alert(
+                            `System Error: Missing answer for ${f.role} -> ${f.label}`,
+                        );
+                    }
+                }
+
+                const btn = document.getElementById("submitBtn");
+                btn.innerText = "pushing_to_cloud...";
+                btn.disabled = true;
+
+                const roleAnswers = [];
+                roleFieldStore.forEach((f) => {
+                    roleAnswers.push({
+                        q: `[${f.role}] ${f.label}`,
+                        a: document.getElementById(f.id).value,
+                    });
+                });
+
+                const { resume_name, resume_data } = await getResumeData();
+
+                const payload = {
+                    action: "CREATE",
+                    department: "Content",
+                    roles: document.getElementById("roleInput").value,
+                    first_name: document.getElementById("content_name").value,
+                    last_name: document.getElementById("content_last").value,
+                    email: document.getElementById("content_mail").value,
+                    phone: document.getElementById("content_phone").value,
+                    city: document.getElementById("content_city").value,
+                    linkedin: document.getElementById("content_linkedin").value,
+                    portfolio: document.getElementById("content_portfolio").value,
+                    why_join: document.getElementById("why_join_content").value,
+                    answers: roleAnswers,
+                    resume_name: resume_name,
+                    resume_data: resume_data,
+                };
+
+                try {
+                    await fetch(SHEET_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        body: JSON.stringify(payload),
+                        headers: { "Content-Type": "application/json" },
+                    });
+                    document.getElementById("form-content").style.display =
+                        "none";
+                    document.getElementById("success-msg").style.display =
+                        "block";
+                    window.scrollTo(0, 0);
+                } catch (e) {
+                    alert("Network Error: Failed to reach deployment server.");
+                    btn.innerText = "Apply for this position";
+                    btn.disabled = false;
+                }
+            }
+
+            /* ── PARTICLES ── */
+            const canvas = document.getElementById("particles");
+            const ctx = canvas.getContext("2d");
+            let particles = [];
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = Math.max(
+                    document.body.scrollHeight,
+                    window.innerHeight,
+                );
+            }
+            function createParticles() {
+                particles = [];
+                const c = Math.floor((canvas.width * canvas.height) / 18000);
+                for (let i = 0; i < c; i++)
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        r: Math.random() * 1 + 0.3,
+                        a: Math.random() * 0.4 + 0.1,
+                        dx: (Math.random() - 0.5) * 0.12,
+                        dy: (Math.random() - 0.5) * 0.12,
+                        ph: Math.random() * Math.PI * 2,
+                    });
+            }
+            function drawParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const t = Date.now() * 0.001;
+                particles.forEach((p) => {
+                    p.x += p.dx;
+                    p.y += p.dy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255,255,255,${p.a * (0.6 + 0.4 * Math.sin(t + p.ph))})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(drawParticles);
+            }
+            window.addEventListener("resize", () => {
+                resizeCanvas();
+                createParticles();
+            });
+            resizeCanvas();
+            createParticles();
+            drawParticles();
+        </script>
+
+        <!-- Smooth Scrolling -->
+        <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+        <script>
+            const lenis = new Lenis();
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+        </script>
+    </body>
+</html>

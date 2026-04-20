@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIESVERSE | ATS Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card-bg: #111111;
+            --border: #222222;
+            --text: #ffffff;
+            --text-dim: #888888;
+            --accent: #FE7A00;
+            --success: #25D366;
+            --danger: #ff4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .logo { font-size: 20px; font-weight: 800; }
+        .logo span { color: var(--accent); }
+
+        /* ── MAIN TOOLBAR ── */
+        .toolbar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: rgba(255,255,255,0.02);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .toolbar input, .toolbar select {
+            background: #151515;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s;
+        }
+        
+        .toolbar input { flex: 2; }
+        .toolbar select { flex: 1; cursor: pointer; }
+        .toolbar input:focus, .toolbar select:focus { border-color: var(--accent); }
+
+        .btn-export {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-export:hover { opacity: 0.9; }
+
+        /* ── CANDIDATE CARD ── */
+        .candidate-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr;
+            gap: 24px;
+            align-items: start;
+            transition: transform 0.2s;
+        }
+        .candidate-card:hover { border-color: #333; }
+
+        .info-col h3 { font-size: 18px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;}
+        .info-col .date-stamp { font-size: 11px; color: var(--text-dim); font-weight: 400;}
+        
+        .info-col .role {
+            font-size: 11px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: inline-block;
+            background: rgba(254, 122, 0, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .info-col p { font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+
+        .links { margin-top: 12px; }
+        .links a {
+            color: #fff;
+            font-size: 12px;
+            text-decoration: none;
+            margin-right: 15px;
+            padding-bottom: 2px;
+            border-bottom: 1px solid var(--accent);
+            transition: opacity 0.2s;
+        }
+        .links a:hover { opacity: 0.7; }
+
+        .eval-col label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            margin-top: 12px;
+        }
+        .eval-col label:first-child { margin-top: 0; }
+
+        .form-select, .form-input {
+            width: 100%;
+            background: #151515;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+        .star-rating input { display: none; }
+        .star-rating label { font-size: 24px; color: #333; cursor: pointer; transition: 0.2s;}
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label { color: var(--accent); }
+
+        .action-col { display: flex; flex-direction: column; gap: 12px; }
+
+        .btn-save {
+            background: var(--accent);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status-badge {
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            display: none;
+        }
+        .status-Selected { color: var(--success); border: 1px solid var(--success); background: rgba(37, 211, 102, 0.1); display: block; }
+        .status-Rejected { color: var(--danger); border: 1px solid var(--danger); background: rgba(255, 68, 68, 0.1); display: block; }
+
+        /* ── EXPORT MODAL ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 450px;
+            max-width: 90%;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .modal-close:hover { color: #fff; }
+
+        .modal-body { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+        
+        .modal-row { display: flex; gap: 12px; }
+        .modal-row > div { flex: 1; }
+
+        .modal label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid #444;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .candidate-card { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">ties<span>verse</span> Admin</div>
+        <div>Showing: <span id="app-count" style="color: var(--accent); font-weight: bold;">0</span> Applications</div>
+    </div>
+
+    <div class="toolbar">
+        <div class="toolbar-group">
+            <input type="text" id="searchInput" placeholder="Search by name, email, or role..." oninput="applyFilters()">
+            
+            <select id="deptFilter" onchange="applyFilters()">
+                <option value="All">All Departments</option>
+                <option value="Tech">Tech</option>
+                <option value="Content">Content</option>
+                <option value="Media">Media</option>
+                <option value="Operations">Operations</option>
+            </select>
+
+            <select id="statusFilter" onchange="applyFilters()">
+                <option value="All">All Decisions</option>
+                <option value="Under Review">Under Review</option>
+                <option value="Selected">Selected</option>
+                <option value="Rejected">Rejected</option>
+            </select>
+        </div>
+        
+        <button class="btn-export" onclick="openModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download PDF Report
+        </button>
+    </div>
+
+    <div id="candidates-container">
+        <p style="text-align: center; color: var(--text-dim); margin-top: 40px;">Fetching candidate data...</p>
+    </div>
+
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal">
+            <div class="modal-header">
+                Export Data to PDF
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <label>Filter by Decision</label>
+                    <select class="form-select" id="pdfDecisionFilter">
+                        <option value="All">All Applications</option>
+                        <option value="Selected">Selected Only</option>
+                        <option value="Rejected">Rejected Only</option>
+                        <option value="Under Review">Under Review Only</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Filter by Department</label>
+                    <select class="form-select" id="pdfDeptFilter">
+                        <option value="All">All Departments</option>
+                        <option value="Tech">Tech</option>
+                        <option value="Content">Content</option>
+                        <option value="Media">Media</option>
+                        <option value="Operations">Operations</option>
+                    </select>
+                </div>
+                <div class="modal-row">
+                    <div>
+                        <label>Start Date</label>
+                        <input type="date" class="form-input" id="pdfStartDate">
+                    </div>
+                    <div>
+                        <label>End Date</label>
+                        <input type="date" class="form-input" id="pdfEndDate">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-export" onclick="generatePDF()">Generate PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SHEET_URL = "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
+        
+        let globalCandidates = [];
+
+        window.onload = fetchCandidates;
+
+        async function fetchCandidates() {
+            const container = document.getElementById("candidates-container");
+            try {
+                const response = await fetch(SHEET_URL, { method: 'GET', redirect: 'follow' });
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    globalCandidates = result.data.reverse(); 
+                    applyFilters();
+                } else {
+                    container.innerHTML = `<p style="color:red; text-align:center;">Error: ${result.message}</p>`;
+                }
+            } catch (error) {
+                container.innerHTML = `<p style="color:red; text-align:center;">Network Error: Ensure the script is deployed as "Anyone".</p>`;
+            }
+        }
+
+        // --- MAIN PAGE FILTERING ---
+        function applyFilters() {
+            const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+            const deptFilter = document.getElementById("deptFilter").value;
+            const statusFilter = document.getElementById("statusFilter").value;
+
+            const filteredData = globalCandidates.filter(c => {
+                const searchString = `${c.first_name} ${c.last_name} ${c.email} ${c.roles}`.toLowerCase();
+                const matchesSearch = searchString.includes(searchTerm);
+                const matchesDept = deptFilter === "All" || c.department === deptFilter;
+                const matchesStatus = statusFilter === "All" || c.final_decision === statusFilter;
+
+                return matchesSearch && matchesDept && matchesStatus;
+            });
+
+            renderCards(filteredData);
+        }
+
+        // --- RENDER CARDS ---
+        function renderCards(data) {
+            const container = document.getElementById("candidates-container");
+            document.getElementById("app-count").innerText = data.length;
+            container.innerHTML = "";
+
+            if(data.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color:#555; padding-top: 40px;">No applications match your filters.</p>`;
+                return;
+            }
+
+            data.forEach(candidate => {
+                container.innerHTML += createCandidateCard(candidate);
+            });
+        }
+
+        function createCandidateCard(c) {
+            let safeAnswers = c.answers ? c.answers.replace(/\n/g, '<br>') : "No assessment data.";
+            let isSelected = c.final_decision === 'Selected';
+            let isRejected = c.final_decision === 'Rejected';
+            let appliedDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString() : "Unknown Date";
+
+            return `
+            <div class="candidate-card" id="row-${c.row_index}">
+                <div class="info-col">
+                    <h3>${c.first_name} ${c.last_name || ''} <span class="date-stamp">(${appliedDate})</span></h3>
+                    <span class="role">${c.roles} | ${c.department || 'General'}</span>
+                    <p>📧 ${c.email}</p>
+                    <p>📱 ${c.phone} | 📍 ${c.city}</p>
+                    
+                    <div class="links">
+                        <a href="${c.resume_link}" target="_blank">Resume</a>
+                        <a href="${c.linkedin}" target="_blank">LinkedIn</a>
+                        ${c.portfolio ? `<a href="${c.portfolio}" target="_blank">Portfolio</a>` : ''}
+                    </div>
+                    
+                    <details style="margin-top: 15px; font-size: 12px; color: var(--text-dim);">
+                        <summary style="cursor: pointer; color: var(--accent); font-weight: 600; margin-bottom: 8px;">View Application Details</summary>
+                        <div style="background: #000; padding: 10px; border-radius: 6px; border: 1px solid #222;">
+                            <p><strong>Summary:</strong><br>${c.why_join}</p>
+                            <hr style="border:0; border-top:1px solid #222; margin:10px 0;">
+                            <div>${safeAnswers}</div>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="eval-col">
+                    <label>Interview Status</label>
+                    <select class="form-select" id="status-${c.row_index}">
+                        <option value="Pending Setup" ${c.interview_status === 'Pending Setup' ? 'selected' : ''}>Pending Setup</option>
+                        <option value="Scheduled" ${c.interview_status === 'Scheduled' ? 'selected' : ''}>Scheduled</option>
+                        <option value="Completed" ${c.interview_status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select>
+
+                    <label>Interviewer</label>
+                    <input type="text" class="form-input" id="interviewer-${c.row_index}" value="${c.interviewer || ''}">
+
+                    <label>Rating</label>
+                    <div class="star-rating">
+                        ${[5,4,3,2,1].map(num => `
+                            <input type="radio" id="star${num}-${c.row_index}" name="rating-${c.row_index}" value="${num}" ${c.rating == num ? 'checked' : ''}>
+                            <label for="star${num}-${c.row_index}">★</label>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="action-col">
+                    <label>Decision</label>
+                    <select class="form-select" id="decision-${c.row_index}" onchange="updateBadgeUI(${c.row_index})">
+                        <option value="Under Review" ${c.final_decision === 'Under Review' ? 'selected' : ''}>Under Review</option>
+                        <option value="Selected" ${isSelected ? 'selected' : ''}>Selected</option>
+                        <option value="Rejected" ${isRejected ? 'selected' : ''}>Rejected</option>
+                    </select>
+                    <div id="badge-${c.row_index}" class="status-badge ${isSelected ? 'status-Selected' : ''} ${isRejected ? 'status-Rejected' : ''}">
+                        ${c.final_decision}
+                    </div>
+                    <button class="btn-save" id="btn-${c.row_index}" onclick="saveEvaluation(${c.row_index})">Save Evaluation</button>
+                </div>
+            </div>`;
+        }
+
+        function updateBadgeUI(rowId) {
+            const decision = document.getElementById(`decision-${rowId}`).value;
+            const badge = document.getElementById(`badge-${rowId}`);
+            badge.className = "status-badge";
+            if (decision !== "Under Review") {
+                badge.classList.add(`status-${decision}`);
+                badge.innerText = decision;
+                badge.style.display = "block";
+            } else {
+                badge.style.display = "none";
+            }
+        }
+
+        async function saveEvaluation(rowId) {
+            const btn = document.getElementById(`btn-${rowId}`);
+            const originalText = btn.innerText;
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            const rating = document.querySelector(`input[name="rating-${rowId}"]:checked`)?.value || 0;
+
+            const payload = {
+                action: "UPDATE_ROW",
+                row: rowId,
+                interview_status: document.getElementById(`status-${rowId}`).value,
+                interviewer: document.getElementById(`interviewer-${rowId}`).value,
+                rating: rating,
+                final_decision: document.getElementById(`decision-${rowId}`).value
+            };
+
+            try {
+                await fetch(SHEET_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+
+                btn.innerText = "Saved!";
+                btn.style.background = "var(--success)";
+                btn.style.color = "#fff";
+                
+                const candidateIndex = globalCandidates.findIndex(c => c.row_index === rowId);
+                if(candidateIndex !== -1) {
+                    globalCandidates[candidateIndex].interview_status = payload.interview_status;
+                    globalCandidates[candidateIndex].interviewer = payload.interviewer;
+                    globalCandidates[candidateIndex].rating = payload.rating;
+                    globalCandidates[candidateIndex].final_decision = payload.final_decision;
+                }
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = "var(--accent)";
+                    btn.style.color = "#000";
+                    btn.disabled = false;
+                }, 2000);
+
+            } catch (error) {
+                console.error(error);
+                alert("Check Console: Save might have worked, but browser blocked the confirmation.");
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        // --- MODAL LOGIC ---
+        function openModal() { document.getElementById('exportModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('exportModal').style.display = 'none'; }
+
+        // --- PDF GENERATION LOGIC ---
+        function generatePDF() {
+            if (globalCandidates.length === 0) {
+                alert("No data available to export.");
+                return;
+            }
+
+            // 1. Gather Filter Inputs from Modal
+            const decisionFilter = document.getElementById("pdfDecisionFilter").value;
+            const deptFilter = document.getElementById("pdfDeptFilter").value;
+            const startDate = document.getElementById("pdfStartDate").value;
+            const endDate = document.getElementById("pdfEndDate").value;
+
+            // 2. Filter the Global Candidates Data
+            const filteredData = globalCandidates.filter(c => {
+                let matchDecision = decisionFilter === "All" || c.final_decision === decisionFilter;
+                let matchDept = deptFilter === "All" || c.department === deptFilter;
+                
+                let matchDate = true;
+                if (startDate || endDate) {
+                    let cDate = new Date(c.timestamp);
+                    cDate.setHours(0,0,0,0); // Normalize time
+                    
+                    if (startDate) {
+                        let sDate = new Date(startDate);
+                        sDate.setHours(0,0,0,0);
+                        if (cDate < sDate) matchDate = false;
+                    }
+                    if (endDate) {
+                        let eDate = new Date(endDate);
+                        eDate.setHours(23,59,59,999);
+                        if (cDate > eDate) matchDate = false;
+                    }
+                }
+                return matchDecision && matchDept && matchDate;
+            });
+
+            if (filteredData.length === 0) {
+                alert("No candidates match these specific filters.");
+                return;
+            }
+
+            // 3. Initialize jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape'); // Landscape for tabular data
+
+            // Title
+            doc.setFontSize(18);
+            doc.text("TIESVERSE - Candidate ATS Report", 14, 20);
+            
+            // Subtitle / Filter Info
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            let filterText = `Filters Applied -> Decision: ${decisionFilter} | Dept: ${deptFilter}`;
+            if(startDate) filterText += ` | From: ${startDate}`;
+            if(endDate) filterText += ` | To: ${endDate}`;
+            doc.text(filterText, 14, 28);
+            doc.text(`Total Records: ${filteredData.length}`, 14, 34);
+
+            // 4. Prepare Table Data
+            const tableCols = ["ID", "Date", "Name", "Department", "Role", "Email", "Phone", "Status", "Decision"];
+            const tableRows = filteredData.map(c => [
+                c.row_index,
+                c.timestamp ? new Date(c.timestamp).toLocaleDateString() : 'N/A',
+                `${c.first_name} ${c.last_name || ''}`,
+                c.department,
+                c.roles,
+                c.email,
+                c.phone,
+                c.interview_status,
+                c.final_decision
+            ]);
+
+            // 5. Generate Table using autoTable plugin
+            doc.autoTable({
+                startY: 40,
+                head: [tableCols],
+                body: tableRows,
+                theme: 'grid',
+                headStyles: { fillColor: [254, 122, 0], textColor: [255, 255, 255] }, // Orange accent
+                styles: { fontSize: 8, cellPadding: 3 },
+                alternateRowStyles: { fillColor: [245, 245, 245] }
+            });
+
+            // 6. Save PDF
+            let filename = `Tiesverse_ATS_Report_${new Date().toISOString().slice(0,10)}.pdf`;
+            doc.save(filename);
+
+            // Close Modal
+            closeModal();
+        }
+    </script>
+</body>
+</html>
