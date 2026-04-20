@@ -406,6 +406,54 @@
             const SHEET_URL =
                 "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
 
+            const SUBMISSION_GUARD_PREFIX = "tv_apply_once_v1";
+            let isSubmitting = false;
+            function normalizeEmail(v) {
+                return String(v || "").trim().toLowerCase();
+            }
+            function normalizePhone(v) {
+                return String(v || "").replace(/[^\d+]/g, "");
+            }
+            function storageGet(key) {
+                try {
+                    return localStorage.getItem(key);
+                } catch (_) {
+                    return null;
+                }
+            }
+            function storageSet(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (_) {}
+            }
+            function submissionKeys(department, email, phone) {
+                const keys = [];
+                if (email) {
+                    keys.push(`${SUBMISSION_GUARD_PREFIX}:GLOBAL:email:${email}`);
+                    keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:email:${email}`);
+                }
+                if (phone) {
+                    keys.push(`${SUBMISSION_GUARD_PREFIX}:GLOBAL:phone:${phone}`);
+                    keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:phone:${phone}`);
+                }
+                return keys;
+            }
+            function findExistingSubmission(department, email, phone) {
+                for (const key of submissionKeys(department, email, phone)) {
+                    const val = storageGet(key);
+                    if (val) return { key, val };
+                }
+                return null;
+            }
+            function markSubmitted(department, email, phone, meta) {
+                const record = JSON.stringify({
+                    ts: Date.now(),
+                    department,
+                    roles: meta?.roles || "",
+                });
+                for (const key of submissionKeys(department, email, phone)) storageSet(key, record);
+            }
+
             const ROLE_QUESTION_BANK = {
                 "Frontend Developer": [
                     {
@@ -591,6 +639,16 @@
                 if (!document.getElementById("acknowledge").checked)
                     return alert("System Error: Must acknowledge terms.");
 
+                if (isSubmitting) return;
+                const emailNorm = normalizeEmail(document.getElementById("dev_mail").value);
+                const phoneNorm = normalizePhone(document.getElementById("dev_phone").value);
+                const existing = findExistingSubmission("Tech", emailNorm, phoneNorm);
+                if (existing) {
+                    return alert(
+                        "Looks like we already received an application from this email/phone. Please avoid submitting multiple entries.",
+                    );
+                }
+
                 for (let f of roleFieldStore) {
                     if (f.req && !document.getElementById(f.id).value) {
                         return alert(
@@ -602,6 +660,7 @@
                 const btn = document.getElementById("submitBtn");
                 btn.innerText = "pushing_to_cloud...";
                 btn.disabled = true;
+                isSubmitting = true;
 
                 const roleAnswers = [];
                 roleFieldStore.forEach((f) => {
@@ -637,6 +696,7 @@
                         body: JSON.stringify(payload),
                         headers: { "Content-Type": "application/json" },
                     });
+                    markSubmitted("Tech", emailNorm, phoneNorm, { roles: payload.roles });
                     document.getElementById("form-content").style.display =
                         "none";
                     document.getElementById("success-msg").style.display =
@@ -646,6 +706,7 @@
                     alert("Runtime Error: Failed to reach deployment server.");
                     btn.innerText = "Apply for this position";
                     btn.disabled = false;
+                    isSubmitting = false;
                 }
             }
 
