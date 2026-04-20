@@ -695,10 +695,10 @@
                 requestAnimationFrame(drawParticles);
             }
 
-            window.addEventListener("resize", () => {
-                resizeCanvas();
-                createParticles();
-            });
+	            window.addEventListener("resize", () => {
+	                resizeCanvas();
+	                createParticles();
+	            });
             resizeCanvas();
             createParticles();
             drawParticles();

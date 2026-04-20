@@ -198,6 +198,141 @@
             }
             .role-check:hover { border-color: var(--accent); }
             .role-check span { font-size: 14px; font-weight: 500; }
+            .role-check.selected {
+                border-color: rgba(254, 122, 0, 0.6);
+                background: rgba(254, 122, 0, 0.04);
+                box-shadow: 0 0 0 1px rgba(254, 122, 0, 0.12) inset;
+            }
+
+            .chip {
+                font-size: 11px;
+                color: var(--text-dim);
+                border: 1px solid var(--border);
+                padding: 6px 10px;
+                border-radius: 999px;
+                white-space: nowrap;
+            }
+
+            .track-guidance {
+                border: 1px solid var(--border);
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 12px;
+                padding: 18px;
+            }
+
+            .track-guidance-title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+
+            .track-guidance-title h4 {
+                font-size: 14px;
+                font-weight: 700;
+                letter-spacing: -0.01em;
+            }
+
+            .mission-tabs {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-bottom: 14px;
+            }
+
+            .mission-tab {
+                appearance: none;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                background: rgba(0, 0, 0, 0.25);
+                color: var(--text);
+                font-family: inherit;
+                font-size: 12px;
+                font-weight: 700;
+                padding: 8px 12px;
+                border-radius: 999px;
+                cursor: pointer;
+                transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+            }
+
+            .mission-tab:hover {
+                border-color: rgba(254, 122, 0, 0.6);
+                transform: translateY(-1px);
+            }
+
+            .mission-tab.active {
+                border-color: rgba(254, 122, 0, 0.85);
+                background: rgba(254, 122, 0, 0.10);
+                box-shadow: 0 0 0 1px rgba(254, 122, 0, 0.10) inset;
+            }
+
+            .mission-console {
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                background: rgba(0, 0, 0, 0.35);
+                border-radius: 14px;
+                overflow: hidden;
+            }
+
+            .mission-console-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 12px 14px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+            }
+
+            .mission-console-title {
+                display: flex;
+                align-items: baseline;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .mission-role {
+                font-size: 13px;
+                font-weight: 900;
+                letter-spacing: 0.2px;
+            }
+
+            .mission-tag {
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 0.7px;
+                text-transform: uppercase;
+                color: var(--accent);
+                opacity: 0.95;
+            }
+
+            .mission-terminal {
+                margin: 0;
+                padding: 14px;
+                font-family: "Fira Code", monospace;
+                font-size: 12px;
+                line-height: 1.65;
+                color: rgba(255, 255, 255, 0.82);
+                white-space: pre-wrap;
+                min-height: 160px;
+            }
+
+            .mission-terminal[data-typing="1"]::after {
+                content: "█";
+                margin-left: 3px;
+                color: rgba(254, 122, 0, 0.9);
+                animation: blink 1s steps(1) infinite;
+            }
+
+            .guide-empty {
+                color: var(--text-dim);
+                font-size: 12px;
+                line-height: 1.6;
+            }
+
+            @keyframes blink {
+                0%, 49% { opacity: 1; }
+                50%, 100% { opacity: 0; }
+            }
 
             /* ── UPLOAD BOX ── */
             .resume-upload-box {
@@ -339,11 +474,13 @@
                     <form onsubmit="event.preventDefault(); deploy();">
                         <div class="section-title">Media Tracks</div>
                         <div class="grid-2">
-                            <label class="role-check"><span>Video Editor</span><input type="checkbox" value="Video Editor" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
-                            <label class="role-check"><span>Graphic Designer (Thumbnail)</span><input type="checkbox" value="Graphic Designer (Thumbnail)" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
-                            <label class="role-check"><span>Social Media (Channel Manager)</span><input type="checkbox" value="Social Media (Channel Manager)" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
-                            <label class="role-check"><span>Content Writer (Scriptwriter)</span><input type="checkbox" value="Content Writer (Scriptwriter)" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
+                            <label class="role-check"><span>Content Writer (UPSC)</span><input type="checkbox" value="Content Writer (UPSC)" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
+                            <label class="role-check"><span>Graphic Designer (Canva)</span><input type="checkbox" value="Graphic Designer (Canva)" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
+                            <label class="role-check"><span>Video Editor (Reels + YouTube)</span><input type="checkbox" value="Video Editor (Reels + YouTube)" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
+                            <label class="role-check"><span>Social Media Manager (Instagram)</span><input type="checkbox" value="Social Media Manager (Instagram)" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
+                            <label class="role-check"><span>YouTube Manager</span><input type="checkbox" value="YouTube Manager" class="role-checkbox" style="accent-color:var(--accent);width:16px;height:16px" onchange="renderQuestions()"></label>
                         </div>
+                        <div id="track-guidance" class="track-guidance" aria-live="polite" style="margin-top: 18px;"></div>
 
                         <div class="section-title">Personal Information</div>
                         <div class="grid-2">
@@ -401,66 +538,237 @@
             const SHEET_URL =
                 "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
             const ROLE_QUESTIONS = {
-                "Video Editor": [
-                    {
-                        q: "Which software do you use (Premiere Pro, CapCut, etc.)?",
-                        t: "text",
-                        req: true,
-                    },
-                    {
-                        q: "How comfortable are you with sound design and music leveling?",
-                        t: "text",
-                        req: true,
-                    },
-                    {
-                        q: "Do you keep up with the latest transition trends on Reels/Shorts?",
-                        t: "text",
-                        req: true,
-                    },
-                    {
-                        q: "Typical turnaround time for a 60-second edited reel?",
-                        t: "text",
-                        req: true,
-                    },
+                "Content Writer (UPSC)": [
+                    { q: "Link to a folder with your UPSC samples (Reel script / YouTube script / Carousel)", t: "url", req: true },
+                    { q: "Write a 30–60 sec Reel script on any UPSC topic (hook + structure + CTA)", t: "textarea", req: true },
+                    { q: "Create 3 Prelims MCQs with explanations (any topic)", t: "textarea", req: true },
                 ],
-                "Graphic Designer (Thumbnail)": [
-                    {
-                        q: "Briefly describe your design style for click-through-rate",
-                        t: "text",
-                        req: true,
-                    },
-                    {
-                        q: "Which software do you use for daily design work?",
-                        t: "text",
-                        req: true,
-                    },
+                "Graphic Designer (Canva)": [
+                    { q: "Link to your design portfolio (Drive/Behance/Instagram)", t: "url", req: true },
+                    { q: "Are you comfortable making carousels in Canva?", t: "text", req: true },
+                    { q: "Link to 1 carousel / infographic you made (if any)", t: "url", req: false },
                 ],
-                "Social Media (Channel Manager)": [
-                    {
-                        q: "Do you know how to read YouTube insights to improve reach?",
-                        t: "text",
-                        req: true,
-                    },
-                    {
-                        q: "How do you stay updated with daily content trends?",
-                        t: "text",
-                        req: true,
-                    },
+                "Video Editor (Reels + YouTube)": [
+                    { q: "Link to an Instagram Reel you edited", t: "url", req: true },
+                    { q: "Link to a YouTube video you edited (short or long)", t: "url", req: false },
+                    { q: "Which editing software do you use? (Premiere/AE/CapCut etc.)", t: "text", req: true },
                 ],
-                "Content Writer (Scriptwriter)": [
-                    {
-                        q: "Do you prefer writing deep dives or short engaging hooks?",
-                        t: "text",
-                        req: true,
-                    },
-                    {
-                        q: "How do you use AI tools to outline scripts?",
-                        t: "text",
-                        req: true,
-                    },
+                "Social Media Manager (Instagram)": [
+                    { q: "Link to an Instagram page you managed (if any)", t: "url", req: false },
+                    { q: "Draft a 7-day posting plan (reels + carousels + stories) with timing + hashtags", t: "textarea", req: true },
+                    { q: "How will you track performance and suggest improvements? (reach/saves/engagement)", t: "textarea", req: true },
+                ],
+                "YouTube Manager": [
+                    { q: "Explain your upload workflow (title + tags + thumbnail + description)", t: "textarea", req: true },
+                    { q: "Basic YouTube SEO: how do you choose keywords?", t: "textarea", req: true },
+                    { q: "How do you track performance (views/watch time/CTR) and improve?", t: "textarea", req: true },
                 ],
             };
+
+            const ROLE_MISSIONS = {
+                "Content Writer (UPSC)": {
+                    tag: "Write & Structure",
+                    blocks: [
+                        { title: "Writes", items: ["Reel scripts (30–60 sec)", "YouTube scripts (5–15 min)", "Carousel content", "Captions"] },
+                        { title: "Formats", items: ["Mains answers (Intro–Body–Conclusion)", "Prelims MCQs with explanations"] },
+                    ],
+                },
+                "Graphic Designer (Canva)": {
+                    tag: "Design & Explain",
+                    blocks: [
+                        { title: "Creates", items: ["Carousel posts (educational slides)", "Infographics (flowcharts, mind maps)", "Thumbnails"] },
+                        { title: "Skills", items: ["Good knowledge of Canva"] },
+                    ],
+                },
+                "Video Editor (Reels + YouTube)": {
+                    tag: "Edit & Elevate",
+                    blocks: [
+                        { title: "Edits", items: ["Instagram reels", "YouTube videos (short + long)"] },
+                        { title: "Adds", items: ["Subtitles", "Transitions", "Background music"] },
+                    ],
+                },
+                "Social Media Manager (Instagram)": {
+                    tag: "Post & Grow",
+                    blocks: [
+                        {
+                            title: "Responsibilities",
+                            items: [
+                                "Post reels, carousels, stories daily with proper timing & hashtags",
+                                "Reply to comments & DMs, engage via polls, quizzes, Q&A",
+                                "Run campaigns & giveaways, follow UPSC trends",
+                                "Track performance (reach, saves, engagement) and suggest improvements",
+                                "Maintain brand tone & visual consistency"
+                            ],
+                        },
+                        {
+                            title: "Skills",
+                            items: [
+                                "Instagram growth knowledge",
+                                "Basic UPSC understanding",
+                                "Communication + engagement skills",
+                                "Basic analytics + design sense"
+                            ],
+                        },
+                    ],
+                },
+                "YouTube Manager": {
+                    tag: "Upload & Optimize",
+                    blocks: [
+                        {
+                            title: "Responsibilities",
+                            items: [
+                                "Upload videos (title, tags, thumbnail)",
+                                "Maintain posting schedule",
+                                "Track performance (views, watch time)",
+                                "Suggest content ideas"
+                            ],
+                        },
+                        { title: "Skills", items: ["Basic YouTube SEO", "Analytics understanding", "Consistency"] },
+                    ],
+                },
+            };
+
             let fieldStore = [];
+            let activeMissionRole = "";
+            let missionTypingSeq = 0;
+
+            function getSelectedRoles() {
+                return Array.from(document.querySelectorAll(".role-checkbox:checked")).map(cb => cb.value);
+            }
+
+            function getMissionText(role) {
+                const mission = ROLE_MISSIONS[role] || { tag: "Track", blocks: [] };
+                const qs = ROLE_QUESTIONS[role] || [];
+                const required = qs.filter((q) => q.req);
+                const optional = qs.filter((q) => !q.req);
+
+                const lines = [];
+                lines.push("> booting mission console...");
+                lines.push(`> path unlocked: ${role}  [${mission.tag}]`);
+                lines.push("");
+
+                const blocks = (mission.blocks && mission.blocks.length)
+                    ? mission.blocks
+                    : [{ title: "Objectives", items: [] }];
+
+                blocks.forEach((b) => {
+                    const items = (b.items && b.items.length) ? b.items : ["Role details will be shared after screening."];
+                    lines.push(`> ${String(b.title || "Objectives").toUpperCase()} (${items.length})`);
+                    items.forEach((t, idx) => {
+                        const n = String(idx + 1).padStart(2, "0");
+                        lines.push(`${n} ▸ ${t}`);
+                    });
+                    lines.push("");
+                });
+
+                lines.push(`> SUBMIT (${required.length} required${optional.length ? `, ${optional.length} optional` : ""})`);
+                if (!qs.length) {
+                    lines.push("01 ▸ No additional assessment for this track.");
+                } else {
+                    qs.forEach((q, idx) => {
+                        const n = String(idx + 1).padStart(2, "0");
+                        lines.push(`${n} ▸ ${q.q} ${q.req ? "[REQ]" : "[OPT]"}`);
+                    });
+                }
+                lines.push("");
+                lines.push("> tip: Fill the questions that appear below.");
+                return lines.join("\n");
+            }
+
+            function typeToTerminal(el, text) {
+                missionTypingSeq += 1;
+                const seq = missionTypingSeq;
+                const reducedMotion = window.matchMedia &&
+                    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+                el.setAttribute("data-typing", "1");
+                el.textContent = "";
+
+                if (reducedMotion) {
+                    el.textContent = text;
+                    el.setAttribute("data-typing", "0");
+                    return;
+                }
+
+                let i = 0;
+                const speed = 2;
+                function step() {
+                    if (seq !== missionTypingSeq) return;
+                    i = Math.min(text.length, i + speed);
+                    el.textContent = text.slice(0, i);
+                    if (i < text.length) requestAnimationFrame(step);
+                    else el.setAttribute("data-typing", "0");
+                }
+                requestAnimationFrame(step);
+            }
+
+            function updateTrackGuidance() {
+                document.querySelectorAll(".role-check").forEach((label) => {
+                    const cb = label.querySelector("input.role-checkbox");
+                    label.classList.toggle("selected", !!cb && cb.checked);
+                });
+
+                const selectedRoles = getSelectedRoles();
+                const box = document.getElementById("track-guidance");
+                if (!box) return;
+
+                if (!selectedRoles.length) {
+                    box.innerHTML = `
+                        <div class="track-guidance-title">
+                            <h4>Pick Your Path</h4>
+                            <div class="chip">Select a track to unlock</div>
+                        </div>
+                        <div class="guide-empty">
+                            Choose a track and we’ll generate a live “mission console” with your responsibilities + what you need to submit.
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!activeMissionRole || !selectedRoles.includes(activeMissionRole)) {
+                    activeMissionRole = selectedRoles[0];
+                }
+
+                const tabs = selectedRoles
+                    .map((role) => {
+                        const active = role === activeMissionRole ? "active" : "";
+                        return `<button type="button" class="mission-tab ${active}" data-role="${role}">${role}</button>`;
+                    })
+                    .join("");
+
+                const activeMission = ROLE_MISSIONS[activeMissionRole] || { tag: "Track" };
+
+                box.innerHTML = `
+                    <div class="track-guidance-title">
+                        <h4>Mission Console</h4>
+                        <div class="chip">${selectedRoles.length} track${selectedRoles.length > 1 ? "s" : ""} selected</div>
+                    </div>
+                    <div class="mission-tabs">${tabs}</div>
+                    <div class="mission-console">
+                        <div class="mission-console-head">
+                            <div class="mission-console-title">
+                                <div class="mission-role">${activeMissionRole}</div>
+                                <div class="mission-tag">${activeMission.tag || "Track"}</div>
+                            </div>
+                            <div class="chip">live preview</div>
+                        </div>
+                        <pre id="missionTerminal" class="mission-terminal" data-typing="0"></pre>
+                    </div>
+                `;
+
+                box.querySelectorAll(".mission-tab").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const role = btn.getAttribute("data-role");
+                        if (!role || role === activeMissionRole) return;
+                        activeMissionRole = role;
+                        updateTrackGuidance();
+                        renderQuestions();
+                    });
+                });
+
+                const term = document.getElementById("missionTerminal");
+                if (term) typeToTerminal(term, getMissionText(activeMissionRole));
+            }
             function renderQuestions() {
                 const c = document.getElementById("dynamic-questions");
                 if (!c) return;
@@ -492,6 +800,38 @@
                         });
                         c.appendChild(w);
                     });
+            }
+
+            function renderQuestions() {
+                updateTrackGuidance();
+
+                const c = document.getElementById("dynamic-questions");
+                if (!c) return;
+                c.innerHTML = "";
+                fieldStore = [];
+                let qi = 0;
+
+                getSelectedRoles().forEach((role) => {
+                    const qs = ROLE_QUESTIONS[role] || [];
+                    const w = document.createElement("div");
+                    w.className = "form-block space-y";
+                    w.innerHTML = `<div class="form-block-title">04 // ${role} — Questions</div>`;
+
+                    qs.forEach((q) => {
+                        const id = "yt_q_" + qi++;
+                        fieldStore.push({ id, role, label: q.q, req: q.req });
+                        const star = q.req ? '<span class="req">*</span>' : "";
+                        const d = document.createElement("div");
+                        const requiredAttr = q.req ? "required" : "";
+                        const field =
+                            q.t === "textarea"
+                                ? `<textarea id="${id}" class="form-input" rows="3" ${requiredAttr}></textarea>`
+                                : `<input type="${q.t || "text"}" id="${id}" class="form-input" ${requiredAttr}>`;
+                        d.innerHTML = `<label class="field-label">${q.q} ${star}</label>${field}`;
+                        w.appendChild(d);
+                    });
+                    c.appendChild(w);
+                });
             }
             /*
             function updateKulaResume() {
@@ -694,9 +1034,78 @@
         btn.disabled = false;
     }
 }
-            /* Particles */
-            const canvas = document.getElementById("particles"),
-                ctx = canvas.getContext("2d");
+	            async function deploy() {
+	                const selectedRoles = getSelectedRoles();
+	                if (selectedRoles.length === 0)
+	                    return alert("Please select at least one media track.");
+
+	                const req = ["yt_first", "yt_email", "yt_phone", "yt_city", "yt_linkedin", "yt_why"];
+	                for (let id of req) {
+	                    if (!document.getElementById(id).value)
+	                        return alert("System Error: Missing mandatory fields.");
+	                }
+	                if (!document.getElementById("acknowledge").checked)
+	                    return alert("System Error: Must acknowledge terms.");
+
+	                for (let f of fieldStore) {
+	                    if (f.req && !document.getElementById(f.id).value) {
+	                        return alert(`System Error: Missing answer for ${f.role} -> ${f.label}`);
+	                    }
+	                }
+
+	                const btn = document.getElementById("submitBtn");
+	                btn.innerText = "pushing_to_cloud...";
+	                btn.disabled = true;
+
+	                const roleAnswers = [];
+	                fieldStore.forEach((f) => {
+	                    roleAnswers.push({
+	                        q: `[${f.role}] ${f.label}`,
+	                        a: document.getElementById(f.id).value,
+	                    });
+	                });
+
+	                const { resume_name, resume_data } = await getResumeData();
+
+	                const payload = {
+	                    action: "CREATE",
+	                    department: "Media",
+	                    roles: selectedRoles.join(", "),
+	                    first_name: document.getElementById("yt_first").value,
+	                    last_name: document.getElementById("yt_last").value,
+	                    email: document.getElementById("yt_email").value,
+	                    phone: document.getElementById("yt_phone").value,
+	                    city: document.getElementById("yt_city").value,
+	                    linkedin: document.getElementById("yt_linkedin").value,
+	                    portfolio: document.getElementById("yt_portfolio").value,
+	                    why_join: document.getElementById("yt_why").value,
+	                    answers: roleAnswers,
+	                    resume_name: resume_name,
+	                    resume_data: resume_data,
+	                };
+
+	                try {
+	                    await fetch(SHEET_URL, {
+	                        method: "POST",
+	                        mode: "no-cors",
+	                        body: JSON.stringify(payload),
+	                        headers: { "Content-Type": "application/json" },
+	                    });
+	                    document.getElementById("form-content").style.display = "none";
+	                    document.getElementById("success-msg").style.display = "block";
+	                    window.scrollTo(0, 0);
+	                } catch (e) {
+	                    alert("Network Error: Failed to reach deployment server.");
+	                    btn.innerText = "Apply for this position";
+	                    btn.disabled = false;
+	                }
+	            }
+
+	            updateTrackGuidance();
+
+	            /* Particles */
+	            const canvas = document.getElementById("particles"),
+	                ctx = canvas.getContext("2d");
             let particles = [];
             function resizeCanvas() {
                 canvas.width = window.innerWidth;

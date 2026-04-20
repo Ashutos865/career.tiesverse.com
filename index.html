@@ -277,13 +277,51 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--text);
-            margin-bottom: 4px
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .role-badge {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.03);
+            white-space: nowrap
+        }
+
+        .role-badge.closed {
+            border-color: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.02)
         }
 
         .role-row .role-meta {
             font-size: 11px;
             color: var(--text-dim);
             letter-spacing: 0.3px
+        }
+
+        .role-row.closed {
+            opacity: 0.55;
+            cursor: not-allowed
+        }
+
+        .role-row.closed:hover {
+            background: transparent
+        }
+
+        .apply-btn.disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-dim);
+            cursor: not-allowed;
+            pointer-events: none
         }
 
         .role-row .role-meta span {
@@ -514,7 +552,7 @@
                     </svg>
                 </div>
                 <div class="dept-roles">
-                    <div class="role-row" onclick="navigate('content-portal.html')">
+                    <div class="role-row" data-role-id="content_editor" onclick="navigate('content-portal.html')">
                         <div>
                             <div class="role-title">Content Editor</div>
                             <div class="role-meta">Content<span>•</span>Remote,
@@ -523,10 +561,19 @@
                         <a href="content-portal.html" class="apply-btn"
                             onclick="event.stopPropagation()">Apply Now</a>
                     </div>
-                    <div class="role-row" onclick="navigate('content-portal.html')">
+                    <div class="role-row" data-role-id="content_writer_upsc" onclick="navigate('content-portal.html')">
                         <div>
-                            <div class="role-title">Content Writer</div>
+                            <div class="role-title">Content Writer (UPSC)</div>
                             <div class="role-meta">Content<span>•</span>Remote,
+                                India<span>•</span>Internship<span>•</span>Remote</div>
+                        </div>
+                        <a href="content-portal.html" class="apply-btn"
+                            onclick="event.stopPropagation()">Apply Now</a>
+                    </div>
+                    <div class="role-row" data-role-id="upsc_strategist" onclick="navigate('content-portal.html')">
+                        <div>
+                            <div class="role-title">UPSC Content Researcher and Strategist</div>
+	                            <div class="role-meta">Content<span>•</span>Remote,
                                 India<span>•</span>Internship<span>•</span>Remote</div>
                         </div>
                         <a href="content-portal.html" class="apply-btn"
@@ -544,16 +591,16 @@
                     </svg>
                 </div>
                 <div class="dept-roles">
-                    <div class="role-row" onclick="navigate('content-portal.html')">
+                    <div class="role-row" data-role-id="graphic_designer_canva" onclick="navigate('content-portal.html')">
                         <div>
-                            <div class="role-title">Graphics Designer</div>
+                            <div class="role-title">Graphic Designer (Canva)</div>
                             <div class="role-meta">Design<span>•</span>Remote,
                                 India<span>•</span>Internship<span>•</span>Remote</div>
                         </div>
                         <a href="content-portal.html" class="apply-btn"
                             onclick="event.stopPropagation()">Apply Now</a>
                     </div>
-                    <div class="role-row" onclick="navigate('content-portal.html')">
+                    <div class="role-row" data-role-id="uiux_designer" onclick="navigate('content-portal.html')">
                         <div>
                             <div class="role-title">UI/UX Designer</div>
                             <div class="role-meta">Design<span>•</span>Remote,
@@ -574,18 +621,27 @@
                     </svg>
                 </div>
                 <div class="dept-roles">
-                    <div class="role-row" onclick="navigate('youtube-portal.html')">
+                    <div class="role-row" data-role-id="video_editor_reels_yt" onclick="navigate('youtube-portal.html')">
                         <div>
-                            <div class="role-title">Video Editor</div>
+                            <div class="role-title">Video Editor (Reels + YouTube)</div>
                             <div class="role-meta">Media<span>•</span>Remote,
                                 India<span>•</span>Internship<span>•</span>Remote</div>
                         </div>
                         <a href="youtube-portal.html" class="apply-btn"
                             onclick="event.stopPropagation()">Apply Now</a>
                     </div>
-                    <div class="role-row" onclick="navigate('youtube-portal.html')">
+                    <div class="role-row" data-role-id="social_media_manager_ig" onclick="navigate('youtube-portal.html')">
                         <div>
-                            <div class="role-title">Social Media Management</div>
+                            <div class="role-title">Social Media Manager (Instagram)</div>
+                            <div class="role-meta">Media<span>•</span>Remote,
+                                India<span>•</span>Internship<span>•</span>Remote</div>
+                        </div>
+                        <a href="youtube-portal.html" class="apply-btn"
+                            onclick="event.stopPropagation()">Apply Now</a>
+                    </div>
+                    <div class="role-row" data-role-id="youtube_manager" onclick="navigate('youtube-portal.html')">
+                        <div>
+                            <div class="role-title">YouTube Manager</div>
                             <div class="role-meta">Media<span>•</span>Remote,
                                 India<span>•</span>Internship<span>•</span>Remote</div>
                         </div>
@@ -604,7 +660,7 @@
                     </svg>
                 </div>
                 <div class="dept-roles">
-                    <div class="role-row" onclick="navigate('hr-portal.html')">
+                    <div class="role-row" data-role-id="hr" onclick="navigate('hr-portal.html')">
                         <div>
                             <div class="role-title">Human Resource (HR)</div>
                             <div class="role-meta">Operations<span>•</span>Remote,
@@ -612,7 +668,7 @@
                         </div>
                         <a href="hr-portal.html" class="apply-btn" onclick="event.stopPropagation()">Apply Now</a>
                     </div>
-                    <div class="role-row" onclick="navigate('hr-portal.html')">
+                    <div class="role-row" data-role-id="marketing_outreach" onclick="navigate('hr-portal.html')">
                         <div>
                             <div class="role-title">Marketing & Outreach</div>
                             <div class="role-meta">Operations<span>•</span>Remote,
@@ -621,18 +677,26 @@
                         <a href="hr-portal.html" class="apply-btn"
                             onclick="event.stopPropagation()">Apply Now</a>
                     </div>
-                    <div class="role-row"
-                        onclick="navigate('hr-portal.html')">
+                    <div class="role-row" data-role-id="management_coordination" onclick="navigate('hr-portal.html')">
                         <div>
                             <div class="role-title">Management / Team Co-ordination</div>
                             <div class="role-meta">Operations<span>•</span>Remote,
                                 India<span>•</span>Internship<span>•</span>Remote</div>
                         </div>
-                        <a href="hr-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                </div>
-            </div>
+	                        <a href="hr-portal.html" class="apply-btn"
+	                            onclick="event.stopPropagation()">Apply Now</a>
+	                    </div>
+	                    <div class="role-row" data-role-id="collab_outreach" onclick="navigate('hr-portal.html')">
+	                        <div>
+	                            <div class="role-title">Collaboration &amp; Outreach Manager</div>
+	                            <div class="role-meta">Operations<span>•</span>Remote,
+	                                India<span>•</span>Internship<span>•</span>Remote</div>
+	                        </div>
+	                        <a href="hr-portal.html" class="apply-btn"
+	                            onclick="event.stopPropagation()">Apply Now</a>
+	                    </div>
+	                </div>
+	            </div>
 
             <!-- Tech -->
             <div class="dept-group" data-dept="tech">
@@ -643,13 +707,14 @@
                     </svg>
                 </div>
                 <div class="dept-roles">
-                    <div class="role-row" onclick="navigate('tech-portal.html')">
+                    <div class="role-row" data-role-id="tech_roles" onclick="navigate('tech-portal.html')">
                         <div>
                             <div class="role-title">Tech Roles</div>
                             <div class="role-meta">Tech<span>•</span>Remote,
                                 India<span>•</span>Internship<span>•</span>Remote</div>
                         </div>
-                        <a href="tech-portal.html" class="apply-btn" onclick="event.stopPropagation()">Apply Now</a>
+                        <a href="tech-portal.html" class="apply-btn"
+                            onclick="event.stopPropagation()">Apply Now</a>
                     </div>
                 </div>
             </div>
@@ -719,57 +784,151 @@
             });
         }
 
-        /* Particles */
-        const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = Math.max(document.body.scrollHeight, window.innerHeight);
+        /* Open/Closed flags */
+        const ROLE_OPEN = {
+            tech_roles: false,
+        };
+
+        function setRoleClosed(row) {
+            row.classList.add('closed');
+
+            const title = row.querySelector('.role-title');
+            if (title && !title.querySelector('.role-badge')) {
+                const badge = document.createElement('span');
+                badge.className = 'role-badge closed';
+                badge.textContent = 'Closed Now';
+                title.appendChild(badge);
+            }
+
+            row.removeAttribute('onclick');
+
+            const apply = row.querySelector('a.apply-btn');
+            if (apply) {
+                apply.classList.add('disabled');
+                apply.textContent = 'Closed';
+                apply.removeAttribute('href');
+                apply.setAttribute('aria-disabled', 'true');
+                apply.setAttribute('tabindex', '-1');
+            }
         }
+
+        function applyRoleFlags() {
+            document.querySelectorAll('.role-row[data-role-id]').forEach((row) => {
+                const id = row.getAttribute('data-role-id');
+                if (ROLE_OPEN[id] === false) setRoleClosed(row);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', applyRoleFlags);
+
+        /* Particles (performance-friendly) */
+        const canvas = document.getElementById('particles');
+        if (canvas) {
+        const ctx = canvas.getContext('2d', { alpha: true });
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+        const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+        const enableParticles = !prefersReducedMotion && !(isSmallScreen && isCoarsePointer);
+
+        let particles = [];
+        let rafId = null;
+        let lastFrameTs = 0;
+        const targetFps = isSmallScreen ? 22 : 30;
+        const frameInterval = 1000 / targetFps;
+
+        function resizeCanvas() {
+            const dprCap = isSmallScreen ? 1 : 1.5;
+            const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
+            const w = Math.floor(window.innerWidth);
+            const h = Math.floor(window.innerHeight);
+            canvas.width = Math.floor(w * dpr);
+            canvas.height = Math.floor(h * dpr);
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
         function createParticles() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
             particles = [];
-            const count = Math.floor((canvas.width * canvas.height) / 20000);
+
+            const base = Math.floor((w * h) / 22000);
+            const maxCount = isSmallScreen ? 70 : 140;
+            const count = Math.max(24, Math.min(maxCount, base));
+
             for (let i = 0; i < count; i++) {
                 particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
+                    x: Math.random() * w,
+                    y: Math.random() * h,
                     r: Math.random() * 1 + 0.3,
-                    a: Math.random() * 0.3 + 0.05,
-                    dx: (Math.random() - 0.5) * 0.1,
-                    dy: (Math.random() - 0.5) * 0.1,
+                    a: Math.random() * 0.28 + 0.05,
+                    dx: (Math.random() - 0.5) * 0.08,
+                    dy: (Math.random() - 0.5) * 0.08,
                     ph: Math.random() * Math.PI * 2
                 });
             }
         }
-        function drawParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const t = Date.now() * 0.001;
-            particles.forEach(p => {
+
+        function tick(ts) {
+            rafId = requestAnimationFrame(tick);
+            if (ts - lastFrameTs < frameInterval) return;
+            lastFrameTs = ts;
+
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            ctx.clearRect(0, 0, w, h);
+            const t = ts * 0.001;
+
+            for (const p of particles) {
                 p.x += p.dx; p.y += p.dy;
-                if (p.x < 0) p.x = canvas.width;
-                if (p.x > canvas.width) p.x = 0;
-                if (p.y < 0) p.y = canvas.height;
-                if (p.y > canvas.height) p.y = 0;
+                if (p.x < 0) p.x = w;
+                if (p.x > w) p.x = 0;
+                if (p.y < 0) p.y = h;
+                if (p.y > h) p.y = 0;
+
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(255,255,255,${p.a * (0.6 + 0.4 * Math.sin(t + p.ph))})`;
                 ctx.fill();
-            });
-            requestAnimationFrame(drawParticles);
+            }
         }
-        window.addEventListener('resize', () => { resizeCanvas(); createParticles(); });
-        resizeCanvas(); createParticles(); drawParticles();
-    </script>
-    <!-- Smooth Scrolling -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
-    <script>
-        const lenis = new Lenis()
-        function raf(time) {
-            lenis.raf(time)
-            requestAnimationFrame(raf)
+
+        function startParticles() {
+            if (!enableParticles) {
+                canvas.style.display = 'none';
+                return;
+            }
+            resizeCanvas();
+            createParticles();
+            if (rafId) cancelAnimationFrame(rafId);
+            lastFrameTs = 0;
+            rafId = requestAnimationFrame(tick);
         }
-        requestAnimationFrame(raf)
+
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            if (!enableParticles) return;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                resizeCanvas();
+                createParticles();
+            }, 120);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!enableParticles) return;
+            if (document.hidden) {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = null;
+            } else {
+                startParticles();
+            }
+        });
+
+        startParticles();
+        }
     </script>
 </body>
 

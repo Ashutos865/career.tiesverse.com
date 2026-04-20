@@ -198,6 +198,178 @@
             }
             .role-check:hover { border-color: var(--accent); }
             .role-check span { font-size: 14px; font-weight: 500; }
+            .role-check.selected {
+                border-color: rgba(254, 122, 0, 0.6);
+                background: rgba(254, 122, 0, 0.04);
+                box-shadow: 0 0 0 1px rgba(254, 122, 0, 0.12) inset;
+            }
+
+            .track-guidance {
+                margin-top: 18px;
+                border: 1px solid var(--border);
+                background: rgba(255, 255, 255, 0.02);
+                border-radius: 12px;
+                padding: 18px;
+            }
+            .track-guidance-title {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            .track-guidance-title h4 {
+                font-size: 14px;
+                font-weight: 700;
+                letter-spacing: 0.2px;
+            }
+            .chip {
+                font-size: 11px;
+                color: var(--text-dim);
+                border: 1px solid var(--border);
+                padding: 6px 10px;
+                border-radius: 999px;
+                white-space: nowrap;
+            }
+            .mission-tabs {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-bottom: 14px;
+            }
+            .mission-tab {
+                appearance: none;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                background: rgba(0, 0, 0, 0.25);
+                color: var(--text);
+                font-family: inherit;
+                font-size: 12px;
+                font-weight: 700;
+                padding: 8px 12px;
+                border-radius: 999px;
+                cursor: pointer;
+                transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+            }
+            .mission-tab:hover {
+                border-color: rgba(254, 122, 0, 0.6);
+                transform: translateY(-1px);
+            }
+            .mission-tab.active {
+                border-color: rgba(254, 122, 0, 0.85);
+                background: rgba(254, 122, 0, 0.10);
+                box-shadow: 0 0 0 1px rgba(254, 122, 0, 0.10) inset;
+            }
+            .mission-console {
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                background: rgba(0, 0, 0, 0.35);
+                border-radius: 14px;
+                overflow: hidden;
+            }
+            .mission-console-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 12px 14px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+            }
+            .mission-console-title {
+                display: flex;
+                align-items: baseline;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .mission-role {
+                font-size: 13px;
+                font-weight: 900;
+                letter-spacing: 0.2px;
+            }
+            .mission-tag {
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 0.7px;
+                text-transform: uppercase;
+                color: var(--accent);
+                opacity: 0.95;
+            }
+            .mission-terminal {
+                margin: 0;
+                padding: 14px;
+                font-family: "Fira Code", monospace;
+                font-size: 12px;
+                line-height: 1.65;
+                color: rgba(255, 255, 255, 0.82);
+                white-space: pre-wrap;
+                min-height: 160px;
+            }
+            .mission-terminal[data-typing="1"]::after {
+                content: "█";
+                margin-left: 3px;
+                color: rgba(254, 122, 0, 0.9);
+                animation: blink 1s steps(1) infinite;
+            }
+            @keyframes blink {
+                0%, 49% { opacity: 1; }
+                50%, 100% { opacity: 0; }
+            }
+            .guide-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .guide-card {
+                border: 1px solid rgba(255, 255, 255, 0.06);
+                background: rgba(0, 0, 0, 0.25);
+                border-radius: 12px;
+                padding: 14px;
+            }
+            .guide-card-head {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            .guide-role {
+                font-size: 13px;
+                font-weight: 800;
+            }
+            .guide-tag {
+                font-size: 11px;
+                color: var(--accent);
+                letter-spacing: 0.6px;
+                text-transform: uppercase;
+                opacity: 0.9;
+                white-space: nowrap;
+            }
+            .guide-cols {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+            .guide-col-title {
+                font-size: 12px;
+                font-weight: 700;
+                color: var(--text);
+                margin-bottom: 6px;
+            }
+            .guide-list {
+                margin: 0;
+                padding-left: 18px;
+                color: var(--text-dim);
+                font-size: 12px;
+                line-height: 1.6;
+            }
+            .guide-empty {
+                color: var(--text-dim);
+                font-size: 12px;
+                line-height: 1.6;
+            }
+
+            @media (max-width: 768px) {
+                .guide-cols { grid-template-columns: 1fr; }
+            }
 
             /* ── UPLOAD BOX ── */
             .resume-upload-box {
@@ -339,12 +511,14 @@
                     <form onsubmit="event.preventDefault(); deploy();">
                         <div class="section-title">Creative Tracks</div>
                         <div class="grid-2">
-                            <label class="role-check"><span>Content Writer</span><input type="checkbox" value="Content Writer" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
-                            <label class="role-check"><span>Video Editor</span><input type="checkbox" value="Video Editor" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
-                            <label class="role-check"><span>Graphic Designer</span><input type="checkbox" value="Graphic Designer" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
-                            <label class="role-check"><span>Social Media Manager</span><input type="checkbox" value="Social Media Manager" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>Content Writer (UPSC)</span><input type="checkbox" value="Content Writer (UPSC)" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>Graphic Designer (Canva)</span><input type="checkbox" value="Graphic Designer (Canva)" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>Video Editor (Reels + YouTube)</span><input type="checkbox" value="Video Editor (Reels + YouTube)" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>Social Media Manager (Instagram)</span><input type="checkbox" value="Social Media Manager (Instagram)" class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
+                            <label class="role-check"><span>UPSC Content Researcher and Strategist</span><input type="checkbox" value="UPSC Content Researcher and Strategist " class="track-chk" style="accent-color:var(--accent);width:16px;height:16px" onchange="syncTracks()"></label>
                         </div>
                         <input type="hidden" id="roleInput">
+                        <div id="track-guidance" class="track-guidance" aria-live="polite"></div>
 
                         <div class="section-title">Personal Information</div>
                         <div class="grid-2">
@@ -406,28 +580,262 @@
             const SHEET_URL = "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
 
             const ROLE_QUESTION_BANK = {
-                "Content Writer": [
-                    { label: "Link to your best writing sample", type: "url", req: true },
-                    { label: "Can you adapt your tone for LinkedIn vs Twitter?", type: "text", req: true }
+                "Content Writer (UPSC)": [
+                    { label: "Link to a folder with your UPSC samples (Reel script / YouTube script / Carousel)", type: "url", req: true },
+                    { label: "Write a 30–60 sec Reel script on any UPSC topic (hook + structure + CTA)", type: "textarea", req: true },
+                    { label: "Create 3 Prelims MCQs with explanations (any topic)", type: "textarea", req: true },
+                    { label: "Write a short Mains answer (Intro–Body–Conclusion) in ~200 words (any topic)", type: "textarea", req: false }
                 ],
-                "Video Editor": [
-                    { label: "Link to a Reel/Short you edited", type: "url", req: true },
-                    { label: "Which editing software do you use?", type: "text", req: true }
+                "Graphic Designer (Canva)": [
+                    { label: "Link to your design portfolio (Drive/Behance/Instagram)", type: "url", req: true },
+                    { label: "Are you comfortable making carousels in Canva?", type: "text", req: true },
+                    { label: "Link to 1 carousel / infographic you made (if any)", type: "url", req: false }
                 ],
-                "Graphic Designer": [
-                    { label: "Link to your Behance / Design Portfolio", type: "url", req: true },
-                    { label: "Are you comfortable with Figma?", type: "text", req: true }
+                "Video Editor (Reels + YouTube)": [
+                    { label: "Link to an Instagram Reel you edited", type: "url", req: true },
+                    { label: "Link to a YouTube video you edited (short or long)", type: "url", req: false },
+                    { label: "Which editing software do you use? (Premiere/AE/CapCut etc.)", type: "text", req: true }
                 ],
-                "Social Media Manager": [
-                    { label: "Link to a page you managed (if any)", type: "url", req: false },
-                    { label: "Describe a viral campaign you loved", type: "textarea", req: true }
-                ]
+                "Social Media Manager (Instagram)": [
+                    { label: "Link to an Instagram page you managed (if any)", type: "url", req: false },
+                    { label: "Draft a 7-day posting plan (reels + carousels + stories) with timing + hashtags", type: "textarea", req: true },
+                    { label: "How will you track performance and suggest improvements? (reach/saves/engagement)", type: "textarea", req: true }
+                ],
+                "UPSC Content Researcher and Strategist": [
+                    { label: "Link to 1 sample (UPSC reel script / YouTube outline / carousel)", type: "url", req: true },
+                    { label: "Draft a weekly content calendar for Prelims + Mains + Interview (topics + format + posting frequency)", type: "textarea", req: true },
+                    { label: "How do you ensure accuracy + syllabus relevance? (sources + verification checklist)", type: "textarea", req: true }
+                ],
+            };
+
+            const ROLE_MISSIONS = {
+                "Content Writer (UPSC)": {
+                    tag: "Write & Structure",
+                    blocks: [
+                        {
+                            title: "Writes",
+                            items: [
+                                "Reel scripts (30–60 sec)",
+                                "YouTube scripts (5–15 min)",
+                                "Carousel content",
+                                "Captions"
+                            ],
+                        },
+                        {
+                            title: "Formats",
+                            items: [
+                                "Mains answers (Intro–Body–Conclusion)",
+                                "Prelims MCQs with explanations"
+                            ],
+                        },
+                    ],
+                },
+                "Graphic Designer (Canva)": {
+                    tag: "Design & Explain",
+                    blocks: [
+                        {
+                            title: "Creates",
+                            items: [
+                                "Carousel posts (educational slides)",
+                                "Infographics (flowcharts, mind maps)",
+                                "Thumbnails"
+                            ],
+                        },
+                        { title: "Skills", items: ["Good knowledge of Canva"] },
+                    ],
+                },
+                "Video Editor (Reels + YouTube)": {
+                    tag: "Edit & Elevate",
+                    blocks: [
+                        { title: "Edits", items: ["Instagram reels", "YouTube videos (short + long)"] },
+                        { title: "Adds", items: ["Subtitles", "Transitions", "Background music"] },
+                    ],
+                },
+                "Social Media Manager (Instagram)": {
+                    tag: "Post & Grow",
+                    blocks: [
+                        {
+                            title: "Responsibilities",
+                            items: [
+                                "Post reels, carousels, stories daily with proper timing & hashtags",
+                                "Reply to comments & DMs, engage via polls, quizzes, Q&A",
+                                "Run campaigns & giveaways, follow UPSC trends",
+                                "Track performance (reach, saves, engagement) and suggest improvements",
+                                "Maintain brand tone & visual consistency"
+                            ],
+                        },
+                        {
+                            title: "Skills",
+                            items: [
+                                "Instagram growth knowledge",
+                                "Basic UPSC understanding",
+                                "Communication + engagement skills",
+                                "Basic analytics + design sense"
+                            ],
+                        },
+                    ],
+                },
+                "UPSC Content Researcher and Strategist": {
+                    tag: "Strategy & Syllabus",
+                    blocks: [
+                        {
+                            title: "Responsibilities",
+                            items: [
+                                "Defines vision of TBA Instagram and YouTube platforms (Prelims + Mains + Interview focus)",
+                                "Plans monthly & weekly content calendar",
+                                "Ensures accuracy + syllabus relevance"
+                            ],
+                        },
+                    ],
+                },
             };
 
             function syncTracks() {
                 selectedTracks = Array.from(document.querySelectorAll(".track-chk:checked")).map(cb => cb.value);
                 document.getElementById("roleInput").value = selectedTracks.join(", ");
+                updateTrackGuidance();
                 renderDynamicQuestions();
+            }
+
+            let activeMissionRole = "";
+            let missionTypingSeq = 0;
+
+            function getRoleDisplayName(role) {
+                if (role === "UPSC Content Researcher and Strategist") return "UPSC Content Researcher and Strategist";
+                return role;
+            }
+
+            function getMissionText(role) {
+                const mission = ROLE_MISSIONS[role] || { tag: "Track", do: [] };
+                const qs = ROLE_QUESTION_BANK[role] || [];
+                const required = qs.filter((q) => q.req);
+                const optional = qs.filter((q) => !q.req);
+
+                const lines = [];
+                lines.push("> booting mission console...");
+                lines.push(`> path unlocked: ${getRoleDisplayName(role)}  [${mission.tag}]`);
+                lines.push("");
+                const blocks = (mission.blocks && mission.blocks.length)
+                    ? mission.blocks
+                    : [{ title: "Objectives", items: mission.do || [] }];
+
+                blocks.forEach((b) => {
+                    const items = (b.items && b.items.length) ? b.items : ["Role details will be shared after screening."];
+                    lines.push(`> ${String(b.title || "Objectives").toUpperCase()} (${items.length})`);
+                    items.forEach((t, idx) => {
+                        const n = String(idx + 1).padStart(2, "0");
+                        lines.push(`${n} \u25b8 ${t}`);
+                    });
+                    lines.push("");
+                });
+                lines.push(`> SUBMIT (${required.length} required${optional.length ? `, ${optional.length} optional` : ""})`);
+                if (!qs.length) {
+                    lines.push("01 \u25b8 No additional assessment for this track.");
+                } else {
+                    qs.forEach((q, idx) => {
+                        const n = String(idx + 1).padStart(2, "0");
+                        lines.push(`${n} \u25b8 ${q.label} ${q.req ? "[REQ]" : "[OPT]"}`);
+                    });
+                }
+                lines.push("");
+                lines.push("> tip: Fill the assessment fields that appear below.");
+                return lines.join("\n");
+            }
+
+            function typeToTerminal(el, text) {
+                missionTypingSeq += 1;
+                const seq = missionTypingSeq;
+                const reducedMotion = window.matchMedia &&
+                    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+                el.setAttribute("data-typing", "1");
+                el.textContent = "";
+
+                if (reducedMotion) {
+                    el.textContent = text;
+                    el.setAttribute("data-typing", "0");
+                    return;
+                }
+
+                let i = 0;
+                const speed = 2; // chars per frame (approx)
+                function step() {
+                    if (seq !== missionTypingSeq) return;
+                    i = Math.min(text.length, i + speed);
+                    el.textContent = text.slice(0, i);
+                    if (i < text.length) {
+                        requestAnimationFrame(step);
+                    } else {
+                        el.setAttribute("data-typing", "0");
+                    }
+                }
+                requestAnimationFrame(step);
+            }
+
+            function updateTrackGuidance() {
+                document.querySelectorAll(".role-check").forEach((label) => {
+                    const cb = label.querySelector("input.track-chk");
+                    label.classList.toggle("selected", !!cb && cb.checked);
+                });
+
+                const box = document.getElementById("track-guidance");
+                if (!box) return;
+
+                if (!selectedTracks.length) {
+                    box.innerHTML = `
+                        <div class="track-guidance-title">
+                            <h4>Pick Your Path</h4>
+                            <div class="chip">Select a track to unlock</div>
+                        </div>
+                        <div class="guide-empty">
+                            Choose a creative track and we’ll generate a live “mission console” with your objectives + what you need to submit.
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!activeMissionRole || !selectedTracks.includes(activeMissionRole)) {
+                    activeMissionRole = selectedTracks[0];
+                }
+
+                const tabs = selectedTracks
+                    .map((role) => {
+                        const active = role === activeMissionRole ? "active" : "";
+                        return `<button type="button" class="mission-tab ${active}" data-role="${role}">${getRoleDisplayName(role)}</button>`;
+                    })
+                    .join("");
+
+                const activeMission = ROLE_MISSIONS[activeMissionRole] || { tag: "Track" };
+
+                box.innerHTML = `
+                    <div class="track-guidance-title">
+                        <h4>Mission Console</h4>
+                        <div class="chip">${selectedTracks.length} track${selectedTracks.length > 1 ? "s" : ""} selected</div>
+                    </div>
+                    <div class="mission-tabs">${tabs}</div>
+                    <div class="mission-console">
+                        <div class="mission-console-head">
+                            <div class="mission-console-title">
+                                <div class="mission-role">${getRoleDisplayName(activeMissionRole)}</div>
+                                <div class="mission-tag">${activeMission.tag || "Track"}</div>
+                            </div>
+                            <div class="chip">live preview</div>
+                        </div>
+                        <pre id="missionTerminal" class="mission-terminal" data-typing="0"></pre>
+                    </div>
+                `;
+
+                box.querySelectorAll(".mission-tab").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const role = btn.getAttribute("data-role");
+                        if (!role || role === activeMissionRole) return;
+                        activeMissionRole = role;
+                        updateTrackGuidance();
+                    });
+                });
+
+                const term = document.getElementById("missionTerminal");
+                if (term) typeToTerminal(term, getMissionText(activeMissionRole));
             }
 
             function renderDynamicQuestions() {
@@ -448,7 +856,13 @@
                             roleFieldStore.push({ id, role, label: q.label, req: q.req });
                             const star = q.req ? '<span class="req">*</span>' : "";
                             const d = document.createElement("div");
-                            d.innerHTML = `<label class="field-label">${q.label} ${star}</label><input type="${q.type}" id="${id}" class="form-input" placeholder="${q.req ? '' : '(if any)'}" ${q.req ? "required" : ""}>`;
+                            const placeholder = q.req ? "" : "(if any)";
+                            const requiredAttr = q.req ? "required" : "";
+                            const fieldHtml =
+                                q.type === "textarea"
+                                    ? `<textarea id="${id}" class="form-input" rows="3" placeholder="${placeholder}" ${requiredAttr}></textarea>`
+                                    : `<input type="${q.type}" id="${id}" class="form-input" placeholder="${placeholder}" ${requiredAttr}>`;
+                            d.innerHTML = `<label class="field-label">${q.label} ${star}</label>${fieldHtml}`;
                             inner.appendChild(d);
                         });
                         w.appendChild(inner);
@@ -456,6 +870,8 @@
                     }
                 });
             }
+
+            updateTrackGuidance();
 
             function updateKulaResume() {
                 const input = document.getElementById("resume");
