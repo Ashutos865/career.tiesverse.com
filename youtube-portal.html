@@ -545,26 +545,73 @@
             </div>
         </div>
 
+        <script src="tv-config.js"></script>
+
         <script>
             const SHEET_URL =
-                "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
+                window.TV_APP_SCRIPT_URL;
+            if (!SHEET_URL) alert("Missing TV_APP_SCRIPT_URL in tv-config.js");
 
-            const FORM_GATE_STORAGE_KEY = "tv_form_gate_v1";
             const DEPARTMENT_ID = "Media";
-            function getFormGateConfig() {
+            let deptClosed = false;
+
+            function jsonp(url, params, timeoutMs = 15000) {
+                return new Promise((resolve, reject) => {
+                    const cb = `__tv_jsonp_${Date.now()}_${Math.random()
+                        .toString(16)
+                        .slice(2)}`;
+                    const query = new URLSearchParams({ ...(params || {}), callback: cb }).toString();
+                    const src = `${url}${url.includes("?") ? "&" : "?"}${query}`;
+
+                    const script = document.createElement("script");
+                    let done = false;
+
+                    function cleanup() {
+                        if (done) return;
+                        done = true;
+                        try {
+                            delete window[cb];
+                        } catch (_) {}
+                        try {
+                            script.remove();
+                        } catch (_) {}
+                    }
+
+                    const t = setTimeout(() => {
+                        cleanup();
+                        reject(new Error("JSONP timeout"));
+                    }, timeoutMs);
+
+                    window[cb] = (data) => {
+                        clearTimeout(t);
+                        cleanup();
+                        resolve(data);
+                    };
+
+                    script.onerror = () => {
+                        clearTimeout(t);
+                        cleanup();
+                        reject(new Error("JSONP load failed"));
+                    };
+                    script.src = src;
+                    document.head.appendChild(script);
+                });
+            }
+
+            async function fetchDeptStatus(email, phone) {
                 try {
-                    const raw = localStorage.getItem(FORM_GATE_STORAGE_KEY);
-                    return raw ? JSON.parse(raw) : {};
+                    return await jsonp(SHEET_URL, {
+                        action: "FORM_STATUS",
+                        department: DEPARTMENT_ID,
+                        email: email || "",
+                        phone: phone || "",
+                    });
                 } catch (_) {
-                    return {};
+                    return null;
                 }
             }
-            function isDeptClosed() {
-                const cfg = getFormGateConfig();
-                return cfg && cfg[DEPARTMENT_ID] === false;
-            }
             function applyDeptGateUI() {
-                if (!isDeptClosed()) return;
+                if (!deptClosed) return;
                 const form = document.getElementById("form-content");
                 const closed = document.getElementById("closed-msg");
                 const btn = document.getElementById("submitBtn");
@@ -576,11 +623,14 @@
                 if (closed) closed.style.display = "block";
                 window.scrollTo(0, 0);
             }
-            applyDeptGateUI();
+            fetchDeptStatus().then((res) => {
+                if (res && res.status === "success" && res.open === false) {
+                    deptClosed = true;
+                    applyDeptGateUI();
+                }
+            });
 
-            const SUBMISSION_GUARD_PREFIX = "tv_apply_once_v1";
             const DEDUP_WINDOW_DAYS = 30;
-            const DEDUP_WINDOW_MS = DEDUP_WINDOW_DAYS * 24 * 60 * 60 * 1000;
             let isSubmitting = false;
             function normalizeEmail(v) {
                 return String(v || "").trim().toLowerCase();
@@ -588,46 +638,19 @@
             function normalizePhone(v) {
                 return String(v || "").replace(/[^\d+]/g, "");
             }
-            function storageGet(key) {
-                try {
-                    return localStorage.getItem(key);
-                } catch (_) {
-                    return null;
-                }
+            function newRequestId() {
+                return `req_${Date.now().toString(36)}_${Math.random().toString(16).slice(2)}`;
             }
-            function storageSet(key, value) {
-                try {
-                    localStorage.setItem(key, value);
-                } catch (_) {}
-            }
-            function submissionKeys(department, email, phone) {
-                const keys = [];
-                if (email) keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:email:${email}`);
-                if (phone) keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:phone:${phone}`);
-                return keys;
-            }
-            function findExistingSubmission(department, email, phone) {
-                for (const key of submissionKeys(department, email, phone)) {
-                    const val = storageGet(key);
-                    if (!val) continue;
+            async function waitForRequestRecorded(requestId, timeoutMs = 15000) {
+                const start = Date.now();
+                while (Date.now() - start < timeoutMs) {
                     try {
-                        const rec = JSON.parse(val);
-                        if (rec && rec.ts && Date.now() - Number(rec.ts) < DEDUP_WINDOW_MS) {
-                            return { key, rec };
-                        }
-                    } catch (_) {
-                        return { key, rec: { ts: Date.now() } };
-                    }
+                        const res = await jsonp(SHEET_URL, { action: "CHECK_REQUEST", request_id: requestId });
+                        if (res && res.status === "success" && res.found === true) return true;
+                    } catch (_) {}
+                    await new Promise((r) => setTimeout(r, 800));
                 }
-                return null;
-            }
-            function markSubmitted(department, email, phone, meta) {
-                const record = JSON.stringify({
-                    ts: Date.now(),
-                    department,
-                    roles: meta?.roles || "",
-                });
-                for (const key of submissionKeys(department, email, phone)) storageSet(key, record);
+                return false;
             }
             const ROLE_QUESTIONS = {
                 "Content Writer (UPSC)": [
@@ -1025,7 +1048,7 @@
                     resume_data: resume_data,
                 };
                 fetch(
-                    "https://script.google.com/macros/s/AKfycbzcI1bgwov9ZetmC1Fu9N0wXmImQOhqSUA11ji_mpAsIMxkLGmW_Xizhvj9pKQkb0Qh/exec",
+                    SHEET_URL,
                     {
                         method: "POST",
                         mode: "no-cors",
@@ -1060,76 +1083,9 @@
                 }
             }
             async function deploy() {
-    // 1. Validation Checks
-    if (selectedTracks.length === 0) return alert("Please select at least one creative track.");
-
-    const req = ["content_name", "content_mail", "content_phone", "content_city", "content_linkedin", "why_join_content"];
-    for (let id of req) { 
-        if (!document.getElementById(id).value) return alert("System Error: Missing mandatory fields."); 
-    }
-    if (!document.getElementById("acknowledge").checked) return alert("System Error: Must acknowledge terms.");
-
-    for (let f of roleFieldStore) {
-        if (f.req && !document.getElementById(f.id).value) {
-            return alert(`System Error: Missing answer for ${f.role} -> ${f.label}`);
-        }
-    }
-
-    const btn = document.getElementById("submitBtn");
-    btn.innerText = "pushing_to_cloud...";
-    btn.disabled = true;
-
-    // 2. Format Answers for the Unified Backend
-    const roleAnswers = [];
-    roleFieldStore.forEach((f) => {
-        roleAnswers.push({
-            q: `[${f.role}] ${f.label}`,
-            a: document.getElementById(f.id).value,
-        });
-    });
-
-    // 3. Handle Optional Resume
-    const { resume_name, resume_data } = await getResumeData();
-
-    // 4. Build Unified Payload
-    const payload = {
-        action: "CREATE",
-        department: "Content", // Explicitly tags it for your master sheet
-        roles: document.getElementById("roleInput").value,
-        first_name: document.getElementById("content_name").value,
-        last_name: document.getElementById("content_last").value,
-        email: document.getElementById("content_mail").value,
-        phone: document.getElementById("content_phone").value,
-        city: document.getElementById("content_city").value,
-        linkedin: document.getElementById("content_linkedin").value,
-        portfolio: document.getElementById("content_portfolio").value,
-        why_join: document.getElementById("why_join_content").value,
-        answers: roleAnswers,
-        resume_name: resume_name,
-        resume_data: resume_data
-    };
-
-    // 5. Send to Google Sheets
-    try {
-        await fetch(SHEET_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify(payload),
-            headers: { "Content-Type": "application/json" }
-        });
-        document.getElementById("form-content").style.display = "none";
-        document.getElementById("success-msg").style.display = "block";
-        window.scrollTo(0, 0);
-    } catch (e) {
-        alert("Network Error: Failed to reach deployment server.");
-        btn.innerText = "Apply for this position";
-        btn.disabled = false;
-    }
-}
- 	            async function deploy() {
-                    if (isDeptClosed()) {
-                        return alert("Applications for this department are currently closed.");
-                    }
+                if (deptClosed) {
+                    return alert("Applications for this department are currently closed.");
+                }
 	                const selectedRoles = getSelectedRoles();
 	                if (selectedRoles.length === 0)
 	                    return alert("Please select at least one media track.");
@@ -1142,16 +1098,6 @@
 	                if (!document.getElementById("acknowledge").checked)
 	                    return alert("System Error: Must acknowledge terms.");
 
-                    if (isSubmitting) return;
-                    const emailNorm = normalizeEmail(document.getElementById("yt_email").value);
-                    const phoneNorm = normalizePhone(document.getElementById("yt_phone").value);
-                    const existing = findExistingSubmission("Media", emailNorm, phoneNorm);
-                    if (existing) {
-                        return alert(
-                            `You already applied for this post in the last ${DEDUP_WINDOW_DAYS} days. Please try again later.`,
-                        );
-                    }
-
 	                for (let f of fieldStore) {
 	                    if (f.req && !document.getElementById(f.id).value) {
 	                        return alert(`System Error: Missing answer for ${f.role} -> ${f.label}`);
@@ -1159,9 +1105,46 @@
 	                }
 
 	                const btn = document.getElementById("submitBtn");
-	                btn.innerText = "pushing_to_cloud...";
-	                btn.disabled = true;
+                    if (isSubmitting) return;
                     isSubmitting = true;
+
+                    const originalBtnText = btn ? btn.innerText : "Apply for this position";
+                    const resetSubmitState = () => {
+                        if (btn) {
+                            btn.innerText = originalBtnText;
+                            btn.disabled = false;
+                        }
+                        isSubmitting = false;
+                    };
+                    if (btn) {
+                        btn.innerText = "Submitting your application…";
+                        btn.disabled = true;
+                    }
+
+                    const requestId = newRequestId();
+                    const resumePromise = getResumeData();
+
+                    const emailNorm = normalizeEmail(document.getElementById("yt_email").value);
+                    const phoneNorm = normalizePhone(document.getElementById("yt_phone").value);
+
+                    let serverStatus = null;
+                    try {
+                        serverStatus = await fetchDeptStatus(emailNorm, phoneNorm);
+                    } catch (_) {}
+                    if (serverStatus && serverStatus.status === "success") {
+                        if (serverStatus.open === false) {
+                            deptClosed = true;
+                            applyDeptGateUI();
+                            resetSubmitState();
+                            return alert("Applications for this department are currently closed.");
+                        }
+                        if (serverStatus.duplicate === true) {
+                            resetSubmitState();
+                            return alert(
+                                `You already applied for this post in the last ${DEDUP_WINDOW_DAYS} days. Please try again later.`,
+                            );
+                        }
+                    }
 
 	                const roleAnswers = [];
 	                fieldStore.forEach((f) => {
@@ -1171,7 +1154,7 @@
 	                    });
 	                });
 
-	                const { resume_name, resume_data } = await getResumeData();
+	                const { resume_name, resume_data } = await resumePromise;
 
 	                const payload = {
 	                    action: "CREATE",
@@ -1188,6 +1171,7 @@
 	                    answers: roleAnswers,
 	                    resume_name: resume_name,
 	                    resume_data: resume_data,
+                        request_id: requestId,
 	                };
 
 	                try {
@@ -1195,17 +1179,17 @@
 	                        method: "POST",
 	                        mode: "no-cors",
 	                        body: JSON.stringify(payload),
-	                        headers: { "Content-Type": "application/json" },
 	                    });
-                        markSubmitted("Media", emailNorm, phoneNorm, { roles: payload.roles });
+                        const ok = await waitForRequestRecorded(requestId);
+                        if (!ok) {
+                            throw new Error("Submission not confirmed yet.");
+                        }
 	                    document.getElementById("form-content").style.display = "none";
 	                    document.getElementById("success-msg").style.display = "block";
 	                    window.scrollTo(0, 0);
 	                } catch (e) {
 	                    alert("Network Error: Failed to reach deployment server.");
-	                    btn.innerText = "Apply for this position";
-	                    btn.disabled = false;
-                        isSubmitting = false;
+                        resetSubmitState();
 	                }
 	            }
 

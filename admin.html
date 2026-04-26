@@ -102,9 +102,9 @@
 
         .btn-export:hover { opacity: 0.9; }
 
-        .btn-secondary {
+        .btn-ghost {
             background: transparent;
-            color: #fff;
+            color: var(--text);
             border: 1px solid #333;
             padding: 10px 16px;
             border-radius: 6px;
@@ -118,12 +118,9 @@
             white-space: nowrap;
         }
 
-        .btn-secondary:hover { border-color: #555; }
-
-        .toolbar-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent);
         }
 
         /* ── FORM GATES ── */
@@ -215,13 +212,6 @@
         .gate-badge.closed {
             border-color: rgba(255, 68, 68, 0.35);
             color: #ff6b6b;
-        }
-
-        .form-gate.in-modal {
-            margin: 0;
-            background: transparent;
-            padding: 0;
-            border: none;
         }
 
         .toggle {
@@ -394,14 +384,63 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
-        .modal.modal-lg {
+        .modal-lg {
             width: 760px;
-            max-width: 95%;
+            max-width: 94vw;
+            max-height: 86vh;
+            overflow: auto;
         }
 
-        .modal.modal-wide {
-            width: 980px;
-            max-width: 96%;
+        .details-grid {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 10px 14px;
+            margin-top: 14px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .details-label {
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .details-value a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .details-value a:hover { text-decoration: underline; }
+
+        .details-section {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .details-section h4 {
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .details-pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #0c0c0c;
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #e8e8e8;
+        }
+
+        .btn-details {
+            margin-top: 12px;
+            width: fit-content;
         }
 
         .modal-header {
@@ -423,69 +462,7 @@
         .modal-close:hover { color: #fff; }
 
         .modal-body { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
-
-        .modal-body.scroll {
-            max-height: 70vh;
-            overflow: auto;
-            padding-right: 6px;
-        }
-
-        .candidate-modal-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-
-        .candidate-modal-grid .box {
-            border: 1px solid #222;
-            background: #0f0f0f;
-            border-radius: 10px;
-            padding: 14px;
-        }
-
-        .box-title {
-            font-size: 11px;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-
-        .box-body {
-            font-size: 13px;
-            color: #ddd;
-            line-height: 1.6;
-        }
-
-        .mini-links {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .mini-links a {
-            color: #fff;
-            font-size: 12px;
-            text-decoration: none;
-            padding-bottom: 2px;
-            border-bottom: 1px solid var(--accent);
-        }
-
-        .btn-view {
-            margin-top: 14px;
-            background: rgba(254,122,0,0.12);
-            border: 1px solid rgba(254,122,0,0.35);
-            color: #fff;
-            padding: 9px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .btn-view:hover { opacity: 0.9; }
-         
+        
         .modal-row { display: flex; gap: 12px; }
         .modal-row > div { flex: 1; }
 
@@ -547,20 +524,11 @@
             </select>
         </div>
         
-        <div class="toolbar-actions">
-            <button class="btn-secondary" onclick="openSettingsModal()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
-                    <path d="M19.4 15a1.8 1.8 0 0 0 .35 1.98l.06.06a2.2 2.2 0 0 1 0 3.11 2.2 2.2 0 0 1-3.11 0l-.06-.06A1.8 1.8 0 0 0 15 19.4a1.8 1.8 0 0 0-1 .33 1.8 1.8 0 0 0-.73 1.48V21a2.2 2.2 0 0 1-4.4 0v-.09A1.8 1.8 0 0 0 9.4 19.4a1.8 1.8 0 0 0-1.98-.35l-.06.06a2.2 2.2 0 0 1-3.11 0 2.2 2.2 0 0 1 0-3.11l.06-.06A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-.33-1 1.8 1.8 0 0 0-1.48-.73H2.7a2.2 2.2 0 0 1 0-4.4h.09A1.8 1.8 0 0 0 4.6 9.4a1.8 1.8 0 0 0-.35-1.98l-.06-.06a2.2 2.2 0 0 1 0-3.11 2.2 2.2 0 0 1 3.11 0l.06.06A1.8 1.8 0 0 0 9.4 4.6a1.8 1.8 0 0 0 1-.33 1.8 1.8 0 0 0 .73-1.48V2.7a2.2 2.2 0 0 1 4.4 0v.09A1.8 1.8 0 0 0 14.6 4.6a1.8 1.8 0 0 0 1.98.35l.06-.06a2.2 2.2 0 0 1 3.11 0 2.2 2.2 0 0 1 0 3.11l-.06.06A1.8 1.8 0 0 0 19.4 9.4c.2.3.31.66.33 1.02 0 .35.13.68.35.94.24.28.58.44.94.44h.09a2.2 2.2 0 0 1 0 4.4H21a1.8 1.8 0 0 0-1.48.73c-.2.3-.31.66-.33 1.02z"></path>
-                </svg>
-                Settings
-            </button>
-
-            <button class="btn-export" onclick="openModal()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Download PDF Report
-            </button>
-        </div>
+        <button class="btn-export" onclick="openModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download PDF Report
+        </button>
+        <button class="btn-ghost" onclick="openSettingsModal()">Settings</button>
     </div>
 
     <div id="candidates-container">
@@ -611,32 +579,28 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal modal-lg">
+    <div class="modal-overlay" id="settingsModal" style="display:none;">
+        <div class="modal">
             <div class="modal-header">
                 Settings
                 <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
             </div>
-            <div class="modal-body scroll">
-                <div class="form-gate in-modal">
+            <div class="modal-body">
+                <p style="color: var(--text-dim); font-size: 12px; margin-bottom: 14px; line-height: 1.4;">
+                    Control which department forms are visible and accepting applications.
+                </p>
+                <div class="form-gate">
                     <div class="form-gate-head">
                         <div>
-                            <div class="form-gate-title">Application Forms</div>
-                            <div class="form-gate-sub">
-                                Open/close application forms. This switch is saved in this browser (admin device) and is useful for quickly pausing submissions.
-                            </div>
-                        </div>
-                        <div class="form-gate-actions">
-                            <button class="btn-cancel" onclick="setAllForms(true)">Open All</button>
-                            <button class="btn-cancel" onclick="setAllForms(false)">Close All</button>
-                            <button class="btn-export" onclick="saveFormGates()">Save</button>
+                            <div class="form-gate-title">Open / Close Application Forms</div>
+                            <div class="form-gate-sub">Changes apply instantly on the live forms.</div>
                         </div>
                     </div>
                     <div class="gate-grid">
                         <div class="gate-card">
                             <div>
                                 <div class="gate-name">Tech</div>
-                                <div class="gate-hint">Tech application form</div>
+                                <div class="gate-hint">Tech roles application form</div>
                             </div>
                             <div class="gate-right">
                                 <span id="gate-badge-Tech" class="gate-badge">—</span>
@@ -646,7 +610,6 @@
                                 </label>
                             </div>
                         </div>
-
                         <div class="gate-card">
                             <div>
                                 <div class="gate-name">Content</div>
@@ -660,7 +623,6 @@
                                 </label>
                             </div>
                         </div>
-
                         <div class="gate-card">
                             <div>
                                 <div class="gate-name">Media</div>
@@ -674,7 +636,6 @@
                                 </label>
                             </div>
                         </div>
-
                         <div class="gate-card">
                             <div>
                                 <div class="gate-name">Operations</div>
@@ -689,72 +650,175 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-gate in-modal" style="margin-top: 18px;">
-                    <div class="form-gate-head">
-                        <div>
-                            <div class="form-gate-title">Backend Key</div>
-                            <div class="form-gate-sub">
-                                Optional: used if you enable server-side settings updates. Saved only in this browser.
-                            </div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 12px;">
-                        <label style="display:block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px;">Admin Key</label>
-                        <input type="password" id="adminKeyInput" class="form-input" placeholder="Enter admin key (if configured)">
+                    <div class="form-gate-actions">
+                        <button class="btn-export" onclick="saveFormGates()">Save Gates</button>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeSettingsModal()">Close</button>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="candidateModal">
-        <div class="modal modal-wide">
+    <div class="modal-overlay" id="candidateModal" style="display:none;" onclick="if(event.target===this) closeCandidateModal()">
+        <div class="modal modal-lg">
             <div class="modal-header">
-                <span id="candidateModalTitle">Application</span>
+                Application Details
                 <button class="modal-close" onclick="closeCandidateModal()">&times;</button>
             </div>
-            <div class="modal-body scroll" id="candidateModalBody"></div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeCandidateModal()">Close</button>
-            </div>
+            <div class="modal-body" id="candidateModalBody"></div>
         </div>
     </div>
- 
-    <script>
-        const SHEET_URL = "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
+
+    <script src="tv-config.js"></script>
+
+  <script>
+        const SHEET_URL = window.TV_APP_SCRIPT_URL;
+        if (!SHEET_URL) alert("Missing TV_APP_SCRIPT_URL in tv-config.js");
         
         let globalCandidates = [];
+        const DEFAULT_FORM_GATES = { Tech: true, Content: true, Media: true, Operations: true };
+        let cachedFormGates = { ...DEFAULT_FORM_GATES };
 
-        const FORM_GATE_STORAGE_KEY = "tv_form_gate_v1";
-        const ADMIN_KEY_STORAGE_KEY = "tv_admin_key_v1";
-        const DEFAULT_FORM_GATES = {
-            Tech: true,
-            Content: true,
-            Media: true,
-            Operations: true,
-        };
-
-        function readFormGates() {
-            try {
-                const raw = localStorage.getItem(FORM_GATE_STORAGE_KEY);
-                const parsed = raw ? JSON.parse(raw) : {};
-                return { ...DEFAULT_FORM_GATES, ...parsed };
-            } catch (_) {
-                return { ...DEFAULT_FORM_GATES };
-            }
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, (ch) => {
+                switch (ch) {
+                    case "&": return "&amp;";
+                    case "<": return "&lt;";
+                    case ">": return "&gt;";
+                    case '"': return "&quot;";
+                    case "'": return "&#39;";
+                    default: return ch;
+                }
+            });
         }
 
-        function writeFormGates(gates) {
+        function isHttpUrl(value) {
+            return /^https?:\/\//i.test(String(value || "").trim());
+        }
+
+        function openCandidateDetails(rowIndex) {
+            const c = globalCandidates.find((x) => x.row_index === rowIndex);
+            if (!c) return;
+
+            const appliedAt = c.timestamp ? new Date(c.timestamp).toLocaleString() : "Unknown";
+            const fullName = `${c.first_name || ""} ${c.last_name || ""}`.trim() || "(No name)";
+
+            const resumeLink = String(c.resume_link || "").trim();
+            const linkedinLink = String(c.linkedin || "").trim();
+            const portfolioLink = String(c.portfolio || "").trim();
+
+            const links = [
+                isHttpUrl(resumeLink) ? `<a href="${escapeHtml(resumeLink)}" target="_blank" rel="noopener">Resume</a>` : "",
+                isHttpUrl(linkedinLink) ? `<a href="${escapeHtml(linkedinLink)}" target="_blank" rel="noopener">LinkedIn</a>` : "",
+                isHttpUrl(portfolioLink) ? `<a href="${escapeHtml(portfolioLink)}" target="_blank" rel="noopener">Portfolio</a>` : "",
+            ].filter(Boolean).join(" · ");
+
+            const body = `
+                <div style="font-size: 18px; font-weight: 800;">${escapeHtml(fullName)}</div>
+                <div style="color: var(--text-dim); font-size: 12px; margin-top: 4px;">
+                    ${escapeHtml(c.roles || "")}${c.department ? ` · ${escapeHtml(c.department)}` : ""}
+                </div>
+
+                <div class="details-grid">
+                    <div class="details-label">Applied</div>
+                    <div class="details-value">${escapeHtml(appliedAt)}</div>
+
+                    <div class="details-label">Email</div>
+                    <div class="details-value"><a href="mailto:${escapeHtml(c.email || "")}">${escapeHtml(c.email || "")}</a></div>
+
+                    <div class="details-label">Phone</div>
+                    <div class="details-value">${escapeHtml(c.phone || "")}</div>
+
+                    <div class="details-label">City</div>
+                    <div class="details-value">${escapeHtml(c.city || "")}</div>
+
+                    <div class="details-label">Links</div>
+                    <div class="details-value">${links || "<span style=\"color: var(--text-dim)\">—</span>"}</div>
+                </div>
+
+                <div class="details-section">
+                    <h4>Summary</h4>
+                    <pre class="details-pre">${escapeHtml(c.why_join || "—")}</pre>
+                </div>
+
+                <div class="details-section">
+                    <h4>Assessment</h4>
+                    <pre class="details-pre">${escapeHtml(c.answers || "No assessment data.")}</pre>
+                </div>
+            `;
+
+            const overlay = document.getElementById("candidateModal");
+            const container = document.getElementById("candidateModalBody");
+            if (container) container.innerHTML = body;
+            if (overlay) overlay.style.display = "flex";
+        }
+
+        function closeCandidateModal() {
+            const overlay = document.getElementById("candidateModal");
+            const container = document.getElementById("candidateModalBody");
+            if (container) container.innerHTML = "";
+            if (overlay) overlay.style.display = "none";
+        }
+
+        function jsonp(url, params, timeoutMs = 15000) {
+            return new Promise((resolve, reject) => {
+                const cb = `__tv_jsonp_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+                const query = new URLSearchParams({ ...(params || {}), callback: cb }).toString();
+                const src = `${url}${url.includes("?") ? "&" : "?"}${query}`;
+
+                const script = document.createElement("script");
+                let done = false;
+
+                function cleanup() {
+                    if (done) return;
+                    done = true;
+                    try {
+                        delete window[cb];
+                    } catch (_) {}
+                    try {
+                        script.remove();
+                    } catch (_) {}
+                }
+
+                const t = setTimeout(() => {
+                    cleanup();
+                    reject(new Error("JSONP timeout"));
+                }, timeoutMs);
+
+                window[cb] = (data) => {
+                    clearTimeout(t);
+                    cleanup();
+                    resolve(data);
+                };
+
+                script.onerror = () => {
+                    clearTimeout(t);
+                    cleanup();
+                    reject(new Error("JSONP load failed"));
+                };
+                script.src = src;
+                document.head.appendChild(script);
+            });
+        }
+
+        function openSettingsModal() {
+            document.getElementById("settingsModal").style.display = "flex";
+            loadFormGatesFromServer().finally(() => hydrateFormGateUI());
+        }
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").style.display = "none";
+        }
+
+        async function loadFormGatesFromServer() {
             try {
-                localStorage.setItem(FORM_GATE_STORAGE_KEY, JSON.stringify(gates));
+                const res = await jsonp(SHEET_URL, { action: "GET_FORM_GATES" });
+                if (res && res.status === "success" && res.gates) {
+                    cachedFormGates = { ...DEFAULT_FORM_GATES, ...res.gates };
+                }
             } catch (_) {}
         }
-
+        function readFormGates() {
+            return { ...DEFAULT_FORM_GATES, ...cachedFormGates };
+        }
         function updateGateBadge(dept, isOpen) {
             const badge = document.getElementById(`gate-badge-${dept}`);
             if (!badge) return;
@@ -762,7 +826,6 @@
             badge.classList.add(isOpen ? "open" : "closed");
             badge.textContent = isOpen ? "Open" : "Closed";
         }
-
         function hydrateFormGateUI() {
             const gates = readFormGates();
             ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
@@ -772,66 +835,32 @@
                 updateGateBadge(dept, cb.checked);
                 cb.onchange = () => updateGateBadge(dept, cb.checked);
             });
-
-            const keyInput = document.getElementById("adminKeyInput");
-            if (keyInput) {
-                try {
-                    keyInput.value = localStorage.getItem(ADMIN_KEY_STORAGE_KEY) || "";
-                } catch (_) {}
-            }
         }
-
         async function saveFormGates() {
-            const gates = readFormGates();
+            const gates = {};
             ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
                 const cb = document.getElementById(`gate-${dept}`);
                 if (!cb) return;
                 gates[dept] = !!cb.checked;
             });
-            writeFormGates(gates);
-
-            let adminKey = "";
-            const keyInput = document.getElementById("adminKeyInput");
-            if (keyInput) adminKey = String(keyInput.value || "").trim();
-            try {
-                localStorage.setItem(ADMIN_KEY_STORAGE_KEY, adminKey);
-            } catch (_) {}
-
-            // Optional server-side sync (works only if backend supports it)
+            cachedFormGates = { ...DEFAULT_FORM_GATES, ...gates };
             try {
                 await fetch(SHEET_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    body: JSON.stringify({
-                        action: "SET_FORM_GATES",
-                        admin_key: adminKey,
-                        gates,
-                    }),
+                    body: JSON.stringify({ action: "SET_FORM_GATES", gates }),
                 });
             } catch (_) {}
-
             alert("Saved.");
         }
 
-        function setAllForms(open) {
-            ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
-                const cb = document.getElementById(`gate-${dept}`);
-                if (!cb) return;
-                cb.checked = !!open;
-                updateGateBadge(dept, cb.checked);
-            });
-        }
-
         window.onload = () => {
-            hydrateFormGateUI();
-            fetchCandidates();
+            loadFormGatesFromServer().finally(() => fetchCandidates());
         };
-
         async function fetchCandidates() {
             const container = document.getElementById("candidates-container");
             try {
-                const response = await fetch(SHEET_URL, { method: 'GET', redirect: 'follow' });
-                const result = await response.json();
+                const result = await jsonp(SHEET_URL, { action: "GET_CANDIDATES" });
 
                 if (result.status === "success") {
                     globalCandidates = result.data.reverse(); 
@@ -886,21 +915,19 @@
             return `
             <div class="candidate-card" id="row-${c.row_index}">
                 <div class="info-col">
-                    <h3>${c.first_name} ${c.last_name || ''} <span class="date-stamp">(${appliedDate})</span></h3>
-                    <span class="role">${c.roles} | ${c.department || 'General'}</span>
-                    <p>📧 ${c.email}</p>
-                    <p>📱 ${c.phone} | 📍 ${c.city}</p>
+                    <h3>${escapeHtml(c.first_name || "")} ${escapeHtml(c.last_name || "")} <span class="date-stamp">(${escapeHtml(appliedDate)})</span></h3>
+                    <span class="role">${escapeHtml(c.roles || "")} | ${escapeHtml(c.department || "General")}</span>
+                    <p><strong style="color: var(--text-dim); font-weight: 600;">Email:</strong> ${escapeHtml(c.email || "")}</p>
+                    <p><strong style="color: var(--text-dim); font-weight: 600;">Phone:</strong> ${escapeHtml(c.phone || "")} &nbsp; <strong style="color: var(--text-dim); font-weight: 600;">City:</strong> ${escapeHtml(c.city || "")}</p>
                     
                     <div class="links">
-                        <a href="${c.resume_link}" target="_blank">Resume</a>
-                        <a href="${c.linkedin}" target="_blank">LinkedIn</a>
-                        ${c.portfolio ? `<a href="${c.portfolio}" target="_blank">Portfolio</a>` : ''}
+                        ${isHttpUrl(c.resume_link) ? `<a href="${escapeHtml(c.resume_link)}" target="_blank" rel="noopener">Resume</a>` : ``}
+                        ${isHttpUrl(c.linkedin) ? `<a href="${escapeHtml(c.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ``}
+                        ${isHttpUrl(c.portfolio) ? `<a href="${escapeHtml(c.portfolio)}" target="_blank" rel="noopener">Portfolio</a>` : ``}
                     </div>
 
-                    <button type="button" class="btn-view" onclick="openCandidateModal(${c.row_index})">
-                        View application
-                    </button>
-                </div>
+                    <button type="button" class="btn-ghost btn-details" onclick="openCandidateDetails(${c.row_index})">View details</button>
+              </div>
 
                 <div class="eval-col">
                     <label>Interview Status</label>
@@ -911,7 +938,7 @@
                     </select>
 
                     <label>Interviewer</label>
-                    <input type="text" class="form-input" id="interviewer-${c.row_index}" value="${c.interviewer || ''}">
+                    <input type="text" class="form-input" id="interviewer-${c.row_index}" value="${escapeHtml(c.interviewer || '')}">
 
                     <label>Rating</label>
                     <div class="star-rating">
@@ -930,7 +957,7 @@
                         <option value="Rejected" ${isRejected ? 'selected' : ''}>Rejected</option>
                     </select>
                     <div id="badge-${c.row_index}" class="status-badge ${isSelected ? 'status-Selected' : ''} ${isRejected ? 'status-Rejected' : ''}">
-                        ${c.final_decision}
+                        ${escapeHtml(c.final_decision)}
                     </div>
                     <button class="btn-save" id="btn-${c.row_index}" onclick="saveEvaluation(${c.row_index})">Save Evaluation</button>
                 </div>
@@ -970,6 +997,7 @@
             try {
                 await fetch(SHEET_URL, {
                     method: "POST",
+                    mode: "no-cors",
                     body: JSON.stringify(payload)
                 });
 
@@ -1003,101 +1031,6 @@
         // --- MODAL LOGIC ---
         function openModal() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('exportModal').style.display = 'none'; }
-
-        function openSettingsModal() {
-            hydrateFormGateUI();
-            document.getElementById("settingsModal").style.display = "flex";
-        }
-
-        function closeSettingsModal() {
-            document.getElementById("settingsModal").style.display = "none";
-        }
-
-        function closeCandidateModal() {
-            document.getElementById("candidateModal").style.display = "none";
-        }
-
-        function escapeHtml(v) {
-            return String(v ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/\"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function safeUrl(url) {
-            const u = String(url || "").trim();
-            if (!u) return "";
-            if (u.startsWith("http://") || u.startsWith("https://")) return u;
-            return "";
-        }
-
-        function linkTag(url, label) {
-            const safe = safeUrl(url);
-            if (!safe) return "";
-            return `<a href="${escapeHtml(safe)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
-        }
-
-        function openCandidateModal(rowId) {
-            const cand = globalCandidates.find((c) => String(c.row_index) === String(rowId));
-            if (!cand) return alert("Candidate not found.");
-
-            const appliedDate = cand.timestamp ? new Date(cand.timestamp).toLocaleString() : "Unknown date";
-            const title = `${cand.first_name || ""} ${cand.last_name || ""}`.trim() || "Application";
-            document.getElementById("candidateModalTitle").textContent = title;
-
-            const answers = cand.answers ? escapeHtml(cand.answers).replace(/\n/g, "<br>") : "No assessment data.";
-            const why = cand.why_join ? escapeHtml(cand.why_join).replace(/\n/g, "<br>") : "—";
-
-            const body = document.getElementById("candidateModalBody");
-            body.innerHTML = `
-                <div class="candidate-modal-grid">
-                    <div class="box">
-                        <div class="box-title">Details</div>
-                        <div class="box-body">
-                            <div><strong>Department:</strong> ${escapeHtml(cand.department || "General")}</div>
-                            <div><strong>Role(s):</strong> ${escapeHtml(cand.roles || "—")}</div>
-                            <div><strong>Applied:</strong> ${escapeHtml(appliedDate)}</div>
-                            <div><strong>City:</strong> ${escapeHtml(cand.city || "—")}</div>
-                        </div>
-                        <div class="mini-links">
-                            ${linkTag(cand.resume_link, "Resume")}
-                            ${linkTag(cand.linkedin, "LinkedIn")}
-                            ${cand.portfolio ? linkTag(cand.portfolio, "Portfolio") : ""}
-                        </div>
-                    </div>
-                    <div class="box">
-                        <div class="box-title">Contact</div>
-                        <div class="box-body">
-                            <div><strong>Email:</strong> ${escapeHtml(cand.email || "—")}</div>
-                            <div><strong>Phone:</strong> ${escapeHtml(cand.phone || "—")}</div>
-                        </div>
-                    </div>
-                    <div class="box" style="grid-column: 1 / -1;">
-                        <div class="box-title">Why Join</div>
-                        <div class="box-body">${why}</div>
-                    </div>
-                    <div class="box" style="grid-column: 1 / -1;">
-                        <div class="box-title">Assessment Answers</div>
-                        <div class="box-body">${answers}</div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById("candidateModal").style.display = "flex";
-        }
-
-        ["exportModal", "settingsModal", "candidateModal"].forEach((id) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.addEventListener("click", (e) => {
-                if (e.target !== el) return;
-                if (id === "exportModal") closeModal();
-                if (id === "settingsModal") closeSettingsModal();
-                if (id === "candidateModal") closeCandidateModal();
-            });
-        });
 
         // --- PDF GENERATION LOGIC ---
         function generatePDF() {
