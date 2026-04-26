@@ -102,6 +102,30 @@
 
         .btn-export:hover { opacity: 0.9; }
 
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #333;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-secondary:hover { border-color: #555; }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
         /* ── FORM GATES ── */
         .form-gate {
             margin-bottom: 18px;
@@ -191,6 +215,13 @@
         .gate-badge.closed {
             border-color: rgba(255, 68, 68, 0.35);
             color: #ff6b6b;
+        }
+
+        .form-gate.in-modal {
+            margin: 0;
+            background: transparent;
+            padding: 0;
+            border: none;
         }
 
         .toggle {
@@ -363,6 +394,16 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
+        .modal.modal-lg {
+            width: 760px;
+            max-width: 95%;
+        }
+
+        .modal.modal-wide {
+            width: 980px;
+            max-width: 96%;
+        }
+
         .modal-header {
             font-size: 18px;
             font-weight: 700;
@@ -382,7 +423,69 @@
         .modal-close:hover { color: #fff; }
 
         .modal-body { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
-        
+
+        .modal-body.scroll {
+            max-height: 70vh;
+            overflow: auto;
+            padding-right: 6px;
+        }
+
+        .candidate-modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .candidate-modal-grid .box {
+            border: 1px solid #222;
+            background: #0f0f0f;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        .box-title {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .box-body {
+            font-size: 13px;
+            color: #ddd;
+            line-height: 1.6;
+        }
+
+        .mini-links {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .mini-links a {
+            color: #fff;
+            font-size: 12px;
+            text-decoration: none;
+            padding-bottom: 2px;
+            border-bottom: 1px solid var(--accent);
+        }
+
+        .btn-view {
+            margin-top: 14px;
+            background: rgba(254,122,0,0.12);
+            border: 1px solid rgba(254,122,0,0.35);
+            color: #fff;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-view:hover { opacity: 0.9; }
+         
         .modal-row { display: flex; gap: 12px; }
         .modal-row > div { flex: 1; }
 
@@ -444,82 +547,19 @@
             </select>
         </div>
         
-        <button class="btn-export" onclick="openModal()">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Download PDF Report
-        </button>
-    </div>
+        <div class="toolbar-actions">
+            <button class="btn-secondary" onclick="openSettingsModal()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"></path>
+                    <path d="M19.4 15a1.8 1.8 0 0 0 .35 1.98l.06.06a2.2 2.2 0 0 1 0 3.11 2.2 2.2 0 0 1-3.11 0l-.06-.06A1.8 1.8 0 0 0 15 19.4a1.8 1.8 0 0 0-1 .33 1.8 1.8 0 0 0-.73 1.48V21a2.2 2.2 0 0 1-4.4 0v-.09A1.8 1.8 0 0 0 9.4 19.4a1.8 1.8 0 0 0-1.98-.35l-.06.06a2.2 2.2 0 0 1-3.11 0 2.2 2.2 0 0 1 0-3.11l.06-.06A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-.33-1 1.8 1.8 0 0 0-1.48-.73H2.7a2.2 2.2 0 0 1 0-4.4h.09A1.8 1.8 0 0 0 4.6 9.4a1.8 1.8 0 0 0-.35-1.98l-.06-.06a2.2 2.2 0 0 1 0-3.11 2.2 2.2 0 0 1 3.11 0l.06.06A1.8 1.8 0 0 0 9.4 4.6a1.8 1.8 0 0 0 1-.33 1.8 1.8 0 0 0 .73-1.48V2.7a2.2 2.2 0 0 1 4.4 0v.09A1.8 1.8 0 0 0 14.6 4.6a1.8 1.8 0 0 0 1.98.35l.06-.06a2.2 2.2 0 0 1 3.11 0 2.2 2.2 0 0 1 0 3.11l-.06.06A1.8 1.8 0 0 0 19.4 9.4c.2.3.31.66.33 1.02 0 .35.13.68.35.94.24.28.58.44.94.44h.09a2.2 2.2 0 0 1 0 4.4H21a1.8 1.8 0 0 0-1.48.73c-.2.3-.31.66-.33 1.02z"></path>
+                </svg>
+                Settings
+            </button>
 
-    <div class="form-gate">
-        <div class="form-gate-head">
-            <div>
-                <div class="form-gate-title">Application Forms</div>
-                <div class="form-gate-sub">
-                    Open/close application forms. This switch is saved in this browser (admin device) and is useful for quickly pausing submissions.
-                </div>
-            </div>
-            <div class="form-gate-actions">
-                <button class="btn-cancel" onclick="setAllForms(true)">Open All</button>
-                <button class="btn-cancel" onclick="setAllForms(false)">Close All</button>
-                <button class="btn-export" onclick="saveFormGates()">Save</button>
-            </div>
-        </div>
-        <div class="gate-grid">
-            <div class="gate-card">
-                <div>
-                    <div class="gate-name">Tech</div>
-                    <div class="gate-hint">Tech application form</div>
-                </div>
-                <div class="gate-right">
-                    <span id="gate-badge-Tech" class="gate-badge">—</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="gate-Tech">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="gate-card">
-                <div>
-                    <div class="gate-name">Content</div>
-                    <div class="gate-hint">Content roles application form</div>
-                </div>
-                <div class="gate-right">
-                    <span id="gate-badge-Content" class="gate-badge">—</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="gate-Content">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="gate-card">
-                <div>
-                    <div class="gate-name">Media</div>
-                    <div class="gate-hint">Media roles application form</div>
-                </div>
-                <div class="gate-right">
-                    <span id="gate-badge-Media" class="gate-badge">—</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="gate-Media">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="gate-card">
-                <div>
-                    <div class="gate-name">Operations</div>
-                    <div class="gate-hint">Operations roles application form</div>
-                </div>
-                <div class="gate-right">
-                    <span id="gate-badge-Operations" class="gate-badge">—</span>
-                    <label class="toggle">
-                        <input type="checkbox" id="gate-Operations">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
+            <button class="btn-export" onclick="openModal()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download PDF Report
+            </button>
         </div>
     </div>
 
@@ -571,6 +611,105 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                Settings
+                <button class="modal-close" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            <div class="modal-body scroll">
+                <div class="form-gate in-modal">
+                    <div class="form-gate-head">
+                        <div>
+                            <div class="form-gate-title">Application Forms</div>
+                            <div class="form-gate-sub">
+                                Open/close application forms. This switch is saved in this browser (admin device) and is useful for quickly pausing submissions.
+                            </div>
+                        </div>
+                        <div class="form-gate-actions">
+                            <button class="btn-cancel" onclick="setAllForms(true)">Open All</button>
+                            <button class="btn-cancel" onclick="setAllForms(false)">Close All</button>
+                            <button class="btn-export" onclick="saveFormGates()">Save</button>
+                        </div>
+                    </div>
+                    <div class="gate-grid">
+                        <div class="gate-card">
+                            <div>
+                                <div class="gate-name">Tech</div>
+                                <div class="gate-hint">Tech application form</div>
+                            </div>
+                            <div class="gate-right">
+                                <span id="gate-badge-Tech" class="gate-badge">—</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="gate-Tech">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="gate-card">
+                            <div>
+                                <div class="gate-name">Content</div>
+                                <div class="gate-hint">Content roles application form</div>
+                            </div>
+                            <div class="gate-right">
+                                <span id="gate-badge-Content" class="gate-badge">—</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="gate-Content">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="gate-card">
+                            <div>
+                                <div class="gate-name">Media</div>
+                                <div class="gate-hint">Media roles application form</div>
+                            </div>
+                            <div class="gate-right">
+                                <span id="gate-badge-Media" class="gate-badge">—</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="gate-Media">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="gate-card">
+                            <div>
+                                <div class="gate-name">Operations</div>
+                                <div class="gate-hint">Operations roles application form</div>
+                            </div>
+                            <div class="gate-right">
+                                <span id="gate-badge-Operations" class="gate-badge">—</span>
+                                <label class="toggle">
+                                    <input type="checkbox" id="gate-Operations">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeSettingsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="candidateModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <span id="candidateModalTitle">Application</span>
+                <button class="modal-close" onclick="closeCandidateModal()">&times;</button>
+            </div>
+            <div class="modal-body scroll" id="candidateModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeCandidateModal()">Close</button>
+            </div>
+        </div>
+    </div>
+ 
     <script>
         const SHEET_URL = "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
         
@@ -696,7 +835,6 @@
         }
 
         function createCandidateCard(c) {
-            let safeAnswers = c.answers ? c.answers.replace(/\n/g, '<br>') : "No assessment data.";
             let isSelected = c.final_decision === 'Selected';
             let isRejected = c.final_decision === 'Rejected';
             let appliedDate = c.timestamp ? new Date(c.timestamp).toLocaleDateString() : "Unknown Date";
@@ -714,15 +852,10 @@
                         <a href="${c.linkedin}" target="_blank">LinkedIn</a>
                         ${c.portfolio ? `<a href="${c.portfolio}" target="_blank">Portfolio</a>` : ''}
                     </div>
-                    
-                    <details style="margin-top: 15px; font-size: 12px; color: var(--text-dim);">
-                        <summary style="cursor: pointer; color: var(--accent); font-weight: 600; margin-bottom: 8px;">View Application Details</summary>
-                        <div style="background: #000; padding: 10px; border-radius: 6px; border: 1px solid #222;">
-                            <p><strong>Summary:</strong><br>${c.why_join}</p>
-                            <hr style="border:0; border-top:1px solid #222; margin:10px 0;">
-                            <div>${safeAnswers}</div>
-                        </div>
-                    </details>
+
+                    <button type="button" class="btn-view" onclick="openCandidateModal(${c.row_index})">
+                        View application
+                    </button>
                 </div>
 
                 <div class="eval-col">
@@ -826,6 +959,101 @@
         // --- MODAL LOGIC ---
         function openModal() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('exportModal').style.display = 'none'; }
+
+        function openSettingsModal() {
+            hydrateFormGateUI();
+            document.getElementById("settingsModal").style.display = "flex";
+        }
+
+        function closeSettingsModal() {
+            document.getElementById("settingsModal").style.display = "none";
+        }
+
+        function closeCandidateModal() {
+            document.getElementById("candidateModal").style.display = "none";
+        }
+
+        function escapeHtml(v) {
+            return String(v ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function safeUrl(url) {
+            const u = String(url || "").trim();
+            if (!u) return "";
+            if (u.startsWith("http://") || u.startsWith("https://")) return u;
+            return "";
+        }
+
+        function linkTag(url, label) {
+            const safe = safeUrl(url);
+            if (!safe) return "";
+            return `<a href="${escapeHtml(safe)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
+        }
+
+        function openCandidateModal(rowId) {
+            const cand = globalCandidates.find((c) => String(c.row_index) === String(rowId));
+            if (!cand) return alert("Candidate not found.");
+
+            const appliedDate = cand.timestamp ? new Date(cand.timestamp).toLocaleString() : "Unknown date";
+            const title = `${cand.first_name || ""} ${cand.last_name || ""}`.trim() || "Application";
+            document.getElementById("candidateModalTitle").textContent = title;
+
+            const answers = cand.answers ? escapeHtml(cand.answers).replace(/\n/g, "<br>") : "No assessment data.";
+            const why = cand.why_join ? escapeHtml(cand.why_join).replace(/\n/g, "<br>") : "—";
+
+            const body = document.getElementById("candidateModalBody");
+            body.innerHTML = `
+                <div class="candidate-modal-grid">
+                    <div class="box">
+                        <div class="box-title">Details</div>
+                        <div class="box-body">
+                            <div><strong>Department:</strong> ${escapeHtml(cand.department || "General")}</div>
+                            <div><strong>Role(s):</strong> ${escapeHtml(cand.roles || "—")}</div>
+                            <div><strong>Applied:</strong> ${escapeHtml(appliedDate)}</div>
+                            <div><strong>City:</strong> ${escapeHtml(cand.city || "—")}</div>
+                        </div>
+                        <div class="mini-links">
+                            ${linkTag(cand.resume_link, "Resume")}
+                            ${linkTag(cand.linkedin, "LinkedIn")}
+                            ${cand.portfolio ? linkTag(cand.portfolio, "Portfolio") : ""}
+                        </div>
+                    </div>
+                    <div class="box">
+                        <div class="box-title">Contact</div>
+                        <div class="box-body">
+                            <div><strong>Email:</strong> ${escapeHtml(cand.email || "—")}</div>
+                            <div><strong>Phone:</strong> ${escapeHtml(cand.phone || "—")}</div>
+                        </div>
+                    </div>
+                    <div class="box" style="grid-column: 1 / -1;">
+                        <div class="box-title">Why Join</div>
+                        <div class="box-body">${why}</div>
+                    </div>
+                    <div class="box" style="grid-column: 1 / -1;">
+                        <div class="box-title">Assessment Answers</div>
+                        <div class="box-body">${answers}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById("candidateModal").style.display = "flex";
+        }
+
+        ["exportModal", "settingsModal", "candidateModal"].forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.addEventListener("click", (e) => {
+                if (e.target !== el) return;
+                if (id === "exportModal") closeModal();
+                if (id === "settingsModal") closeSettingsModal();
+                if (id === "candidateModal") closeCandidateModal();
+            });
+        });
 
         // --- PDF GENERATION LOGIC ---
         function generatePDF() {
