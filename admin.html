@@ -649,7 +649,6 @@
         <div class="auth-card">
             <div class="auth-title">Admin access</div>
             <div class="auth-sub">Enter the admin password to view applications and control form settings.</div>
-            <div class="auth-sub" id="authScriptUrl" style="margin-top: 8px;"></div>
 
             <div class="auth-row">
                 <label for="adminPassword">Password</label>
@@ -1222,11 +1221,6 @@
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") handleAdminLogin();
                 });
-            }
-
-            const scriptUrl = document.getElementById("authScriptUrl");
-            if (scriptUrl) {
-                scriptUrl.textContent = `Apps Script: ${SHEET_URL || "(missing)"}`;
             }
 
             if (window.location && window.location.protocol === "file:") {
