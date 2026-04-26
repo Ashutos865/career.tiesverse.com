@@ -531,11 +531,51 @@
                 <a href="https://chat.whatsapp.com/CvRuM20vyEW25QV3iWqE6y" target="_blank" class="whatsapp-btn">Join Community Group</a><br>
                 <button onclick="location.href = 'index.html'" class="back-link" style="margin-top: 16px">← Return to jobs list</button>
             </div>
+
+            <div id="closed-msg" class="success-card" style="display: none; max-width: 600px; margin: 0 auto; margin-top: 40px;">
+                <div class="success-icon" style="background: rgba(255,68,68,0.15); color: #ff6b6b;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <h3>Applications Closed</h3>
+                <p>We’re not accepting applications for Operations roles right now. Please check back soon.</p>
+                <button onclick="location.href = 'index.html'" class="back-link" style="margin-top: 16px">← Return to jobs list</button>
+            </div>
         </div>
 
         <script>
             const SHEET_URL =
                 "https://script.google.com/macros/s/AKfycbyV5WknA4fT06gepbh4rfP-1g39ruXEbpqv9r7ROnukecXBPbb5mOVAxtwJB8wf4KWXXQ/exec";
+
+            const FORM_GATE_STORAGE_KEY = "tv_form_gate_v1";
+            const DEPARTMENT_ID = "Operations";
+            function getFormGateConfig() {
+                try {
+                    const raw = localStorage.getItem(FORM_GATE_STORAGE_KEY);
+                    return raw ? JSON.parse(raw) : {};
+                } catch (_) {
+                    return {};
+                }
+            }
+            function isDeptClosed() {
+                const cfg = getFormGateConfig();
+                return cfg && cfg[DEPARTMENT_ID] === false;
+            }
+            function applyDeptGateUI() {
+                if (!isDeptClosed()) return;
+                const form = document.getElementById("form-content");
+                const closed = document.getElementById("closed-msg");
+                const btn = document.getElementById("submitBtn");
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerText = "Applications Closed";
+                }
+                if (form) form.style.display = "none";
+                if (closed) closed.style.display = "block";
+                window.scrollTo(0, 0);
+            }
+            applyDeptGateUI();
 
             const SUBMISSION_GUARD_PREFIX = "tv_apply_once_v1";
             let isSubmitting = false;
@@ -914,6 +954,9 @@
                 });
             }
             async function deploy() {
+                if (isDeptClosed()) {
+                    return alert("Applications for this department are currently closed.");
+                }
                 const selectedRoles = Array.from(
                     document.querySelectorAll(".role-chk:checked"),
                 ).map((c) => c.value);

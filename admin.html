@@ -102,6 +102,141 @@
 
         .btn-export:hover { opacity: 0.9; }
 
+        /* ── FORM GATES ── */
+        .form-gate {
+            margin-bottom: 18px;
+            background: rgba(255,255,255,0.02);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .form-gate-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .form-gate-title {
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .form-gate-sub {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .form-gate-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .gate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .gate-card {
+            background: #121212;
+            border: 1px solid #222;
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .gate-name {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .gate-hint {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .gate-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gate-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid #333;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        .gate-badge.open {
+            border-color: rgba(37, 211, 102, 0.35);
+            color: var(--success);
+        }
+
+        .gate-badge.closed {
+            border-color: rgba(255, 68, 68, 0.35);
+            color: #ff6b6b;
+        }
+
+        .toggle {
+            position: relative;
+            width: 46px;
+            height: 26px;
+            display: inline-block;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #2e2e2e;
+            border-radius: 999px;
+            border: 1px solid #444;
+            transition: 0.2s;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            top: 2px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .toggle input:checked + .slider {
+            background: rgba(254, 122, 0, 0.95);
+            border-color: rgba(254, 122, 0, 0.95);
+        }
+
+        .toggle input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
         /* ── CANDIDATE CARD ── */
         .candidate-card {
             background: var(--card-bg);
@@ -315,6 +450,79 @@
         </button>
     </div>
 
+    <div class="form-gate">
+        <div class="form-gate-head">
+            <div>
+                <div class="form-gate-title">Application Forms</div>
+                <div class="form-gate-sub">
+                    Open/close application forms. This switch is saved in this browser (admin device) and is useful for quickly pausing submissions.
+                </div>
+            </div>
+            <div class="form-gate-actions">
+                <button class="btn-cancel" onclick="setAllForms(true)">Open All</button>
+                <button class="btn-cancel" onclick="setAllForms(false)">Close All</button>
+                <button class="btn-export" onclick="saveFormGates()">Save</button>
+            </div>
+        </div>
+        <div class="gate-grid">
+            <div class="gate-card">
+                <div>
+                    <div class="gate-name">Tech</div>
+                    <div class="gate-hint">Tech application form</div>
+                </div>
+                <div class="gate-right">
+                    <span id="gate-badge-Tech" class="gate-badge">—</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="gate-Tech">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="gate-card">
+                <div>
+                    <div class="gate-name">Content</div>
+                    <div class="gate-hint">Content roles application form</div>
+                </div>
+                <div class="gate-right">
+                    <span id="gate-badge-Content" class="gate-badge">—</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="gate-Content">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="gate-card">
+                <div>
+                    <div class="gate-name">Media</div>
+                    <div class="gate-hint">Media roles application form</div>
+                </div>
+                <div class="gate-right">
+                    <span id="gate-badge-Media" class="gate-badge">—</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="gate-Media">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="gate-card">
+                <div>
+                    <div class="gate-name">Operations</div>
+                    <div class="gate-hint">Operations roles application form</div>
+                </div>
+                <div class="gate-right">
+                    <span id="gate-badge-Operations" class="gate-badge">—</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="gate-Operations">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="candidates-container">
         <p style="text-align: center; color: var(--text-dim); margin-top: 40px;">Fetching candidate data...</p>
     </div>
@@ -368,7 +576,73 @@
         
         let globalCandidates = [];
 
-        window.onload = fetchCandidates;
+        const FORM_GATE_STORAGE_KEY = "tv_form_gate_v1";
+        const DEFAULT_FORM_GATES = {
+            Tech: true,
+            Content: true,
+            Media: true,
+            Operations: true,
+        };
+
+        function readFormGates() {
+            try {
+                const raw = localStorage.getItem(FORM_GATE_STORAGE_KEY);
+                const parsed = raw ? JSON.parse(raw) : {};
+                return { ...DEFAULT_FORM_GATES, ...parsed };
+            } catch (_) {
+                return { ...DEFAULT_FORM_GATES };
+            }
+        }
+
+        function writeFormGates(gates) {
+            try {
+                localStorage.setItem(FORM_GATE_STORAGE_KEY, JSON.stringify(gates));
+            } catch (_) {}
+        }
+
+        function updateGateBadge(dept, isOpen) {
+            const badge = document.getElementById(`gate-badge-${dept}`);
+            if (!badge) return;
+            badge.classList.remove("open", "closed");
+            badge.classList.add(isOpen ? "open" : "closed");
+            badge.textContent = isOpen ? "Open" : "Closed";
+        }
+
+        function hydrateFormGateUI() {
+            const gates = readFormGates();
+            ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
+                const cb = document.getElementById(`gate-${dept}`);
+                if (!cb) return;
+                cb.checked = gates[dept] !== false;
+                updateGateBadge(dept, cb.checked);
+                cb.onchange = () => updateGateBadge(dept, cb.checked);
+            });
+        }
+
+        function saveFormGates() {
+            const gates = readFormGates();
+            ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
+                const cb = document.getElementById(`gate-${dept}`);
+                if (!cb) return;
+                gates[dept] = !!cb.checked;
+            });
+            writeFormGates(gates);
+            alert("Saved. The application forms will follow this setting on this device.");
+        }
+
+        function setAllForms(open) {
+            ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
+                const cb = document.getElementById(`gate-${dept}`);
+                if (!cb) return;
+                cb.checked = !!open;
+                updateGateBadge(dept, cb.checked);
+            });
+        }
+
+        window.onload = () => {
+            hydrateFormGateUI();
+            fetchCandidates();
+        };
 
         async function fetchCandidates() {
             const container = document.getElementById("candidates-container");
