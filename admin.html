@@ -649,6 +649,7 @@
         <div class="auth-card">
             <div class="auth-title">Admin access</div>
             <div class="auth-sub">Enter the admin password to view applications and control form settings.</div>
+            <div class="auth-sub" id="authScriptUrl" style="margin-top: 8px;"></div>
 
             <div class="auth-row">
                 <label for="adminPassword">Password</label>
@@ -1105,7 +1106,13 @@
             try {
                 const res = await jsonp(SHEET_URL, { action: "ADMIN_LOGIN", password });
                 if (!res || res.status !== "success" || !res.token) {
-                    showAuth_("Wrong password. Please try again.");
+                    if (res && res.message === "INVALID_PASSWORD") {
+                        showAuth_("Wrong password. Please try again.");
+                        return;
+                    }
+                    showAuth_(
+                        "Admin backend not updated. Paste the latest Apps Script code and redeploy the Web App, then update tv-config.js if the /exec URL changed.",
+                    );
                     return;
                 }
                 setAdminSession_(res.token, res.expires_at, remember);
@@ -1215,6 +1222,18 @@
                 input.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") handleAdminLogin();
                 });
+            }
+
+            const scriptUrl = document.getElementById("authScriptUrl");
+            if (scriptUrl) {
+                scriptUrl.textContent = `Apps Script: ${SHEET_URL || "(missing)"}`;
+            }
+
+            if (window.location && window.location.protocol === "file:") {
+                showAuth_(
+                    "This admin page must be opened via http/https (not file://). Use GitHub Pages/Netlify or run a local server, otherwise the browser may block access.",
+                );
+                return;
             }
 
             ensureAdminAuth_().then((ok) => {
