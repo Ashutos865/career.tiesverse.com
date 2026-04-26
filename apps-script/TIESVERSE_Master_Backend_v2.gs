@@ -7,6 +7,44 @@ const DEDUP_WINDOW_MS = DEDUP_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 const REQUEST_ID_HEADER = "request_id";
 const REQUEST_ID_COL = 19;
 
+// Admin access (for admin.html only)
+const ADMIN_PASSWORD = "TIESVERSE2025";
+const ADMIN_SESSION_DAYS = 7;
+const ADMIN_SESSION_MS = ADMIN_SESSION_DAYS * 24 * 60 * 60 * 1000;
+const ADMIN_SESSION_PREFIX = "tv_admin_session_";
+
+function issueAdminSession_() {
+  const token = Utilities.getUuid();
+  const nowMs = Date.now();
+  PropertiesService.getScriptProperties().setProperty(
+    ADMIN_SESSION_PREFIX + token,
+    JSON.stringify({ issuedAt: nowMs }),
+  );
+  return { token: token, expiresAt: new Date(nowMs + ADMIN_SESSION_MS).toISOString() };
+}
+
+function validateAdminSession_(token) {
+  const t = String(token || "").trim();
+  if (!t) return false;
+
+  const props = PropertiesService.getScriptProperties();
+  const raw = props.getProperty(ADMIN_SESSION_PREFIX + t);
+  if (!raw) return false;
+
+  try {
+    const parsed = JSON.parse(raw);
+    const issuedAt = Number(parsed && parsed.issuedAt);
+    if (!issuedAt) return false;
+    if (Date.now() - issuedAt > ADMIN_SESSION_MS) {
+      props.deleteProperty(ADMIN_SESSION_PREFIX + t);
+      return false;
+    }
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 /**
  * Handle CORS Preflight
  */
@@ -26,6 +64,23 @@ function doGet(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet) return respond_(e, { status: "error", message: "Sheet not found" });
+
+    if (action === "ADMIN_LOGIN") {
+      const password = String(p.password || "");
+      if (password !== ADMIN_PASSWORD) return respond_(e, { status: "error", message: "INVALID_PASSWORD" });
+      const session = issueAdminSession_();
+      return respond_(e, { status: "success", token: session.token, expires_at: session.expiresAt });
+    }
+
+    if (action === "ADMIN_CHECK") {
+      const ok = validateAdminSession_(p.token);
+      return respond_(e, { status: ok ? "success" : "UNAUTHORIZED" });
+    }
+
+    // Protect admin-only GET endpoints
+    if (action === "GET_CANDIDATES" || action === "GET_FORM_GATES") {
+      if (!validateAdminSession_(p.token)) return respond_(e, { status: "UNAUTHORIZED" });
+    }
 
     if (action === "GET_CANDIDATES") {
       return respond_(e, { status: "success", data: listCandidates_(sheet) });
@@ -69,12 +124,14 @@ function doPost(e) {
     const data = JSON.parse((e && e.postData && e.postData.contents) || "{}");
 
     if (data.action === "SET_FORM_GATES") {
+      if (!validateAdminSession_(data.token)) return createJsonResponse({ status: "UNAUTHORIZED" });
       writeFormGates_(data.gates || {});
       return createJsonResponse({ status: "success" });
     }
 
     // --- 1. ADMIN UPDATING AN INTERVIEW ---
     if (data.action === "UPDATE_ROW") {
+      if (!validateAdminSession_(data.token)) return createJsonResponse({ status: "UNAUTHORIZED" });
       const rowNum = parseInt(data.row);
       sheet.getRange(rowNum, 15).setValue(data.interview_status);
       sheet.getRange(rowNum, 16).setValue(data.interviewer);
