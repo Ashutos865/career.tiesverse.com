@@ -260,6 +260,48 @@
             margin-top: 12px;
         }
 
+        .pos-note {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.02);
+            color: var(--text-dim);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .pos-section {
+            margin-top: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.01);
+            overflow: hidden;
+        }
+
+        .pos-summary {
+            cursor: pointer;
+            padding: 12px 14px;
+            font-weight: 900;
+            font-size: 13px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            user-select: none;
+        }
+
+        .pos-summary span {
+            color: var(--text-dim);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .pos-body {
+            padding: 0 14px 14px;
+        }
+
         .gate-card {
             background: #121212;
             border: 1px solid #222;
@@ -786,7 +828,7 @@
                             <div class="gate-right">
                                 <span id="gate-badge-Tech" class="gate-badge">—</span>
                                 <label class="toggle">
-                                    <input type="checkbox" id="gate-Tech">
+                                    <input type="checkbox" id="gate-Tech" data-gate-key="Tech">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -799,7 +841,7 @@
                             <div class="gate-right">
                                 <span id="gate-badge-Content" class="gate-badge">—</span>
                                 <label class="toggle">
-                                    <input type="checkbox" id="gate-Content">
+                                    <input type="checkbox" id="gate-Content" data-gate-key="Content">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -812,7 +854,7 @@
                             <div class="gate-right">
                                 <span id="gate-badge-Media" class="gate-badge">—</span>
                                 <label class="toggle">
-                                    <input type="checkbox" id="gate-Media">
+                                    <input type="checkbox" id="gate-Media" data-gate-key="Media">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -825,12 +867,227 @@
                             <div class="gate-right">
                                 <span id="gate-badge-Operations" class="gate-badge">—</span>
                                 <label class="toggle">
-                                    <input type="checkbox" id="gate-Operations">
+                                    <input type="checkbox" id="gate-Operations" data-gate-key="Operations">
                                     <span class="slider"></span>
                                 </label>
                             </div>
                         </div>
                     </div>
+
+                    <div class="pos-note">
+                        <strong style="color: var(--text);">Position toggles:</strong> control each role individually (example: <em>Content Writer (UPSC)</em>).
+                        <br>
+                        <strong style="color: var(--text);">Category toggles:</strong> override positions (if a category is closed, all positions inside it are closed on the site).
+                    </div>
+
+                    <details class="pos-section" open>
+                        <summary class="pos-summary">Content <span>Positions</span></summary>
+                        <div class="pos-body">
+                            <div class="gate-grid">
+                                <div class="gate-card" id="gate-card-content_editor">
+                                    <div>
+                                        <div class="gate-name">Content Editor</div>
+                                        <div class="gate-hint">Key: content_editor</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-content_editor" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-content_editor" data-gate-key="content_editor">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-content_writer_upsc">
+                                    <div>
+                                        <div class="gate-name">Content Writer (UPSC)</div>
+                                        <div class="gate-hint">Key: content_writer_upsc</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-content_writer_upsc" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-content_writer_upsc" data-gate-key="content_writer_upsc">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-upsc_strategist">
+                                    <div>
+                                        <div class="gate-name">UPSC Content Researcher and Strategist</div>
+                                        <div class="gate-hint">Key: upsc_strategist</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-upsc_strategist" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-upsc_strategist" data-gate-key="upsc_strategist">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="pos-section" open>
+                        <summary class="pos-summary">Design <span>Positions</span></summary>
+                        <div class="pos-body">
+                            <div class="gate-grid">
+                                <div class="gate-card" id="gate-card-graphic_designer_canva">
+                                    <div>
+                                        <div class="gate-name">Graphic Designer (Canva)</div>
+                                        <div class="gate-hint">Key: graphic_designer_canva</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-graphic_designer_canva" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-graphic_designer_canva" data-gate-key="graphic_designer_canva">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-uiux_designer">
+                                    <div>
+                                        <div class="gate-name">UI/UX Designer</div>
+                                        <div class="gate-hint">Key: uiux_designer</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-uiux_designer" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-uiux_designer" data-gate-key="uiux_designer">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="pos-section" open>
+                        <summary class="pos-summary">Media <span>Positions</span></summary>
+                        <div class="pos-body">
+                            <div class="gate-grid">
+                                <div class="gate-card" id="gate-card-video_editor_reels_yt">
+                                    <div>
+                                        <div class="gate-name">Video Editor (Reels + YouTube)</div>
+                                        <div class="gate-hint">Key: video_editor_reels_yt</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-video_editor_reels_yt" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-video_editor_reels_yt" data-gate-key="video_editor_reels_yt">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-social_media_manager_ig">
+                                    <div>
+                                        <div class="gate-name">Social Media Manager (Instagram)</div>
+                                        <div class="gate-hint">Key: social_media_manager_ig</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-social_media_manager_ig" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-social_media_manager_ig" data-gate-key="social_media_manager_ig">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-youtube_manager">
+                                    <div>
+                                        <div class="gate-name">YouTube Manager</div>
+                                        <div class="gate-hint">Key: youtube_manager</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-youtube_manager" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-youtube_manager" data-gate-key="youtube_manager">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="pos-section" open>
+                        <summary class="pos-summary">Operations <span>Positions</span></summary>
+                        <div class="pos-body">
+                            <div class="gate-grid">
+                                <div class="gate-card" id="gate-card-hr">
+                                    <div>
+                                        <div class="gate-name">Human Resource (HR)</div>
+                                        <div class="gate-hint">Key: hr</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-hr" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-hr" data-gate-key="hr">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-marketing_outreach">
+                                    <div>
+                                        <div class="gate-name">Marketing &amp; Outreach Specialist</div>
+                                        <div class="gate-hint">Key: marketing_outreach</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-marketing_outreach" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-marketing_outreach" data-gate-key="marketing_outreach">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-management_coordination">
+                                    <div>
+                                        <div class="gate-name">Management / Team Co-ordination</div>
+                                        <div class="gate-hint">Key: management_coordination</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-management_coordination" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-management_coordination" data-gate-key="management_coordination">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="gate-card" id="gate-card-collab_outreach">
+                                    <div>
+                                        <div class="gate-name">Collaboration &amp; Outreach Manager</div>
+                                        <div class="gate-hint">Key: collab_outreach</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-collab_outreach" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-collab_outreach" data-gate-key="collab_outreach">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="pos-section" open>
+                        <summary class="pos-summary">Tech <span>Positions</span></summary>
+                        <div class="pos-body">
+                            <div class="gate-grid">
+                                <div class="gate-card" id="gate-card-tech_roles">
+                                    <div>
+                                        <div class="gate-name">Tech Roles</div>
+                                        <div class="gate-hint">Key: tech_roles</div>
+                                    </div>
+                                    <div class="gate-right">
+                                        <span id="gate-badge-tech_roles" class="gate-badge">—</span>
+                                        <label class="toggle">
+                                            <input type="checkbox" id="gate-tech_roles" data-gate-key="tech_roles">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
                 </div>
             </div>
             <div class="modal-footer settings-footer">
@@ -863,7 +1120,33 @@
         if (!SHEET_URL) alert("Missing TV_APP_SCRIPT_URL in tv-config.js");
         
         let globalCandidates = [];
-        const DEFAULT_FORM_GATES = { Tech: true, Content: true, Media: true, Operations: true };
+
+        const DEFAULT_FORM_GATES = (() => {
+            const keys = [
+                "Tech",
+                "Content",
+                "Media",
+                "Operations",
+                "content_editor",
+                "content_writer_upsc",
+                "upsc_strategist",
+                "graphic_designer_canva",
+                "uiux_designer",
+                "video_editor_reels_yt",
+                "social_media_manager_ig",
+                "youtube_manager",
+                "hr",
+                "marketing_outreach",
+                "management_coordination",
+                "collab_outreach",
+                "tech_roles",
+            ];
+            const o = {};
+            keys.forEach((k) => (o[k] = true));
+            return o;
+        })();
+
+        const ALL_GATE_KEYS = Object.keys(DEFAULT_FORM_GATES);
         let cachedFormGates = { ...DEFAULT_FORM_GATES };
         const ADMIN_SESSION_KEY = "tv_admin_session_v1";
 
@@ -1166,7 +1449,7 @@
         }
         function hydrateFormGateUI() {
             const gates = readFormGates();
-            ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
+            ALL_GATE_KEYS.forEach((dept) => {
                 const cb = document.getElementById(`gate-${dept}`);
                 if (!cb) return;
                 cb.checked = gates[dept] !== false;
@@ -1176,7 +1459,7 @@
         }
 
         function setAllGates(open) {
-            ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
+            ALL_GATE_KEYS.forEach((dept) => {
                 const cb = document.getElementById(`gate-${dept}`);
                 if (!cb) return;
                 cb.checked = !!open;
@@ -1193,7 +1476,7 @@
             }
 
             const gates = {};
-            ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
+            ALL_GATE_KEYS.forEach((dept) => {
                 const cb = document.getElementById(`gate-${dept}`);
                 if (!cb) return;
                 gates[dept] = !!cb.checked;

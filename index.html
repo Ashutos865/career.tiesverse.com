@@ -844,11 +844,14 @@
                 document.querySelectorAll(".dept-group[data-dept]").forEach((group) => {
                     const dept = group.getAttribute("data-dept");
                     const gateKey = deptToGateKey[String(dept || "").toLowerCase()];
-                    const open = gates && gateKey ? gates[gateKey] !== false : true;
+                    const deptOpen = gates && gateKey ? gates[gateKey] !== false : true;
                     group.querySelectorAll(".role-row[data-role-id]").forEach((row) => {
                         const id = row.getAttribute("data-role-id");
                         if (!id) return;
-                        ROLE_OPEN[id] = open;
+                        const hasRoleGate =
+                            gates && Object.prototype.hasOwnProperty.call(gates, id);
+                        const roleOpen = hasRoleGate ? gates[id] !== false : true;
+                        ROLE_OPEN[id] = deptOpen && roleOpen;
                     });
                 });
             } catch (_) {}
