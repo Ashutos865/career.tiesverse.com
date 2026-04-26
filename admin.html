@@ -62,18 +62,39 @@
         .auth-sub { margin-top: 6px; color: var(--text-dim); font-size: 12px; line-height: 1.5; }
         .auth-row { margin-top: 14px; }
         .auth-row label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+        .auth-pass-wrap { position: relative; }
         .auth-input {
             width: 100%;
             background: #151515;
             border: 1px solid #333;
             color: #fff;
-            padding: 12px 14px;
+            padding: 12px 44px 12px 14px;
             border-radius: 10px;
             font-size: 14px;
             outline: none;
             transition: 0.2s;
         }
         .auth-input:focus { border-color: var(--accent); }
+        .auth-eye {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.14);
+            color: var(--text);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .auth-eye:hover { border-color: rgba(254, 122, 0, 0.55); color: var(--accent); }
+        .auth-eye svg { width: 18px; height: 18px; }
+        .auth-eye.is-on { border-color: rgba(254, 122, 0, 0.55); color: var(--accent); }
         .auth-meta {
             margin-top: 12px;
             display: flex;
@@ -631,7 +652,15 @@
 
             <div class="auth-row">
                 <label for="adminPassword">Password</label>
-                <input class="auth-input" id="adminPassword" type="password" placeholder="Enter password" autocomplete="current-password">
+                <div class="auth-pass-wrap">
+                    <input class="auth-input" id="adminPassword" type="password" placeholder="Enter password" autocomplete="current-password">
+                    <button type="button" class="auth-eye" id="toggleAdminPw" onclick="toggleAdminPassword()" aria-label="Show password" title="Show password">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="auth-meta">
@@ -903,6 +932,19 @@
                 err.style.display = "none";
             }
             if (overlay) overlay.classList.remove("show");
+        }
+
+        function toggleAdminPassword() {
+            const input = document.getElementById("adminPassword");
+            const btn = document.getElementById("toggleAdminPw");
+            if (!input) return;
+            const nextIsText = input.type === "password";
+            input.type = nextIsText ? "text" : "password";
+            if (btn) {
+                btn.classList.toggle("is-on", nextIsText);
+                btn.setAttribute("aria-label", nextIsText ? "Hide password" : "Show password");
+                btn.title = nextIsText ? "Hide password" : "Show password";
+            }
         }
 
         function escapeHtml(value) {
