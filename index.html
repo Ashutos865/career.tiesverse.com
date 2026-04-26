@@ -830,7 +830,7 @@
         async function loadRoleFlagsFromServer() {
             if (!SHEET_URL) return;
             try {
-                const res = await jsonp(SHEET_URL, { action: "GET_FORM_GATES" });
+                const res = await jsonp(SHEET_URL, { action: "GET_PUBLIC_FORM_GATES" });
                 const gates = (res && res.status === "success" && res.gates) ? res.gates : {};
 
                 const deptToGateKey = {
@@ -852,6 +852,25 @@
                     });
                 });
             } catch (_) {}
+        }
+
+        function captureRoleDefaults() {
+            document.querySelectorAll(".role-row[data-role-id]").forEach((row) => {
+                if (!row.dataset.defaultOnclick) {
+                    const oc = row.getAttribute("onclick");
+                    if (oc) row.dataset.defaultOnclick = oc;
+                }
+                const apply = row.querySelector("a.apply-btn");
+                if (apply) {
+                    if (!apply.dataset.defaultHref) {
+                        const href = apply.getAttribute("href");
+                        if (href) apply.dataset.defaultHref = href;
+                    }
+                    if (!apply.dataset.defaultText) {
+                        apply.dataset.defaultText = (apply.textContent || "").trim() || "Apply Now";
+                    }
+                }
+            });
         }
 
         function setRoleClosed(row) {
@@ -877,15 +896,42 @@
             }
         }
 
+        function setRoleOpen(row) {
+            row.classList.remove("closed");
+
+            const title = row.querySelector(".role-title");
+            const badge = title ? title.querySelector(".role-badge.closed") : null;
+            if (badge) badge.remove();
+
+            if (!row.getAttribute("onclick") && row.dataset.defaultOnclick) {
+                row.setAttribute("onclick", row.dataset.defaultOnclick);
+            }
+
+            const apply = row.querySelector("a.apply-btn");
+            if (apply) {
+                apply.classList.remove("disabled");
+                apply.textContent = apply.dataset.defaultText || "Apply Now";
+                if (!apply.getAttribute("href") && apply.dataset.defaultHref) {
+                    apply.setAttribute("href", apply.dataset.defaultHref);
+                }
+                apply.removeAttribute("aria-disabled");
+                apply.removeAttribute("tabindex");
+            }
+        }
+
         function applyRoleFlags() {
             document.querySelectorAll('.role-row[data-role-id]').forEach((row) => {
                 const id = row.getAttribute('data-role-id');
                 if (ROLE_OPEN[id] === false) setRoleClosed(row);
+                else setRoleOpen(row);
             });
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            loadRoleFlagsFromServer().finally(applyRoleFlags);
+            captureRoleDefaults();
+            const refresh = () => loadRoleFlagsFromServer().finally(applyRoleFlags);
+            refresh();
+            setInterval(refresh, 20000);
         });
 
         /* Particles (performance-friendly) */
