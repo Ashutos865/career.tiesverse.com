@@ -443,6 +443,48 @@
                 .main-form-card { padding: 32px 20px; }
                 .grid-2 { grid-template-columns: 1fr; }
             }
+
+            /* ── THEMED NOTIFICATION ── */
+            .tv-toast {
+                position: fixed;
+                top: 18px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: min(560px, calc(100vw - 32px));
+                z-index: 9999;
+                display: none;
+            }
+            .tv-toast.show { display: block; animation: tvToastIn 180ms ease-out; }
+            @keyframes tvToastIn {
+                from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+            .tv-toast-card {
+                background: rgba(17, 17, 17, 0.92);
+                border: 1px solid rgba(255,255,255,0.10);
+                border-left: 4px solid var(--accent);
+                border-radius: 14px;
+                padding: 14px 14px 12px;
+                box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+                backdrop-filter: blur(10px);
+            }
+            .tv-toast-card.warn { border-left-color: #ffb020; }
+            .tv-toast-card.error { border-left-color: #ff4444; }
+            .tv-toast-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+            .tv-toast-title { font-weight: 800; font-size: 14px; letter-spacing: 0.2px; }
+            .tv-toast-msg { margin-top: 6px; color: var(--text-dim); font-size: 13px; line-height: 1.45; }
+            .tv-toast-close {
+                width: 32px;
+                height: 32px;
+                border-radius: 10px;
+                background: transparent;
+                border: 1px solid rgba(255,255,255,0.14);
+                color: var(--text);
+                cursor: pointer;
+                font-size: 18px;
+                line-height: 0;
+            }
+            .tv-toast-close:hover { border-color: rgba(254, 122, 0, 0.55); color: var(--accent); }
         </style>
     </head>
 
@@ -636,6 +678,49 @@
             }
             function normalizePhone(v) {
                 return String(v || "").replace(/[^\d+]/g, "");
+            }
+
+            function tvHideToast() {
+                const root = document.getElementById("tv-toast");
+                if (root) root.classList.remove("show");
+            }
+
+            function tvNotify(kind, title, message, timeoutMs = 9000) {
+                let root = document.getElementById("tv-toast");
+                if (!root) {
+                    root = document.createElement("div");
+                    root.id = "tv-toast";
+                    root.className = "tv-toast";
+                    root.innerHTML = `
+                        <div class="tv-toast-card" role="status" aria-live="polite">
+                            <div class="tv-toast-head">
+                                <div>
+                                    <div class="tv-toast-title"></div>
+                                    <div class="tv-toast-msg"></div>
+                                </div>
+                                <button type="button" class="tv-toast-close" aria-label="Close">×</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(root);
+                    const closeBtn = root.querySelector(".tv-toast-close");
+                    if (closeBtn) closeBtn.onclick = tvHideToast;
+                }
+
+                const card = root.querySelector(".tv-toast-card");
+                const titleEl = root.querySelector(".tv-toast-title");
+                const msgEl = root.querySelector(".tv-toast-msg");
+                if (card) {
+                    card.classList.remove("warn", "error");
+                    if (kind === "warn") card.classList.add("warn");
+                    if (kind === "error") card.classList.add("error");
+                }
+                if (titleEl) titleEl.textContent = String(title || "");
+                if (msgEl) msgEl.textContent = String(message || "");
+
+                root.classList.add("show");
+                clearTimeout(root._tvTimer);
+                root._tvTimer = setTimeout(() => tvHideToast(), timeoutMs);
             }
             function newRequestId() {
                 return `req_${Date.now().toString(36)}_${Math.random().toString(16).slice(2)}`;
@@ -1053,9 +1138,12 @@
                     }
                     if (serverStatus.duplicate === true) {
                         resetSubmitState();
-                        return alert(
-                            `You already applied for this post in the last ${DEDUP_WINDOW_DAYS} days. Please try again later.`,
+                        tvNotify(
+                            "warn",
+                            "Already applied",
+                            `Looks like you already applied for this role in the last ${DEDUP_WINDOW_DAYS} days. Please try again later.`,
                         );
+                        return;
                     }
                 }
 
