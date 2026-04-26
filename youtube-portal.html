@@ -579,6 +579,8 @@
             applyDeptGateUI();
 
             const SUBMISSION_GUARD_PREFIX = "tv_apply_once_v1";
+            const DEDUP_WINDOW_DAYS = 30;
+            const DEDUP_WINDOW_MS = DEDUP_WINDOW_DAYS * 24 * 60 * 60 * 1000;
             let isSubmitting = false;
             function normalizeEmail(v) {
                 return String(v || "").trim().toLowerCase();
@@ -600,20 +602,22 @@
             }
             function submissionKeys(department, email, phone) {
                 const keys = [];
-                if (email) {
-                    keys.push(`${SUBMISSION_GUARD_PREFIX}:GLOBAL:email:${email}`);
-                    keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:email:${email}`);
-                }
-                if (phone) {
-                    keys.push(`${SUBMISSION_GUARD_PREFIX}:GLOBAL:phone:${phone}`);
-                    keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:phone:${phone}`);
-                }
+                if (email) keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:email:${email}`);
+                if (phone) keys.push(`${SUBMISSION_GUARD_PREFIX}:${department}:phone:${phone}`);
                 return keys;
             }
             function findExistingSubmission(department, email, phone) {
                 for (const key of submissionKeys(department, email, phone)) {
                     const val = storageGet(key);
-                    if (val) return { key, val };
+                    if (!val) continue;
+                    try {
+                        const rec = JSON.parse(val);
+                        if (rec && rec.ts && Date.now() - Number(rec.ts) < DEDUP_WINDOW_MS) {
+                            return { key, rec };
+                        }
+                    } catch (_) {
+                        return { key, rec: { ts: Date.now() } };
+                    }
                 }
                 return null;
             }
@@ -1144,7 +1148,7 @@
                     const existing = findExistingSubmission("Media", emailNorm, phoneNorm);
                     if (existing) {
                         return alert(
-                            "Looks like we already received an application from this email/phone. Please avoid submitting multiple entries.",
+                            `You already applied for this post in the last ${DEDUP_WINDOW_DAYS} days. Please try again later.`,
                         );
                     }
 

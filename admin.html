@@ -690,6 +690,21 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="form-gate in-modal" style="margin-top: 18px;">
+                    <div class="form-gate-head">
+                        <div>
+                            <div class="form-gate-title">Backend Key</div>
+                            <div class="form-gate-sub">
+                                Optional: used if you enable server-side settings updates. Saved only in this browser.
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px;">
+                        <label style="display:block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px;">Admin Key</label>
+                        <input type="password" id="adminKeyInput" class="form-input" placeholder="Enter admin key (if configured)">
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeSettingsModal()">Close</button>
@@ -716,6 +731,7 @@
         let globalCandidates = [];
 
         const FORM_GATE_STORAGE_KEY = "tv_form_gate_v1";
+        const ADMIN_KEY_STORAGE_KEY = "tv_admin_key_v1";
         const DEFAULT_FORM_GATES = {
             Tech: true,
             Content: true,
@@ -756,9 +772,16 @@
                 updateGateBadge(dept, cb.checked);
                 cb.onchange = () => updateGateBadge(dept, cb.checked);
             });
+
+            const keyInput = document.getElementById("adminKeyInput");
+            if (keyInput) {
+                try {
+                    keyInput.value = localStorage.getItem(ADMIN_KEY_STORAGE_KEY) || "";
+                } catch (_) {}
+            }
         }
 
-        function saveFormGates() {
+        async function saveFormGates() {
             const gates = readFormGates();
             ["Tech", "Content", "Media", "Operations"].forEach((dept) => {
                 const cb = document.getElementById(`gate-${dept}`);
@@ -766,7 +789,28 @@
                 gates[dept] = !!cb.checked;
             });
             writeFormGates(gates);
-            alert("Saved. The application forms will follow this setting on this device.");
+
+            let adminKey = "";
+            const keyInput = document.getElementById("adminKeyInput");
+            if (keyInput) adminKey = String(keyInput.value || "").trim();
+            try {
+                localStorage.setItem(ADMIN_KEY_STORAGE_KEY, adminKey);
+            } catch (_) {}
+
+            // Optional server-side sync (works only if backend supports it)
+            try {
+                await fetch(SHEET_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: JSON.stringify({
+                        action: "SET_FORM_GATES",
+                        admin_key: adminKey,
+                        gates,
+                    }),
+                });
+            } catch (_) {}
+
+            alert("Saved.");
         }
 
         function setAllForms(open) {
