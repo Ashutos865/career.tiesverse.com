@@ -1150,6 +1150,34 @@
         let cachedFormGates = { ...DEFAULT_FORM_GATES };
         const ADMIN_SESSION_KEY = "tv_admin_session_v1";
 
+        const CATEGORY_KEYS = ["Tech", "Content", "Media", "Operations"];
+        const CATEGORY_POSITIONS = {
+            Content: ["content_editor", "content_writer_upsc", "upsc_strategist", "graphic_designer_canva", "uiux_designer"],
+            Media: ["video_editor_reels_yt", "social_media_manager_ig", "youtube_manager"],
+            Operations: ["hr", "marketing_outreach", "management_coordination", "collab_outreach"],
+            Tech: ["tech_roles"],
+        };
+
+        function normalizeGateHierarchyClient_(gates) {
+            const out = { ...(gates || {}) };
+
+            CATEGORY_KEYS.forEach((cat) => {
+                const positions = CATEGORY_POSITIONS[cat] || [];
+
+                // If category is closed, force close all positions under it.
+                if (out[cat] === false) {
+                    positions.forEach((p) => (out[p] = false));
+                    return;
+                }
+
+                // If any position is open, category must be open.
+                const anyOpen = positions.some((p) => out[p] !== false);
+                if (anyOpen) out[cat] = true;
+            });
+
+            return out;
+        }
+
         function getAdminSession_() {
             const read = (storage) => {
                 try {
@@ -1449,12 +1477,36 @@
         }
         function hydrateFormGateUI() {
             const gates = readFormGates();
-            ALL_GATE_KEYS.forEach((dept) => {
-                const cb = document.getElementById(`gate-${dept}`);
+            ALL_GATE_KEYS.forEach((key) => {
+                const cb = document.getElementById(`gate-${key}`);
                 if (!cb) return;
-                cb.checked = gates[dept] !== false;
-                updateGateBadge(dept, cb.checked);
-                cb.onchange = () => updateGateBadge(dept, cb.checked);
+                cb.checked = gates[key] !== false;
+                updateGateBadge(key, cb.checked);
+                cb.onchange = () => {
+                    // Category close => close everything under it instantly in UI.
+                    if (CATEGORY_KEYS.includes(key) && cb.checked === false) {
+                        (CATEGORY_POSITIONS[key] || []).forEach((p) => {
+                            const pcb = document.getElementById(`gate-${p}`);
+                            if (!pcb) return;
+                            pcb.checked = false;
+                            updateGateBadge(p, false);
+                        });
+                    }
+
+                    // Position open => category must be open.
+                    if (!CATEGORY_KEYS.includes(key) && cb.checked === true) {
+                        const cat = CATEGORY_KEYS.find((c) => (CATEGORY_POSITIONS[c] || []).includes(key));
+                        if (cat) {
+                            const ccb = document.getElementById(`gate-${cat}`);
+                            if (ccb && ccb.checked === false) {
+                                ccb.checked = true;
+                                updateGateBadge(cat, true);
+                            }
+                        }
+                    }
+
+                    updateGateBadge(key, cb.checked);
+                };
             });
         }
 
@@ -1476,17 +1528,26 @@
             }
 
             const gates = {};
-            ALL_GATE_KEYS.forEach((dept) => {
-                const cb = document.getElementById(`gate-${dept}`);
+            ALL_GATE_KEYS.forEach((key) => {
+                const cb = document.getElementById(`gate-${key}`);
                 if (!cb) return;
-                gates[dept] = !!cb.checked;
+                gates[key] = !!cb.checked;
             });
-            cachedFormGates = { ...DEFAULT_FORM_GATES, ...gates };
+
+            const normalized = normalizeGateHierarchyClient_(gates);
+            cachedFormGates = { ...DEFAULT_FORM_GATES, ...normalized };
+
+            // Update UI to reflect normalization before sending.
+            ALL_GATE_KEYS.forEach((key) => {
+                const cb = document.getElementById(`gate-${key}`);
+                if (cb) cb.checked = cachedFormGates[key] !== false;
+                updateGateBadge(key, cachedFormGates[key] !== false);
+            });
             try {
                 await fetch(SHEET_URL, {
                     method: "POST",
                     mode: "no-cors",
-                    body: JSON.stringify({ action: "SET_FORM_GATES", token: getAdminToken_(), gates }),
+                    body: JSON.stringify({ action: "SET_FORM_GATES", token: getAdminToken_(), gates: normalized }),
                 });
             } catch (_) {}
             if (btn) {
@@ -1496,6 +1557,9 @@
                     btn.disabled = false;
                 }, 1200);
             }
+
+            // Pull back the canonical server state (in case server normalized more).
+            loadFormGatesFromServer().finally(() => hydrateFormGateUI());
         }
 
         window.onload = () => {
