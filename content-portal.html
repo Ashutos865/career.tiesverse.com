@@ -760,8 +760,8 @@
                 const optional = qs.filter((q) => !q.req);
 
                 const lines = [];
-                lines.push("> booting mission console...");
-                lines.push(`> path unlocked: ${getRoleDisplayName(role)}  [${mission.tag}]`);
+                lines.push("> loading your role preview...");
+                lines.push(`> role selected: ${getRoleDisplayName(role)}  [${mission.tag}]`);
                 lines.push("");
                 const blocks = (mission.blocks && mission.blocks.length)
                     ? mission.blocks
@@ -833,10 +833,10 @@
                     box.innerHTML = `
                         <div class="track-guidance-title">
                             <h4>Pick Your Path</h4>
-                            <div class="chip">Select a track to unlock</div>
+                            <div class="chip">Select a track to preview</div>
                         </div>
                         <div class="guide-empty">
-                            Choose a creative track and we’ll generate a live “mission console” with your objectives + what you need to submit.
+                            Choose a creative track and we’ll generate a live role preview with your objectives + what you need to submit.
                         </div>
                     `;
                     return;
@@ -857,7 +857,7 @@
 
                 box.innerHTML = `
                     <div class="track-guidance-title">
-                        <h4>Mission Console</h4>
+                        <h4>Role Preview</h4>
                         <div class="chip">${selectedTracks.length} track${selectedTracks.length > 1 ? "s" : ""} selected</div>
                     </div>
                     <div class="mission-tabs">${tabs}</div>
