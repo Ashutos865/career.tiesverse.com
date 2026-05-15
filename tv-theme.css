@@ -1,0 +1,90 @@
+:root{
+  --tv-bg:#050505;
+  --tv-text:rgba(255,255,255,.92);
+  --tv-muted:rgba(255,255,255,.66);
+  --tv-dim:rgba(255,255,255,.48);
+  --tv-faint:rgba(255,255,255,.28);
+  --tv-border:rgba(255,255,255,.12);
+  --tv-border-soft:rgba(255,255,255,.08);
+  --tv-surface:rgba(255,255,255,.035);
+  --tv-surface-2:rgba(255,255,255,.055);
+  --tv-accent:#fe7a00;
+  --tv-accent-2:#ff9a3d;
+  --tv-radius:18px;
+  --tv-radius-sm:14px;
+  --tv-shadow:0 22px 70px rgba(0,0,0,.55);
+  --tv-maxw:1080px;
+}
+
+/* Map legacy page tokens to premium tokens (keeps existing CSS working) */
+:root{
+  --bg:var(--tv-bg);
+  --accent:var(--tv-accent);
+  --text:var(--tv-text);
+  --text-dim:var(--tv-muted);
+  --text-muted:var(--tv-faint);
+  --border:var(--tv-border-soft);
+  --card-bg:var(--tv-surface);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:
+    radial-gradient(900px 520px at 18% -6%, rgba(254,122,0,.18), transparent 60%),
+    radial-gradient(720px 460px at 85% 6%, rgba(120,70,30,.18), transparent 62%),
+    radial-gradient(520px 320px at 50% 22%, rgba(254,122,0,.07), transparent 70%),
+    var(--tv-bg);
+  color:var(--tv-text);
+}
+
+/* Soft grain */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.03) 0px,
+      rgba(255,255,255,.03) 1px,
+      transparent 2px,
+      transparent 6px
+    );
+  opacity:.14;
+  mix-blend-mode:overlay;
+}
+
+/* Ensure main canvases/content stay above grain */
+#particles{z-index:0;opacity:.22}
+
+/* Lift page content above grain */
+body > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Shared container rhythm */
+.header,
+.hero,
+.positions-section,
+.footer,
+.page-content{
+  max-width:var(--tv-maxw);
+}
+
+/* Type */
+body, input, select, textarea, button{
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+.hero h1{
+  font-family:"Bebas Neue", Inter, system-ui, sans-serif;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+/* Links */
+a{color:inherit}
