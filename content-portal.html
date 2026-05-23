@@ -26,7 +26,12 @@
             }
 
             body {
-                background-color: var(--bg);
+                background:
+                    radial-gradient(520px 900px at -12% 55%, rgba(254, 122, 0, 0.16), transparent 62%),
+                    radial-gradient(520px 900px at 112% 45%, rgba(254, 122, 0, 0.10), transparent 62%),
+                    var(--bg);
+                background-attachment: fixed;
+                background-repeat: no-repeat;
                 color: var(--text);
                 font-family: "Inter", sans-serif;
                 min-height: 100vh;
@@ -34,6 +39,26 @@
                 overflow-x: hidden;
                 -webkit-font-smoothing: antialiased;
                 text-rendering: optimizeLegibility;
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 2;
+                opacity: 0.08;
+                mix-blend-mode: overlay;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+            }
+
+            body::after {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                z-index: 2;
+                background: radial-gradient(1200px 900px at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
             }
 
             ::selection {

@@ -35,13 +35,38 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg);
+            background:
+                radial-gradient(520px 900px at -12% 55%, rgba(254, 122, 0, 0.16), transparent 62%),
+                radial-gradient(520px 900px at 112% 45%, rgba(254, 122, 0, 0.10), transparent 62%),
+                var(--bg);
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             color: var(--text);
             overflow-x: hidden;
             position: relative;
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
             min-height: 100vh
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.08;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(1200px 900px at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
         }
 
         ::selection {
@@ -368,12 +393,76 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            height: clamp(220px, 38vw, 420px);
+            position: relative;
         }
 
         .swiper-slide img {
             width: 100%;
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block;
+        }
+
+        .swiper::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0) 40%),
+                linear-gradient(0deg, rgba(0,0,0,0.30), rgba(0,0,0,0) 55%);
+            z-index: 2;
+        }
+
+        .swiper .swiper-pagination {
+            bottom: 14px !important;
+            z-index: 3;
+        }
+
+        .swiper .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            opacity: 0.55;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .swiper .swiper-pagination-bullet-active {
+            opacity: 1;
+            background: var(--accent);
+        }
+
+        .swiper .swiper-button-prev,
+        .swiper .swiper-button-next {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #fff;
+            z-index: 3;
+            backdrop-filter: blur(10px);
+            transition: 0.2s;
+        }
+
+        .swiper .swiper-button-prev:hover,
+        .swiper .swiper-button-next:hover {
+            border-color: rgba(254, 122, 0, 0.45);
+            color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .swiper .swiper-button-prev::after,
+        .swiper .swiper-button-next::after {
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        @media (max-width: 640px) {
+            .swiper .swiper-button-prev,
+            .swiper .swiper-button-next {
+                display: none;
+            }
         }
 
         /* ── FOOTER ── */
@@ -526,17 +615,28 @@
     </section>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
-    <div class="swiper">
+    <div class="swiper" aria-label="Tiesverse highlights carousel">
         <div class="swiper-wrapper">
-            <div class="swiper-slide"><img src="main.jpg" /></div>
-            <div class="swiper-slide"><img src="main2.jpg" /></div>
-            <div class="swiper-slide"><img src="main3.jpg" /></div>
+            <div class="swiper-slide"><img src="main.jpg" alt="Tiesverse highlight 1" loading="lazy" /></div>
+            <div class="swiper-slide"><img src="main2.jpg" alt="Tiesverse highlight 2" loading="lazy" /></div>
+            <div class="swiper-slide"><img src="main3.jpg" alt="Tiesverse highlight 3" loading="lazy" /></div>
         </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev" aria-label="Previous slide"></div>
+        <div class="swiper-button-next" aria-label="Next slide"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
     <script>
-        new Swiper('.swiper', { loop: true, autoplay: { delay: 10000 } });
+        new Swiper('.swiper', {
+            loop: true,
+            speed: 650,
+            grabCursor: true,
+            keyboard: { enabled: true },
+            autoplay: { delay: 7000, disableOnInteraction: false, pauseOnMouseEnter: true },
+            pagination: { el: '.swiper-pagination', clickable: true },
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        });
     </script>
     <!-- Open Positions -->
     <section class="positions-section" id="positions">
