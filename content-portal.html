@@ -32,6 +32,18 @@
                 min-height: 100vh;
                 position: relative;
                 overflow-x: hidden;
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+            }
+
+            ::selection {
+                background: rgba(254, 122, 0, 0.35);
+                color: var(--text);
+            }
+
+            :focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 3px;
             }
 
             #particles {

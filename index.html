@@ -39,7 +39,19 @@
             color: var(--text);
             overflow-x: hidden;
             position: relative;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
             min-height: 100vh
+        }
+
+        ::selection {
+            background: rgba(254, 122, 0, 0.35);
+            color: var(--text);
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
         }
 
         /* ── PARTICLES ── */
@@ -507,7 +519,7 @@
 
     <!-- Hero -->
     <section class="hero">
-        <h1>Join us in<br>building .ties<span class="accent">verse</span></h1>
+        <h1>Join us in<br>building <span class="accent">.</span>ties<span class="accent">verse</span></h1>
         <p>We're building impactful research, media, and tech projects. Join us to work on real challenges and shape the
             future of digital media in India.</p>
         <a href="#positions" class="hero-btn">See Open Positions</a>
