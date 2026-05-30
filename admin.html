@@ -9,6 +9,8 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
     <style>
         :root {
@@ -966,7 +968,37 @@
             .cd-tile-grid {
                 grid-template-columns: 1fr;
             }
+            .offer-card { flex-direction: column; align-items: flex-start; }
         }
+
+        .offer-list { display: grid; gap: 10px; }
+        .offer-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 12px;
+            border-radius: 14px;
+            background: #121212;
+            border: 1px solid var(--border);
+        }
+        .offer-title { font-weight: 800; }
+        .offer-sub { margin-top: 4px; color: var(--text-dim); font-size: 12px; }
+        .offer-left { min-width: 0; }
+        .offer-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+        .offer-badge {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            letter-spacing: 0.12em;
+            font-weight: 800;
+            font-size: 12px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(254, 122, 0, 0.35);
+            background: rgba(254, 122, 0, 0.08);
+            color: var(--text);
+            white-space: nowrap;
+        }
+        .offer-hint { color: var(--text-dim); font-size: 12px; }
     </style>
 </head>
 <body>
@@ -1033,6 +1065,15 @@
         <button class="btn-export" onclick="openModal()">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             Download PDF Report
+        </button>
+        <button class="btn-export" onclick="openOfferModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="8" y1="13" x2="16" y2="13"></line>
+                <line x1="8" y1="17" x2="16" y2="17"></line>
+            </svg>
+            Offer Letters
         </button>
         <button class="btn-ghost" onclick="openSettingsModal()">Settings</button>
     </div>
@@ -1383,6 +1424,79 @@
                     <button class="btn-ghost btn-sm" onclick="setAllGates(false)">Close all</button>
                     <button class="btn-export btn-sm" id="settingsSaveBtn" onclick="saveFormGates()">Save changes</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="offerModal" style="display:none;" onclick="if(event.target===this) closeOfferModal()">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                Offer Letters
+                <button class="modal-close" onclick="closeOfferModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-callout" style="margin-bottom: 14px;">
+                    Selected candidates appear here for <strong>offer letter generation</strong>. Generated letters are stored with a unique 6-character code and can be re-downloaded anytime.
+                </div>
+
+                <div class="candidate-details-tabs" role="tablist" aria-label="Offer letter sections">
+                    <button type="button" class="cd-tab is-active" data-tab="offer_pending">Pending</button>
+                    <button type="button" class="cd-tab" data-tab="offer_search">Search & Download</button>
+                </div>
+
+                <div class="cd-tabpanel is-active" data-panel="offer_pending">
+                    <div id="offerPendingContainer" style="margin-top: 14px;"></div>
+                </div>
+
+                <div class="cd-tabpanel" data-panel="offer_search">
+                    <div style="display:flex; gap:10px; align-items:center; margin-top: 14px; flex-wrap: wrap;">
+                        <input class="form-input" id="offerSearchInput" placeholder="Search by candidate name, email, phone, or certificate code" style="flex:1; min-width: 260px;">
+                        <button class="btn-export btn-sm" onclick="searchOfferLetters()">Search</button>
+                    </div>
+                    <div id="offerSearchResults" style="margin-top: 12px;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel btn-sm" onclick="closeOfferModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="offerFormModal" style="display:none;" onclick="if(event.target===this) closeOfferFormModal()">
+        <div class="modal">
+            <div class="modal-header">
+                Generate Offer Letter
+                <button class="modal-close" onclick="closeOfferFormModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-callout" id="offerFormCandidateHint" style="margin-bottom: 14px;"></div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label>Role (for letter)</label>
+                        <input class="form-input" id="offerFormRole" placeholder="e.g., Operations Intern">
+                    </div>
+                    <div>
+                        <label>Manager Name</label>
+                        <input class="form-input" id="offerFormManager" placeholder="e.g., Abhishek Upadhyay">
+                    </div>
+                    <div>
+                        <label>Joining Date</label>
+                        <input class="form-input" id="offerFormJoining" placeholder="e.g., 01 Jun 2026">
+                    </div>
+                    <div>
+                        <label>Issue Date</label>
+                        <input class="form-input" id="offerFormIssueDate" placeholder="e.g., May 30, 2026">
+                    </div>
+                </div>
+
+                <div class="offer-hint" style="margin-top: 10px;">
+                    These values will be stored for this candidate and reused for future downloads (no new code will be generated).
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel btn-sm" onclick="closeOfferFormModal()">Cancel</button>
+                <button class="btn-export btn-sm" id="offerFormSubmitBtn" onclick="submitOfferFormModal()">Generate & Download</button>
             </div>
         </div>
     </div>
@@ -2216,6 +2330,595 @@
         // --- MODAL LOGIC ---
         function openModal() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('exportModal').style.display = 'none'; }
+
+        // --- OFFER LETTER MODAL ---
+        let offerTemplateCache = null;
+
+        function openOfferModal() {
+            const modal = document.getElementById("offerModal");
+            if (!modal) return;
+            modal.style.display = "flex";
+            document.body.classList.add("modal-open");
+            setupTabsIn_(modal);
+            renderOfferPending_();
+            document.getElementById("offerSearchResults").innerHTML = `<div class="offer-hint">Search generated letters by name, email, phone, or certificate code.</div>`;
+        }
+
+        function closeOfferModal() {
+            const modal = document.getElementById("offerModal");
+            if (!modal) return;
+            modal.style.display = "none";
+            document.body.classList.remove("modal-open");
+        }
+
+        function setupTabsIn_(rootEl) {
+            if (rootEl.dataset && rootEl.dataset.tabsWired === "1") return;
+            const tabs = rootEl.querySelectorAll(".cd-tab");
+            const panels = rootEl.querySelectorAll(".cd-tabpanel");
+            if (!tabs.length || !panels.length) return;
+            tabs.forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const key = btn.getAttribute("data-tab");
+                    tabs.forEach((b) => b.classList.toggle("is-active", b === btn));
+                    panels.forEach((p) => p.classList.toggle("is-active", p.getAttribute("data-panel") === key));
+                    const scroller = rootEl.querySelector(".modal-body") || rootEl;
+                    try { scroller.scrollTo({ top: 0, behavior: "smooth" }); } catch (_) { scroller.scrollTop = 0; }
+                });
+            });
+            try { rootEl.dataset.tabsWired = "1"; } catch (_) {}
+        }
+
+        function normalizePhone_(v) {
+            return String(v || "").replace(/[^\d+]/g, "");
+        }
+
+        function formatDate_(d) {
+            try {
+                const date = d instanceof Date ? d : new Date(d);
+                return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+            } catch (_) {
+                return "";
+            }
+        }
+
+        function formatLongDate_(d) {
+            try {
+                const date = d instanceof Date ? d : new Date(d);
+                return date.toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" });
+            } catch (_) {
+                return "";
+            }
+        }
+
+        function renderOfferPending_() {
+            const container = document.getElementById("offerPendingContainer");
+            if (!container) return;
+
+            const pending = (globalCandidates || []).filter((c) => {
+                const selected = String(c.final_decision || "").trim() === "Selected";
+                const hasCode = String(c.certificate_code || "").trim().length > 0;
+                return selected && !hasCode;
+            });
+
+            if (!pending.length) {
+                container.innerHTML = `<div class="offer-hint">No pending offer letters. Mark a candidate as <strong>Selected</strong> to enable offer letter generation.</div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="offer-list">
+                    ${pending.map((c) => {
+                        const name = `${c.first_name || ""} ${c.last_name || ""}`.trim() || "(No name)";
+                        const sub = `${c.roles || ""} • ${c.email || ""} • ${c.phone || ""}`.replace(/\s+/g, " ").trim();
+                        return `
+                            <div class="offer-card">
+                                <div class="offer-left">
+                                    <div class="offer-title">${escapeHtml_(name)}</div>
+                                    <div class="offer-sub">${escapeHtml_(sub)}</div>
+                                </div>
+                                <div class="offer-right">
+                                    <button class="btn-export btn-sm" onclick="openOfferFormModal(${c.row_index})">Generate & Download</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join("")}
+                </div>
+            `;
+        }
+
+        let offerFormRowIndex_ = null;
+
+        function openOfferFormModal(rowIndex) {
+            const c = (globalCandidates || []).find((x) => x.row_index === rowIndex);
+            if (!c) return alert("Candidate not found.");
+
+            offerFormRowIndex_ = rowIndex;
+
+            const name = `${c.first_name || ""} ${c.last_name || ""}`.trim() || "(No name)";
+            const hint = document.getElementById("offerFormCandidateHint");
+            if (hint) {
+                hint.innerHTML = `Generating offer letter for <strong>${escapeHtml_(name)}</strong> (${escapeHtml_(c.email || "")} ${escapeHtml_(c.phone || "")}).`;
+            }
+
+            const roleEl = document.getElementById("offerFormRole");
+            const mgrEl = document.getElementById("offerFormManager");
+            const joinEl = document.getElementById("offerFormJoining");
+            const issueEl = document.getElementById("offerFormIssueDate");
+
+            if (roleEl) roleEl.value = String(c.offer_role || c.roles || "").trim();
+            if (mgrEl) mgrEl.value = String(c.offer_manager_name || "").trim();
+            if (joinEl) joinEl.value = String(c.offer_joining_date || "").trim();
+            if (issueEl) issueEl.value = String(c.offer_issue_date || "").trim() || formatLongDate_(new Date());
+
+            const modal = document.getElementById("offerFormModal");
+            if (modal) modal.style.display = "flex";
+            document.body.classList.add("modal-open");
+        }
+
+        function closeOfferFormModal() {
+            offerFormRowIndex_ = null;
+            const modal = document.getElementById("offerFormModal");
+            if (modal) modal.style.display = "none";
+            document.body.classList.remove("modal-open");
+        }
+
+        async function submitOfferFormModal() {
+            const rowIndex = offerFormRowIndex_;
+            const c = (globalCandidates || []).find((x) => x.row_index === rowIndex);
+            if (!rowIndex || !c) return alert("Candidate not found.");
+
+            const offerRole = String(document.getElementById("offerFormRole")?.value || c.offer_role || c.roles || "").trim();
+            const managerName = String(document.getElementById("offerFormManager")?.value || c.offer_manager_name || "").trim();
+            const joiningDate = String(document.getElementById("offerFormJoining")?.value || c.offer_joining_date || "").trim();
+            const issueDate = String(document.getElementById("offerFormIssueDate")?.value || "").trim() || formatLongDate_(new Date());
+
+            if (!offerRole) return alert("Please enter Role (for letter).");
+            if (!managerName) return alert("Please enter Manager Name.");
+            if (!joiningDate) return alert("Please enter Joining Date.");
+
+            const btn = document.getElementById("offerFormSubmitBtn");
+            const originalText = btn ? btn.innerText : "";
+            if (btn) { btn.disabled = true; btn.innerText = "Generatingâ€¦"; }
+
+            try {
+                const res = await adminJsonp({
+                    action: "GENERATE_OFFER_LETTER",
+                    row: rowIndex,
+                    offer_role: offerRole,
+                    manager_name: managerName,
+                    joining_date: joiningDate,
+                    issue_date: issueDate
+                });
+                if (!res) {
+                    alert("Offer letter generation failed: No response from Apps Script.");
+                    return;
+                }
+                if (res.status === "UNAUTHORIZED") {
+                    alert("Offer letter generation failed: Admin session expired. Please sign in again.");
+                    try { clearAdminSession_(); } catch (_) {}
+                    try { showAuth_("Session expired. Please sign in again."); } catch (_) {}
+                    return;
+                }
+                if (res.status !== "success" || !res.data) {
+                    const msg = res && (res.message || res.error || res.status) ? ` (${res.message || res.error || res.status})` : "";
+                    alert("Offer letter generation failed. Please redeploy the updated Apps Script Web App URL in `tv-config.js` and try again." + msg);
+                    return;
+                }
+
+                // Update local cache
+                c.offer_letter_status = "Done";
+                c.certificate_code = res.data.certificate_code || c.certificate_code;
+                c.offer_issue_date = res.data.issue_date || c.offer_issue_date;
+                c.offer_role = res.data.offer_role || offerRole || c.offer_role;
+                c.offer_manager_name = res.data.manager_name || managerName || c.offer_manager_name;
+                c.offer_joining_date = res.data.joining_date || joiningDate || c.offer_joining_date;
+                c.offer_generated_at = new Date().toISOString();
+
+                renderOfferPending_();
+                closeOfferFormModal();
+                await openOfferLetterWindow_(c, res.data, { asPdf: true });
+            } catch (err) {
+                console.error(err);
+                alert("Network error while generating offer letter.");
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = originalText || "Generate & Download"; }
+            }
+        }
+
+        async function searchOfferLetters() {
+            const q = String(document.getElementById("offerSearchInput")?.value || "").trim();
+            const resultsEl = document.getElementById("offerSearchResults");
+            if (!resultsEl) return;
+            if (!q) {
+                resultsEl.innerHTML = `<div class="offer-hint">Enter a name, email, phone, or certificate code.</div>`;
+                return;
+            }
+
+            resultsEl.innerHTML = `<div class="offer-hint">Searchingâ€¦</div>`;
+            try {
+                const res = await adminJsonp({ action: "GET_OFFER_BY_QUERY", q });
+                const rows = (res && res.status === "success" && Array.isArray(res.data)) ? res.data : [];
+
+                if (!rows.length) {
+                    resultsEl.innerHTML = `<div class="offer-hint">No generated offer letters found for that query.</div>`;
+                    return;
+                }
+
+                resultsEl.innerHTML = `
+                    <div class="offer-list">
+                        ${rows.map((r) => {
+                            const name = `${r.first_name || ""} ${r.last_name || ""}`.trim() || "(No name)";
+                            const sub = `${r.roles || ""} • ${r.email || ""} • ${r.phone || ""}`.replace(/\s+/g, " ").trim();
+                            const code = String(r.certificate_code || "").trim().toUpperCase();
+                            return `
+                                <div class="offer-card">
+                                    <div class="offer-left">
+                                        <div class="offer-title">${escapeHtml_(name)}</div>
+                                        <div class="offer-sub">${escapeHtml_(sub)}</div>
+                                    </div>
+                                    <div class="offer-right">
+                                        <span class="offer-badge">${escapeHtml_(code)}</span>
+                                        <button class="btn-export btn-sm" onclick="downloadExistingOffer(${r.row_index}, '${escapeAttr_(code)}', '${escapeAttr_(r.issue_date || '')}', '${escapeAttr_(r.verify_url || '')}', '${escapeAttr_(r.qr_url || '')}', '${escapeAttr_(r.offer_role || '')}', '${escapeAttr_(r.manager_name || '')}', '${escapeAttr_(r.joining_date || '')}')">Download</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                resultsEl.innerHTML = `<div class="offer-hint">Search failed. Check Apps Script deployment URL.</div>`;
+            }
+        }
+
+        async function downloadExistingOffer(rowIndex, certificateCode, issueDate, verifyUrl, qrUrl, offerRole, managerName, joiningDate) {
+            const c = (globalCandidates || []).find((x) => x.row_index === rowIndex) || {};
+            const candidate = {
+                ...c,
+                row_index: rowIndex,
+                certificate_code: certificateCode,
+                offer_issue_date: issueDate,
+                offer_role: offerRole || c.offer_role || c.roles || "",
+                offer_manager_name: managerName || c.offer_manager_name || "",
+                offer_joining_date: joiningDate || c.offer_joining_date || "",
+            };
+            await openOfferLetterWindow_(candidate, {
+                certificate_code: certificateCode,
+                issue_date: issueDate,
+                verify_url: verifyUrl,
+                qr_url: qrUrl,
+                offer_role: offerRole,
+                manager_name: managerName,
+                joining_date: joiningDate
+            }, { asPdf: true });
+        }
+
+        async function loadOfferTemplate_() {
+            if (offerTemplateCache) return offerTemplateCache;
+            const res = await fetch("template_offer_letter.html", { cache: "no-cache" });
+            const text = await res.text();
+            offerTemplateCache = text;
+            return text;
+        }
+
+        function escapeHtml_(s) {
+            return String(s || "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll("\"", "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function escapeAttr_(s) {
+            return escapeHtml_(s).replaceAll("`", "&#096;");
+        }
+
+        function getVerifyUrlForCode_(code, fallback) {
+            const base = String(window.TV_VERIFY_BASE_URL || "").trim();
+            const cert = String(code || "").trim().toUpperCase();
+            if (base && cert) return `${base}${base.includes("?") ? "&" : "?"}id=${encodeURIComponent(cert)}`;
+            return String(fallback || "").trim();
+        }
+
+        function buildQrUrl_(url) {
+            const u = String(url || "").trim();
+            if (!u) return "";
+            const size = "220x220";
+            return `https://chart.googleapis.com/chart?chs=${size}&cht=qr&chl=${encodeURIComponent(u)}`;
+        }
+
+        const OFFER_QR_SIZE_PX = 78;
+        const OFFER_QR_RIGHT_PX = 92;
+        const OFFER_QR_TOP_PX = 295;
+
+        function qrDataUrlForText_(text, sizePx = OFFER_QR_SIZE_PX) {
+            const t = String(text || "").trim();
+            if (!t || typeof qrcode !== "function") return "";
+
+            try {
+                const qr = qrcode(0, "M");
+                qr.addData(t);
+                qr.make();
+
+                const count = qr.getModuleCount();
+                const canvas = document.createElement("canvas");
+                canvas.width = sizePx;
+                canvas.height = sizePx;
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = "rgba(255,255,255,0)";
+                ctx.clearRect(0, 0, sizePx, sizePx);
+
+                const tileW = sizePx / count;
+                const tileH = sizePx / count;
+                ctx.fillStyle = "#FE7A00";
+
+                for (let row = 0; row < count; row++) {
+                    for (let col = 0; col < count; col++) {
+                        if (!qr.isDark(row, col)) continue;
+                        const x = Math.round(col * tileW);
+                        const y = Math.round(row * tileH);
+                        const w = Math.ceil((col + 1) * tileW) - Math.floor(col * tileW);
+                        const h = Math.ceil((row + 1) * tileH) - Math.floor(row * tileH);
+                        ctx.fillRect(x, y, w, h);
+                    }
+                }
+
+                return canvas.toDataURL("image/png");
+            } catch (_) {
+                return "";
+            }
+        }
+
+        function buildOfferOverlay_(candidate, meta) {
+            const code = String(meta.certificate_code || candidate.certificate_code || "").trim().toUpperCase();
+            const verifyUrl = getVerifyUrlForCode_(code, meta.verify_url);
+            const qrDataUrl = qrDataUrlForText_(verifyUrl) || "";
+            const safeQr = escapeAttr_(qrDataUrl);
+
+            return `
+                <div id="tv_offer_overlay" style="position:absolute; left:0; top:0; width:100%; height:100%; z-index:55; pointer-events:none;">
+                    ${qrDataUrl ? `
+                        <div style="position:absolute; right:${OFFER_QR_RIGHT_PX}px; top:${OFFER_QR_TOP_PX}px; width:${OFFER_QR_SIZE_PX}px; height:${OFFER_QR_SIZE_PX}px; background:transparent; overflow:hidden;">
+                            <img src="${safeQr}" alt="QR verification code" style="position:absolute; inset:0; width:100%; height:100%; display:block; object-fit:contain;">
+                        </div>
+                    ` : ""}
+                </div>
+            `;
+        }
+
+        function normalizePdfText_(s) {
+            return String(s || "")
+                .replace(/\u00a0/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        function replacePlaceholderInElement_(el, placeholderRegex, value) {
+            if (!el || !(placeholderRegex instanceof RegExp)) return false;
+            const v = String(value ?? "");
+
+            let replaced = false;
+            const doc = el.ownerDocument || document;
+            const walker = doc.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+            let node;
+            while ((node = walker.nextNode())) {
+                const before = String(node.nodeValue || "");
+                const after = before.replace(placeholderRegex, v);
+                if (after !== before) {
+                    node.nodeValue = after;
+                    replaced = true;
+                }
+            }
+
+            // Fallback: if the placeholder is split across spans, we might not catch it in any single text node.
+            // In that case, only replace if the entire element is just the placeholder.
+            if (!replaced) {
+                const txt = normalizePdfText_(el.textContent);
+                if (placeholderRegex.test(txt) && txt.replace(placeholderRegex, "").trim() === "") {
+                    el.textContent = v;
+                    replaced = true;
+                }
+            }
+
+            return replaced;
+        }
+
+        function fillOfferTemplateDom_(pageEl, candidate, meta) {
+            const certificateCode = String(meta.certificate_code || candidate.certificate_code || "").trim().toUpperCase();
+            const issueDate = String(meta.issue_date || candidate.offer_issue_date || "").trim() || formatLongDate_(new Date());
+            const employeeName = `${candidate.first_name || ""} ${candidate.last_name || ""}`.trim();
+            const offerRole = String(meta.offer_role || candidate.offer_role || candidate.roles || "").trim();
+            const managerName = String(meta.manager_name || candidate.offer_manager_name || "").trim();
+            const joiningDate = String(meta.joining_date || candidate.offer_joining_date || "").trim();
+
+            const patterns = [
+                { re: /\{\s*employee\s*name\s*\}/gi, val: employeeName, cls: "tv-emp" },
+                { re: /\{\s*role\s*\}/gi, val: offerRole, cls: "tv-mont" },
+                { re: /\{\s*manager_name\s*\}/gi, val: managerName, cls: "tv-mont" },
+                { re: /\{\s*joining_date\s*\}/gi, val: joiningDate, cls: "tv-mont" },
+                { re: /\{\s*issue_date\s*\}/gi, val: issueDate, cls: "tv-mont" },
+                { re: /\{\s*certificate_id\s*\}/gi, val: certificateCode, cls: "tv-mont" },
+            ];
+
+            // Replace placeholders in-place without changing styles/structure.
+            // This preserves labels like "Department:" / "Reporting to:" / "Joining:" if they share a node.
+            const nodes = pageEl.querySelectorAll(".t");
+
+            // Apply fonts to filled fields only (labels remain unchanged if in separate nodes).
+            const doc = pageEl.ownerDocument;
+            if (doc && !doc.getElementById("tv_filled_style")) {
+                const s = doc.createElement("style");
+                s.id = "tv_filled_style";
+                s.textContent = `
+                  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@700;800&display=swap');
+                  .tv-mont { font-family: 'Montserrat', sans-serif !important; font-weight: 500 !important; }
+                  .tv-emp { font-family: 'Poppins', sans-serif !important; font-weight: 800 !important; }
+                `;
+                doc.head.appendChild(s);
+            }
+
+            for (const el of nodes) {
+                const txt = normalizePdfText_(el.textContent);
+                if (!txt.includes("{")) continue;
+                for (const p of patterns) {
+                    if (p.re.test(txt)) {
+                        // Reset lastIndex due to global regex reuse
+                        p.re.lastIndex = 0;
+                        const did = replacePlaceholderInElement_(el, p.re, p.val);
+                        if (did && p.cls) el.classList.add(p.cls);
+                    }
+                }
+            }
+
+            // No additional styling modifications: keep template styling as-is.
+        }
+
+        async function openOfferLetterWindow_(candidate, meta, opts) {
+            const options = opts || {};
+
+            if (options.asPdf) {
+                const code = String(meta.certificate_code || candidate.certificate_code || "").trim().toUpperCase() || "OFFER";
+                const filename = `Offer_Letter_${code}.pdf`;
+                await generatePdfFromTemplate_(candidate, meta, filename);
+                return;
+            }
+
+            // Preview in a new tab (filled DOM)
+            const templateHtml = await loadOfferTemplate_();
+            const win = window.open("", "_blank");
+            if (!win) {
+                alert("Popup blocked. Please allow popups for this site.");
+                return;
+            }
+            win.document.open();
+            win.document.write(templateHtml);
+            win.document.close();
+
+            await new Promise((r) => setTimeout(r, 250));
+            const pageContainer = win.document.querySelector("#page-container");
+            const pf = pageContainer ? pageContainer.querySelector(".pf") : null;
+            if (!pf) return;
+            const page = pf.cloneNode(true);
+            pageContainer.replaceChildren(page);
+            fillOfferTemplateDom_(page, candidate, meta);
+
+            // Add QR overlay (uses existing helper)
+            const overlay = buildOfferOverlay_(candidate, meta);
+            page.insertAdjacentHTML("beforeend", overlay);
+        }
+
+        async function generatePdfFromTemplate_(candidate, meta, filename) {
+            // Load template into iframe, clone page, fill placeholders (DOM), then render to A4 PDF.
+            const templateHtml = await loadOfferTemplate_();
+
+            const iframe = document.createElement("iframe");
+            iframe.style.position = "fixed";
+            iframe.style.left = "-10000px";
+            iframe.style.top = "0";
+            iframe.style.width = "1000px";
+            iframe.style.height = "1400px";
+            iframe.style.border = "0";
+            document.body.appendChild(iframe);
+
+            const doc = iframe.contentDocument;
+            doc.open();
+            doc.write(templateHtml);
+            doc.close();
+
+            await new Promise((r) => setTimeout(r, 250));
+
+            // Ensure fonts available in iframe
+            // No font/style injection: keep template styling as-is.
+
+            // Wait for images
+            const imgs = Array.from(doc.images || []);
+            await Promise.all(imgs.map((img) => new Promise((resolve) => {
+                if (img.complete) return resolve(true);
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(true);
+            })));
+
+            const pageContainer = doc.querySelector("#page-container");
+            if (!pageContainer) { try { iframe.remove(); } catch (_) {} ; throw new Error("Template missing #page-container"); }
+            const pf = pageContainer.querySelector(".pf");
+            if (!pf) { try { iframe.remove(); } catch (_) {} ; throw new Error("Template missing .pf"); }
+
+            const page = pf.cloneNode(true);
+            pageContainer.replaceChildren(page);
+
+            fillOfferTemplateDom_(page, candidate, meta);
+
+            // QR overlay
+            const overlay = buildOfferOverlay_(candidate, meta);
+            page.insertAdjacentHTML("beforeend", overlay);
+
+            // Use the user-requested PDF pipeline on the filled page element
+            await generatePdfFromElement_(iframe, page, filename);
+
+            try { iframe.remove(); } catch (_) {}
+        }
+
+        async function generatePdfFromElement_(iframe, element, filename) {
+            if (!window.jspdf) {
+                alert("PDF engine not loaded. Please reload the page.");
+                return;
+            }
+
+            // Ensure html2canvas is available in iframe window (for correct rendering)
+            if (!(iframe.contentWindow && iframe.contentWindow.html2canvas)) {
+                await new Promise((resolve) => {
+                    const s = iframe.contentDocument.createElement("script");
+                    s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+                    s.onload = () => resolve(true);
+                    s.onerror = () => resolve(true);
+                    iframe.contentDocument.head.appendChild(s);
+                });
+            }
+
+            // Store original styles to restore later
+            const prevBoxShadow = element.style.boxShadow;
+            const prevBorderRadius = element.style.borderRadius;
+            const prevOverflow = element.style.overflow;
+
+            // Remove visual effects that shouldn't appear in PDF
+            element.style.boxShadow = "none";
+            element.style.borderRadius = "0";
+            element.style.overflow = "visible";
+
+            let canvas;
+            try {
+                canvas = await iframe.contentWindow.html2canvas(element, {
+                    scale: 4,
+                    useCORS: true,
+                    backgroundColor: "#ffffff",
+                    logging: false,
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight,
+                    imageTimeout: 0,
+                    removeContainer: true,
+                });
+            } finally {
+                // Restore original styles
+                element.style.boxShadow = prevBoxShadow;
+                element.style.borderRadius = prevBorderRadius;
+                element.style.overflow = prevOverflow;
+            }
+
+            const imgData = canvas.toDataURL("image/png", 1.0);
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4",
+                compress: true,
+            });
+            pdf.addImage(imgData, "PNG", 0, 0, 210, 297, undefined, "NONE");
+            pdf.save(filename);
+        }
+
+        // Note: Offer letter PDF generation now uses `generatePdfFromTemplate_()` to fill placeholders via DOM (issue flow)
+        // and then export A4 PDF via `generatePdfFromElement_()`.
 
         // --- PDF GENERATION LOGIC ---
         function generatePDF() {
