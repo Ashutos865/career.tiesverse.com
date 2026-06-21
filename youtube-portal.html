@@ -522,8 +522,9 @@
                 line-height: 0;
             }
             .tv-toast-close:hover { border-color: rgba(254, 122, 0, 0.55); color: var(--accent); }
-        </style>
-    </head>
+    </style>
+    <link rel="stylesheet" href="tiesverse-theme.css">
+</head>
 
     <body>
         <canvas id="particles"></canvas>
@@ -1101,98 +1102,6 @@
                     reader.readAsDataURL(file);
                 });
             }
-            /*
-                        async function deploy() {
-                const req = ["yt_name", "yt_email", "yt_phone", "yt_city", "yt_linkedin", "yt_why"];
-                for (let id of req) { if (!document.getElementById(id).value) return alert("System Error: Missing mandatory fields."); }
-                if (!document.getElementById("acknowledge").checked) return alert("System Error: Must acknowledge terms.");
-
-                const btn = document.getElementById("submitBtn");
-                btn.in
-                nerText = "pushing_to_cloud...";
-                btn.disabled = true;
-
-                const { resume_name, resume_data } = await getResumeData();
-
-                const payload = {
-                    sheetName: "YouTube_Data",
-                    name: document.getElementById("yt_name").value,
-                    email: document.getElementById("yt_email").value,
-                    phone: document.getElementById("yt_phone").value,
-                    city: document.getElementById("yt_city").value,
-                    linkedin: document.getElementById("yt_linkedin").value,
-                    portfolio: document.getElementById("yt_portfolio").value,
-                    why_join: document.getElementById("yt_why").value,
-                    resume_name: resume_name,
-                    resume_data: resume_data
-                };
-
-                try {
-                    await fetch(SHEET_URL, {
-                        method: "POST",
-                        mode: "no-cors",
-                        body: JSON.stringify(payload),
-                        headers: { "Content-Type": "application/json" }
-                    });
-                    document.getElementById("form-content").style.display = "none";
-                    document.getElementById("success-msg").style.display = "block";
-                    window.scrollTo(0, 0);
-                } catch (e) {
-                    alert("Network Error: Failed to reach deployment server.");
-                    btn.innerText = "Apply for this position";
-                    btn.disabled = false;
-                }
-            }
-                const btn = document.getElementById("submitBtn");
-                btn.innerHTML = "pushing_to_cloud...";
-                btn.disabled = true;
-                const roleAnswers = {};
-                fieldStore.forEach((f) => {
-                    if (!roleAnswers[f.role]) roleAnswers[f.role] = [];
-                    roleAnswers[f.role].push({
-                        q: f.label,
-                        a: document.getElementById(f.id).value,
-                    });
-                });
-                const { resume_name, resume_data } = await getResumeData();
-                const payload = {
-                    type: "YOUTUBE",
-                    name: document.getElementById("yt_name").value,
-                    email: document.getElementById("yt_email").value,
-                    phone: document.getElementById("yt_phone").value,
-                    city: document.getElementById("yt_city").value,
-                    linkedin: document.getElementById("yt_linkedin").value,
-                    portfolio: document.getElementById("yt_portfolio").value,
-                    why_join: document.getElementById("yt_why").value,
-                    roles: selectedRoles.join(", "),
-                    answers: roleAnswers,
-                    resume_name: resume_name,
-                    resume_data: resume_data,
-                };
-                fetch(
-                    SHEET_URL,
-                    {
-                        method: "POST",
-                        mode: "no-cors",
-                        body: JSON.stringify(payload),
-                        headers: { "Content-Type": "application/json" },
-                    },
-                )
-                    .then(() => {
-                        document.getElementById("form-content").style.display =
-                            "none";
-                        document.getElementById("success-msg").style.display =
-                            "block";
-                    })
-                    .catch(() => {
-                        alert("Submission failed.");
-                        btn.innerHTML = "submit_application()";
-                        btn.disabled = false;
-                    });
-                return false;
-            }
-
-            */
             function updateKulaResume() {
                 const input = document.getElementById("resume");
                 const title = document.getElementById("resumeTitle");
@@ -1204,7 +1113,76 @@
                     title.style.color = "";
                 }
             }
-            async function deploy() {
+                        function ensureUploadProgress() {
+                let root = document.getElementById("uploadProgress");
+                if (root) return root;
+                const btn = document.getElementById("submitBtn");
+                root = document.createElement("div");
+                root.id = "uploadProgress";
+                root.className = "upload-progress";
+                root.innerHTML = `
+                    <div class="upload-progress-row">
+                        <span id="uploadProgressLabel">Preparing upload...</span>
+                        <span id="uploadProgressValue">0%</span>
+                    </div>
+                    <div class="upload-progress-track"><div class="upload-progress-fill" id="uploadProgressFill"></div></div>
+                `;
+                if (btn && btn.parentNode) btn.parentNode.insertBefore(root, btn);
+                return root;
+            }
+
+            function setUploadProgress(percent, label) {
+                const root = ensureUploadProgress();
+                const safe = Math.max(0, Math.min(100, Math.round(percent || 0)));
+                const fill = document.getElementById("uploadProgressFill");
+                const value = document.getElementById("uploadProgressValue");
+                const labelEl = document.getElementById("uploadProgressLabel");
+                root.classList.add("show");
+                if (fill) fill.style.width = `${safe}%`;
+                if (value) value.textContent = `${safe}%`;
+                if (labelEl && label) labelEl.textContent = label;
+            }
+
+            function hideUploadProgress() {
+                const root = document.getElementById("uploadProgress");
+                if (root) root.classList.remove("show");
+            }
+
+            function postApplicationPayload(payload) {
+                setUploadProgress(3, "Preparing application...");
+                const body = JSON.stringify(payload || {});
+                return new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("POST", SHEET_URL, true);
+                    xhr.setRequestHeader("Content-Type", "application/json");
+                    xhr.upload.onprogress = (event) => {
+                        if (!event.lengthComputable) {
+                            setUploadProgress(45, "Uploading resume...");
+                            return;
+                        }
+                        const pct = 8 + (event.loaded / event.total) * 82;
+                        setUploadProgress(pct, "Uploading resume...");
+                    };
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            setUploadProgress(94, "Confirming application...");
+                            let data = {};
+                            try { data = JSON.parse(xhr.responseText || "{}"); }
+                            catch (_) { data = { status: "success" }; }
+                            if (data.status && data.status !== "success") {
+                                reject(new Error(data.status));
+                                return;
+                            }
+                            resolve(data);
+                            return;
+                        }
+                        reject(new Error(`Upload failed with HTTP ${xhr.status}`));
+                    };
+                    xhr.onerror = () => reject(new Error("Upload failed"));
+                    xhr.send(body);
+                });
+            }
+async function deploy() {
                 if (deptClosed) {
                     return alert("Applications for this department are currently closed.");
                 }
@@ -1279,7 +1257,8 @@
 	                    });
 	                });
 
-	                const { resume_name, resume_data } = await resumePromise;
+	                setUploadProgress(2, "Reading resume...");
+                const { resume_name, resume_data } = await resumePromise;
 
 	                const payload = {
 	                    action: "CREATE",
@@ -1300,85 +1279,27 @@
 	                };
 
 	                try {
-	                    await fetch(SHEET_URL, {
-	                        method: "POST",
-	                        mode: "no-cors",
-	                        body: JSON.stringify(payload),
-	                    });
-                        const ok = await waitForRequestRecorded(requestId);
+	                    await postApplicationPayload(payload);
+                        setUploadProgress(96, "Confirming application...");
+                    const ok = await waitForRequestRecorded(requestId);
                         if (!ok) {
                             throw new Error("Submission not confirmed yet.");
                         }
 	                    document.getElementById("form-content").style.display = "none";
 	                    document.getElementById("success-msg").style.display = "block";
+	                    setUploadProgress(100, "Application submitted.");
 	                    window.scrollTo(0, 0);
 	                } catch (e) {
 	                    alert("Network Error: Failed to reach deployment server.");
-                        resetSubmitState();
-	                }
+                        hideUploadProgress();
+                    resetSubmitState();
+                }
 	            }
 
 	            updateTrackGuidance();
 
 	            /* Particles */
-	            const canvas = document.getElementById("particles"),
-	                ctx = canvas.getContext("2d");
-            let particles = [];
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = Math.max(
-                    document.body.scrollHeight,
-                    window.innerHeight,
-                );
-            }
-            function createParticles() {
-                particles = [];
-                const c = Math.floor((canvas.width * canvas.height) / 18000);
-                for (let i = 0; i < c; i++)
-                    particles.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        r: Math.random() * 1 + 0.3,
-                        a: Math.random() * 0.4 + 0.1,
-                        dx: (Math.random() - 0.5) * 0.12,
-                        dy: (Math.random() - 0.5) * 0.12,
-                        ph: Math.random() * Math.PI * 2,
-                    });
-            }
-            function drawParticles() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                const t = Date.now() * 0.001;
-                particles.forEach((p) => {
-                    p.x += p.dx;
-                    p.y += p.dy;
-                    if (p.x < 0) p.x = canvas.width;
-                    if (p.x > canvas.width) p.x = 0;
-                    if (p.y < 0) p.y = canvas.height;
-                    if (p.y > canvas.height) p.y = 0;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255,255,255,${p.a * (0.6 + 0.4 * Math.sin(t + p.ph))})`;
-                    ctx.fill();
-                });
-                requestAnimationFrame(drawParticles);
-            }
-            window.addEventListener("resize", () => {
-                resizeCanvas();
-                createParticles();
-            });
-            resizeCanvas();
-            createParticles();
-            drawParticles();
-        </script>
-        <!-- Smooth Scrolling -->
-        <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
-        <script>
-            const lenis = new Lenis();
-            function raf(time) {
-                lenis.raf(time);
-                requestAnimationFrame(raf);
-            }
-            requestAnimationFrame(raf);
+	            // Particles are disabled by the shared theme to keep the form smooth.
         </script>
 
         <script src="tv-guard.js"></script>

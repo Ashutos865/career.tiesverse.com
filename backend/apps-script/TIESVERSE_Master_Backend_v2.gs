@@ -32,6 +32,22 @@ const ADMIN_SESSION_DAYS = 7;
 const ADMIN_SESSION_MS = ADMIN_SESSION_DAYS * 24 * 60 * 60 * 1000;
 const ADMIN_SESSION_PREFIX = "tv_admin_session_";
 
+// Cloudflare sync/migration.
+// Set these in Apps Script -> Project Settings -> Script properties:
+// CLOUDFLARE_SYNC_ENABLED=true
+// CLOUDFLARE_ACCOUNT_ID=...
+// CLOUDFLARE_D1_DATABASE_ID=...
+// CLOUDFLARE_API_TOKEN=...
+// CLOUDFLARE_R2_BUCKET=...
+// CLOUDFLARE_R2_ACCESS_KEY_ID=...
+// CLOUDFLARE_R2_SECRET_ACCESS_KEY=...
+const CLOUDFLARE_SYNC_ENABLED_PROP = "CLOUDFLARE_SYNC_ENABLED";
+const CLOUDFLARE_MIGRATION_CURSOR_PROP = "CLOUDFLARE_MIGRATION_CURSOR";
+const CLOUDFLARE_MIGRATION_RUNNING_PROP = "CLOUDFLARE_MIGRATION_RUNNING";
+const CLOUDFLARE_MIGRATION_STATUS_PROP = "CLOUDFLARE_MIGRATION_STATUS";
+const CLOUDFLARE_MIGRATION_BATCH_SIZE = 20;
+let CLOUDFLARE_SCHEMA_READY = false;
+
 // Category/position gate hierarchy (used for Settings normalization)
 const CATEGORY_KEYS = ["Tech", "Content", "Media", "Operations"];
 const CATEGORY_POSITIONS = {
@@ -323,7 +339,24 @@ function doPost(e) {
       if (!validateAdminSession_(data.token)) return createJsonResponse({ status: "UNAUTHORIZED" });
       const normalized = normalizeGateHierarchy_(data.gates || {});
       writeFormGates_(normalized);
+      try { syncFormGatesToCloudflare_(normalized); } catch (syncErr) { console.warn(syncErr); }
       return createJsonResponse({ status: "success" });
+    }
+
+    if (data.action === "MIGRATE_CLOUDFLARE_BATCH") {
+      if (!validateAdminSession_(data.token)) return createJsonResponse({ status: "UNAUTHORIZED" });
+      const limit = Math.max(1, Math.min(100, parseInt(data.limit || CLOUDFLARE_MIGRATION_BATCH_SIZE, 10) || CLOUDFLARE_MIGRATION_BATCH_SIZE));
+      return createJsonResponse(migrateCloudflareBatch_(sheet, limit, data.reset === true));
+    }
+
+    if (data.action === "MIGRATE_CLOUDFLARE_ALL") {
+      if (!validateAdminSession_(data.token)) return createJsonResponse({ status: "UNAUTHORIZED" });
+      return createJsonResponse(startFullCloudflareMigration_());
+    }
+
+    if (data.action === "GET_CLOUDFLARE_MIGRATION_STATUS") {
+      if (!validateAdminSession_(data.token)) return createJsonResponse({ status: "UNAUTHORIZED" });
+      return createJsonResponse(getCloudflareMigrationStatus_());
     }
 
     // --- 1. ADMIN UPDATING AN INTERVIEW ---
@@ -347,6 +380,7 @@ function doPost(e) {
           }
         }
       } catch (_) {}
+      try { syncCandidateRowToCloudflare_(sheet, rowNum); } catch (syncErr) { console.warn(syncErr); }
       return createJsonResponse({ status: "success", message: "Updated" });
     }
 
@@ -416,6 +450,7 @@ function doPost(e) {
         ];
 
         sheet.appendRow(rowData);
+        try { syncCandidateRowToCloudflare_(sheet, sheet.getLastRow()); } catch (syncErr) { console.warn(syncErr); }
 
         // --- EMAIL NOTIFICATIONS ---
         sendCandidateEmail(String(data.email || ""), String(data.first_name || "Applicant"), String(data.roles || ""), dept);
@@ -648,6 +683,459 @@ function hasRecentDuplicate_(sheet, dept, email, phone) {
   }
 
   return false;
+}
+
+function getScriptProp_(key) {
+  return String(PropertiesService.getScriptProperties().getProperty(key) || "").trim();
+}
+
+function isCloudflareSyncEnabled_() {
+  return getScriptProp_(CLOUDFLARE_SYNC_ENABLED_PROP).toLowerCase() === "true";
+}
+
+function requireScriptProp_(key) {
+  const value = getScriptProp_(key);
+  if (!value) throw new Error("Missing Apps Script property: " + key);
+  return value;
+}
+
+function cloudflareD1Endpoint_() {
+  return (
+    "https://api.cloudflare.com/client/v4/accounts/" +
+    encodeURIComponent(requireScriptProp_("CLOUDFLARE_ACCOUNT_ID")) +
+    "/d1/database/" +
+    encodeURIComponent(requireScriptProp_("CLOUDFLARE_D1_DATABASE_ID")) +
+    "/query"
+  );
+}
+
+function cloudflareD1Query_(sql, params) {
+  const response = UrlFetchApp.fetch(cloudflareD1Endpoint_(), {
+    method: "post",
+    contentType: "application/json",
+    headers: { Authorization: "Bearer " + requireScriptProp_("CLOUDFLARE_API_TOKEN") },
+    payload: JSON.stringify({ sql: sql, params: params || [] }),
+    muteHttpExceptions: true,
+  });
+  const text = response.getContentText();
+  let parsed = {};
+  try {
+    parsed = JSON.parse(text || "{}");
+  } catch (err) {
+    throw new Error("Cloudflare D1 returned non-JSON: " + text.slice(0, 300));
+  }
+  if (response.getResponseCode() >= 300 || parsed.success !== true) {
+    throw new Error("Cloudflare D1 error: " + text.slice(0, 800));
+  }
+  return parsed;
+}
+
+function cloudflareEnsureSchema_() {
+  if (CLOUDFLARE_SCHEMA_READY) return;
+  cloudflareD1Query_(
+    "CREATE TABLE IF NOT EXISTS candidates (" +
+      "id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp TEXT NOT NULL, department TEXT NOT NULL DEFAULT '', " +
+      "roles TEXT NOT NULL DEFAULT '', first_name TEXT NOT NULL DEFAULT '', last_name TEXT NOT NULL DEFAULT '', " +
+      "email TEXT NOT NULL DEFAULT '', phone TEXT NOT NULL DEFAULT '', city TEXT NOT NULL DEFAULT '', " +
+      "linkedin TEXT NOT NULL DEFAULT '', portfolio TEXT NOT NULL DEFAULT '', why_join TEXT NOT NULL DEFAULT '', " +
+      "answers TEXT NOT NULL DEFAULT '', resume_name TEXT NOT NULL DEFAULT '', resume_key TEXT NOT NULL DEFAULT '', " +
+      "resume_content_type TEXT NOT NULL DEFAULT '', resume_data TEXT NOT NULL DEFAULT '', " +
+      "interview_status TEXT NOT NULL DEFAULT 'Pending Setup', interviewer TEXT NOT NULL DEFAULT '', " +
+      "rating INTEGER NOT NULL DEFAULT 0, final_decision TEXT NOT NULL DEFAULT 'Under Review', " +
+      "request_id TEXT NOT NULL UNIQUE, created_at TEXT NOT NULL, updated_at TEXT NOT NULL" +
+      ")",
+    [],
+  );
+  cloudflareD1Query_("CREATE INDEX IF NOT EXISTS idx_candidates_request_id ON candidates (request_id)", []);
+  cloudflareD1Query_("CREATE INDEX IF NOT EXISTS idx_candidates_email ON candidates (email)", []);
+  cloudflareD1Query_(
+    "CREATE TABLE IF NOT EXISTS form_gates (key TEXT PRIMARY KEY, is_open INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL)",
+    [],
+  );
+  CLOUDFLARE_SCHEMA_READY = true;
+}
+
+function toIsoString_(value) {
+  if (value instanceof Date) return value.toISOString();
+  const text = String(value || "").trim();
+  if (!text) return new Date().toISOString();
+  const parsed = new Date(text);
+  return isNaN(parsed.getTime()) ? text : parsed.toISOString();
+}
+
+function parseIntSafe_(value) {
+  const parsed = parseInt(String(value || "0"), 10);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+function stableMigrationRequestId_(row, rowNum) {
+  const existing = String(row[REQUEST_ID_COL - 1] || "").trim();
+  if (existing) return existing;
+  const oldId = String(row[1] || "").trim();
+  if (oldId) return "migrated_" + sanitizeFilename_(oldId);
+  const email = normalizeEmail_(row[6]);
+  const phone = normalizePhone_(row[7]);
+  const seed = [rowNum, toIsoString_(row[0]), email, phone].join("|");
+  const digest = bytesToHex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, seed)).slice(0, 16);
+  return "migrated_" + digest;
+}
+
+function candidateFromSheetRow_(sheet, rowNum) {
+  ensureRequestIdColumn_(sheet);
+  const row = sheet.getRange(rowNum, 1, 1, Math.max(sheet.getLastColumn(), REQUEST_ID_COL)).getValues()[0] || [];
+  const requestId = stableMigrationRequestId_(row, rowNum);
+  if (!String(row[REQUEST_ID_COL - 1] || "").trim()) {
+    sheet.getRange(rowNum, REQUEST_ID_COL).setValue(requestId);
+  }
+  return {
+    timestamp: toIsoString_(row[0]),
+    department: String(row[2] || ""),
+    roles: String(row[3] || ""),
+    first_name: String(row[4] || ""),
+    last_name: String(row[5] || ""),
+    email: String(row[6] || ""),
+    phone: String(row[7] || ""),
+    city: String(row[8] || ""),
+    linkedin: String(row[9] || ""),
+    portfolio: String(row[10] || ""),
+    why_join: String(row[11] || ""),
+    answers: String(row[12] || ""),
+    resume_link: String(row[13] || ""),
+    interview_status: String(row[14] || "Pending Setup"),
+    interviewer: String(row[15] || ""),
+    rating: parseIntSafe_(row[16]),
+    final_decision: String(row[17] || "Under Review"),
+    request_id: requestId,
+  };
+}
+
+function syncCandidateRowToCloudflare_(sheet, rowNum) {
+  if (!isCloudflareSyncEnabled_()) return { status: "skipped", reason: "Cloudflare sync disabled" };
+  cloudflareEnsureSchema_();
+  const candidate = candidateFromSheetRow_(sheet, rowNum);
+  if (!candidate.email && !candidate.first_name) return { status: "skipped", reason: "empty row" };
+
+  const resumeMeta = uploadSheetResumeToR2_(candidate);
+  upsertCandidateToD1_(candidate, resumeMeta);
+  return { status: "success", request_id: candidate.request_id };
+}
+
+function upsertCandidateToD1_(candidate, resumeMeta) {
+  const now = new Date().toISOString();
+  const params = [
+    candidate.timestamp,
+    candidate.department,
+    candidate.roles,
+    candidate.first_name,
+    candidate.last_name,
+    candidate.email,
+    candidate.phone,
+    candidate.city,
+    candidate.linkedin,
+    candidate.portfolio,
+    candidate.why_join,
+    candidate.answers,
+    resumeMeta.name,
+    resumeMeta.key,
+    resumeMeta.contentType,
+    "",
+    candidate.interview_status,
+    candidate.interviewer,
+    candidate.rating,
+    candidate.final_decision,
+    candidate.request_id,
+    candidate.timestamp,
+    now,
+  ];
+  cloudflareD1Query_(
+    "INSERT INTO candidates (" +
+      "timestamp, department, roles, first_name, last_name, email, phone, city, linkedin, portfolio, why_join, answers, " +
+      "resume_name, resume_key, resume_content_type, resume_data, interview_status, interviewer, rating, final_decision, " +
+      "request_id, created_at, updated_at" +
+      ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+      "ON CONFLICT(request_id) DO UPDATE SET " +
+      "timestamp=excluded.timestamp, department=excluded.department, roles=excluded.roles, first_name=excluded.first_name, " +
+      "last_name=excluded.last_name, email=excluded.email, phone=excluded.phone, city=excluded.city, linkedin=excluded.linkedin, " +
+      "portfolio=excluded.portfolio, why_join=excluded.why_join, answers=excluded.answers, resume_name=excluded.resume_name, " +
+      "resume_key=excluded.resume_key, resume_content_type=excluded.resume_content_type, interview_status=excluded.interview_status, " +
+      "interviewer=excluded.interviewer, rating=excluded.rating, final_decision=excluded.final_decision, updated_at=excluded.updated_at",
+    params,
+  );
+}
+
+function uploadSheetResumeToR2_(candidate) {
+  const file = getDriveFileFromUrl_(candidate.resume_link);
+  if (!file) return { name: "", key: "", contentType: "" };
+  const blob = file.getBlob();
+  const fileName = sanitizeFilename_(file.getName() || "resume");
+  const contentType = blob.getContentType() || "application/octet-stream";
+  const extension = fileName.indexOf(".") >= 0 ? "" : guessExtensionFromContentType_(contentType);
+  const key = "resumes/migrated/" + candidate.request_id + "-" + fileName + extension;
+  cloudflareR2PutObject_(key, blob.getBytes(), contentType);
+  return { name: fileName + extension, key: key, contentType: contentType };
+}
+
+function getDriveFileFromUrl_(url) {
+  const text = String(url || "").trim();
+  if (!text || text.indexOf("drive.google.com") === -1) return null;
+  let match = text.match(/[?&]id=([^&]+)/);
+  if (!match) match = text.match(/\/d\/([^/]+)/);
+  if (!match) return null;
+  try {
+    return DriveApp.getFileById(decodeURIComponent(match[1]));
+  } catch (_) {
+    return null;
+  }
+}
+
+function guessExtensionFromContentType_(contentType) {
+  const type = String(contentType || "").toLowerCase();
+  if (type.indexOf("pdf") >= 0) return ".pdf";
+  if (type.indexOf("wordprocessingml") >= 0) return ".docx";
+  if (type.indexOf("msword") >= 0) return ".doc";
+  return "";
+}
+
+function migrateCloudflareBatch_(sheet, limit, reset) {
+  if (!isCloudflareSyncEnabled_()) return { status: "error", message: "Set CLOUDFLARE_SYNC_ENABLED=true first" };
+  cloudflareEnsureSchema_();
+  const props = PropertiesService.getScriptProperties();
+  if (reset) props.deleteProperty(CLOUDFLARE_MIGRATION_CURSOR_PROP);
+
+  const lastRow = sheet.getLastRow();
+  let rowNum = parseInt(props.getProperty(CLOUDFLARE_MIGRATION_CURSOR_PROP) || "2", 10);
+  if (!rowNum || rowNum < 2) rowNum = 2;
+
+  let processed = 0;
+  let synced = 0;
+  let failed = 0;
+  const errors = [];
+
+  while (rowNum <= lastRow && processed < limit) {
+    try {
+      const result = syncCandidateRowToCloudflare_(sheet, rowNum);
+      if (result && result.status === "success") synced += 1;
+    } catch (err) {
+      failed += 1;
+      errors.push({ row: rowNum, message: String(err).slice(0, 300) });
+    }
+    processed += 1;
+    rowNum += 1;
+  }
+
+  props.setProperty(CLOUDFLARE_MIGRATION_CURSOR_PROP, String(rowNum));
+  syncFormGatesToCloudflare_(readFormGates_());
+  const previousStatus = getCloudflareMigrationStatus_();
+  writeCloudflareMigrationStatus_({
+    running: rowNum <= lastRow,
+    processed: parseInt(previousStatus.processed || "0", 10) + processed,
+    synced: parseInt(previousStatus.synced || "0", 10) + synced,
+    failed: parseInt(previousStatus.failed || "0", 10) + failed,
+    errors: (previousStatus.errors || []).concat(errors).slice(-10),
+    next_row: rowNum,
+    total_rows: Math.max(0, lastRow - 1),
+    done: rowNum > lastRow,
+    updated_at: new Date().toISOString(),
+  });
+
+  return {
+    status: "success",
+    processed: processed,
+    synced: synced,
+    failed: failed,
+    errors: errors,
+    next_row: rowNum,
+    done: rowNum > lastRow,
+  };
+}
+
+function startCloudflareMigration() {
+  return startFullCloudflareMigration_();
+}
+
+function startFullCloudflareMigration_() {
+  if (!isCloudflareSyncEnabled_()) return { status: "error", message: "Set CLOUDFLARE_SYNC_ENABLED=true first" };
+  const props = PropertiesService.getScriptProperties();
+  props.deleteProperty(CLOUDFLARE_MIGRATION_CURSOR_PROP);
+  props.setProperty(CLOUDFLARE_MIGRATION_RUNNING_PROP, "true");
+  writeCloudflareMigrationStatus_({
+    running: true,
+    processed: 0,
+    synced: 0,
+    failed: 0,
+    errors: [],
+    next_row: 2,
+    done: false,
+    updated_at: new Date().toISOString(),
+  });
+  cloudflareEnsureSchema_();
+  syncFormGatesToCloudflare_(readFormGates_());
+  deleteCloudflareMigrationTriggers_();
+  ScriptApp.newTrigger("continueCloudflareMigration").timeBased().after(1000).create();
+  return { status: "success", message: "Full Cloudflare migration started", next_row: 2 };
+}
+
+function continueCloudflareMigration() {
+  const props = PropertiesService.getScriptProperties();
+  if (props.getProperty(CLOUDFLARE_MIGRATION_RUNNING_PROP) !== "true") {
+    deleteCloudflareMigrationTriggers_();
+    return;
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) throw new Error("Sheet not found: " + SHEET_NAME);
+
+  const result = migrateCloudflareBatch_(sheet, CLOUDFLARE_MIGRATION_BATCH_SIZE, false);
+  console.log(JSON.stringify(result));
+
+  deleteCloudflareMigrationTriggers_();
+  if (result.done) {
+    props.deleteProperty(CLOUDFLARE_MIGRATION_RUNNING_PROP);
+    return;
+  }
+  ScriptApp.newTrigger("continueCloudflareMigration").timeBased().after(60 * 1000).create();
+}
+
+function stopCloudflareMigration() {
+  PropertiesService.getScriptProperties().deleteProperty(CLOUDFLARE_MIGRATION_RUNNING_PROP);
+  const status = getCloudflareMigrationStatus_();
+  status.running = false;
+  status.stopped = true;
+  status.updated_at = new Date().toISOString();
+  writeCloudflareMigrationStatus_(status);
+  deleteCloudflareMigrationTriggers_();
+  return "Cloudflare migration stopped.";
+}
+
+function getCloudflareMigrationStatus() {
+  const status = getCloudflareMigrationStatus_();
+  const message =
+    "Cloudflare migration status\n" +
+    "Running: " + (status.running === true ? "yes" : "no") + "\n" +
+    "Done: " + (status.done === true ? "yes" : "no") + "\n" +
+    "Processed: " + (status.processed || 0) + " / " + (status.total_rows || "unknown") + "\n" +
+    "Synced: " + (status.synced || 0) + "\n" +
+    "Failed: " + (status.failed || 0) + "\n" +
+    "Next row: " + (status.next_row || 2) + "\n" +
+    "Updated: " + (status.updated_at || "not started") + "\n" +
+    "Recent errors: " + JSON.stringify(status.errors || []);
+  console.log(message);
+  Logger.log(message);
+  return message;
+}
+
+function getCloudflareMigrationStatus_() {
+  const props = PropertiesService.getScriptProperties();
+  const raw = props.getProperty(CLOUDFLARE_MIGRATION_STATUS_PROP);
+  let status = {};
+  try {
+    status = raw ? JSON.parse(raw) : {};
+  } catch (_) {
+    status = {};
+  }
+  status.status = "success";
+  status.running = props.getProperty(CLOUDFLARE_MIGRATION_RUNNING_PROP) === "true";
+  status.next_row = parseInt(props.getProperty(CLOUDFLARE_MIGRATION_CURSOR_PROP) || status.next_row || "2", 10);
+  return status;
+}
+
+function writeCloudflareMigrationStatus_(status) {
+  PropertiesService.getScriptProperties().setProperty(CLOUDFLARE_MIGRATION_STATUS_PROP, JSON.stringify(status || {}));
+}
+
+function deleteCloudflareMigrationTriggers_() {
+  ScriptApp.getProjectTriggers().forEach((trigger) => {
+    if (trigger.getHandlerFunction && trigger.getHandlerFunction() === "continueCloudflareMigration") {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
+}
+
+function syncFormGatesToCloudflare_(gates) {
+  if (!isCloudflareSyncEnabled_()) return;
+  cloudflareEnsureSchema_();
+  const now = new Date().toISOString();
+  Object.keys(gates || {}).forEach((key) => {
+    cloudflareD1Query_(
+      "INSERT INTO form_gates (key, is_open, updated_at) VALUES (?, ?, ?) " +
+        "ON CONFLICT(key) DO UPDATE SET is_open=excluded.is_open, updated_at=excluded.updated_at",
+      [String(key), gates[key] === false ? 0 : 1, now],
+    );
+  });
+}
+
+function bytesToHex_(bytes) {
+  return bytes
+    .map((b) => {
+      const value = b < 0 ? b + 256 : b;
+      return ("0" + value.toString(16)).slice(-2);
+    })
+    .join("");
+}
+
+function hmacHex_(keyBytes, value) {
+  return bytesToHex_(hmacBytes_(keyBytes, value));
+}
+
+function hmacBytes_(keyBytes, value) {
+  const valueBytes = Array.isArray(value) ? value : Utilities.newBlob(String(value)).getBytes();
+  return Utilities.computeHmacSha256Signature(valueBytes, keyBytes);
+}
+
+function awsUriEncode_(value) {
+  return encodeURIComponent(String(value)).replace(/[!'()*]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase());
+}
+
+function cloudflareR2PutObject_(key, bytes, contentType) {
+  const accountId = requireScriptProp_("CLOUDFLARE_ACCOUNT_ID");
+  const bucket = requireScriptProp_("CLOUDFLARE_R2_BUCKET");
+  const accessKey = requireScriptProp_("CLOUDFLARE_R2_ACCESS_KEY_ID");
+  const secretKey = requireScriptProp_("CLOUDFLARE_R2_SECRET_ACCESS_KEY");
+
+  const now = new Date();
+  const amzDate = Utilities.formatDate(now, "GMT", "yyyyMMdd'T'HHmmss'Z'");
+  const dateStamp = Utilities.formatDate(now, "GMT", "yyyyMMdd");
+  const host = accountId + ".r2.cloudflarestorage.com";
+  const canonicalUri = "/" + awsUriEncode_(bucket) + "/" + String(key).split("/").map(awsUriEncode_).join("/");
+  const payloadHash = bytesToHex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, bytes));
+  const canonicalHeaders =
+    "host:" + host + "\n" +
+    "x-amz-content-sha256:" + payloadHash + "\n" +
+    "x-amz-date:" + amzDate + "\n";
+  const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
+  const canonicalRequest = ["PUT", canonicalUri, "", canonicalHeaders, signedHeaders, payloadHash].join("\n");
+  const credentialScope = dateStamp + "/auto/s3/aws4_request";
+  const stringToSign =
+    "AWS4-HMAC-SHA256\n" +
+    amzDate + "\n" +
+    credentialScope + "\n" +
+    bytesToHex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, canonicalRequest));
+
+  const kDate = hmacBytes_(Utilities.newBlob("AWS4" + secretKey).getBytes(), dateStamp);
+  const kRegion = hmacBytes_(kDate, "auto");
+  const kService = hmacBytes_(kRegion, "s3");
+  const kSigning = hmacBytes_(kService, "aws4_request");
+  const signature = hmacHex_(kSigning, stringToSign);
+  const authorization =
+    "AWS4-HMAC-SHA256 Credential=" + accessKey + "/" + credentialScope +
+    ", SignedHeaders=" + signedHeaders +
+    ", Signature=" + signature;
+
+  const response = UrlFetchApp.fetch("https://" + host + canonicalUri, {
+    method: "put",
+    contentType: contentType || "application/octet-stream",
+    payload: bytes,
+    headers: {
+      Authorization: authorization,
+      "x-amz-content-sha256": payloadHash,
+      "x-amz-date": amzDate,
+    },
+    muteHttpExceptions: true,
+  });
+  if (response.getResponseCode() >= 300) {
+    throw new Error("Cloudflare R2 upload failed: " + response.getResponseCode() + " " + response.getContentText().slice(0, 500));
+  }
 }
 
 function ensureOfferLetterColumns_(sheet) {

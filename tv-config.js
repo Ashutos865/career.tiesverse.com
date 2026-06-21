@@ -1,6 +1,10 @@
-window.TV_APP_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxtJNhAeo6hDl7nKmPRv7OxSBWKQClY5gjTrtsoV_TKJLBQPwsX4DqlkhqUZ-8inmuM6Q/exec";
-// v7
+const TV_IS_LOCAL_FRONTEND =
+  window.location.protocol === "file:" ||
+  ["127.0.0.1", "localhost"].includes(window.location.hostname) &&
+    window.location.port !== "8000";
 
-// Public verification page base (QR points here)
-window.TV_VERIFY_BASE_URL = "https://career.tiesverse.com/verify";
+window.TV_API_URL = TV_IS_LOCAL_FRONTEND
+  ? "http://127.0.0.1:8000/api/"
+  : `${window.location.origin}/api/`;
+
+window.TV_APP_SCRIPT_URL = window.TV_API_URL;
