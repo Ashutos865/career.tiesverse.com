@@ -18,6 +18,7 @@ def load_dotenv(path):
 
 
 load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR / "env")   # also try un-dotted filename
 
 SECRET_KEY = "dev-tiesverse-career-change-me"
 DEBUG = True
@@ -96,3 +97,8 @@ CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "")
 CLOUDFLARE_R2_BUCKET = os.environ.get("CLOUDFLARE_R2_BUCKET", "")
 CLOUDFLARE_R2_ACCESS_KEY_ID = os.environ.get("CLOUDFLARE_R2_ACCESS_KEY_ID", "")
 CLOUDFLARE_R2_SECRET_ACCESS_KEY = os.environ.get("CLOUDFLARE_R2_SECRET_ACCESS_KEY", "")
+
+AWS_SES_ACCESS_KEY_ID = os.environ.get("AWS_SES_ACCESS_KEY_ID", "")
+AWS_SES_SECRET_ACCESS_KEY = os.environ.get("AWS_SES_SECRET_ACCESS_KEY", "")
+AWS_SES_REGION = os.environ.get("AWS_SES_REGION", "us-east-1")
+SES_CAREERS_FROM_EMAIL = os.environ.get("SES_CAREERS_FROM_EMAIL", "careers@tiesverse.com")

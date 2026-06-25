@@ -233,6 +233,19 @@ class CloudflareD1Provider:
                 now_iso(),
             ],
         )
+
+        # Send "Thank you for applying" confirmation email
+        try:
+            from careers.ses_email import send_application_confirmation
+            send_application_confirmation(
+                to_email=str(data.get("email") or ""),
+                first_name=str(data.get("first_name") or "Applicant"),
+                department=department,
+                roles=str(data.get("roles") or ""),
+            )
+        except Exception:
+            pass
+
         return {"status": "success"}
 
     def store_resume(self, data, request_id):
