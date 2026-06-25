@@ -1,6 +1,6 @@
 const RESUMES_FOLDER_NAME = "TV_Resumes";
-const SHEET_NAME = "Master"; 
-const ADMIN_EMAIL = "theindianequation@gmail.com"; 
+const SHEET_NAME = "Master";
+const ADMIN_EMAIL = "theindianequation@gmail.com";
 const CONFIG_SHEET_NAME = "TV_Config";
 const DEDUP_WINDOW_DAYS = 30;
 const DEDUP_WINDOW_MS = DEDUP_WINDOW_DAYS * 24 * 60 * 60 * 1000;
@@ -1350,11 +1350,11 @@ function sendCandidateEmail(targetEmail, firstName, roles, dept) {
     <div style="font-family: sans-serif; max-width: 600px; color: #111;">
       <h2 style="color: #fe7a00;">Hi ${firstName},</h2>
       <p>Your application for <b>${roles}</b> (${dept}) has been successfully submitted.</p>
-      
+
       <div style="background: #fdf2e9; border: 1px solid #fe7a00; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <h3 style="margin-top: 0; color: #fe7a00;">⚠️ ACTION REQUIRED</h3>
         <p>Shortlisting updates, test tasks, and interview links are shared <b>only</b> via our WhatsApp community.</p>
-        <a href="https://chat.whatsapp.com/CvRuM20vyEW25QV3iWqE6y" 
+        <a href="https://chat.whatsapp.com/CvRuM20vyEW25QV3iWqE6y"
            style="display: inline-block; background: #25D366; color: #fff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">
            Join WhatsApp Community Group
         </a>

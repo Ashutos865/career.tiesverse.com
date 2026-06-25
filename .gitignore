@@ -9,4 +9,5 @@ backend/media/resumes/*
 .tmp/
 .pip-cache/
 .env
+backend/env
 migration/
