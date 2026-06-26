@@ -1,0 +1,23 @@
+[Unit]
+Description=TiesVerse Career API (Django + gunicorn)
+After=network.target
+
+[Service]
+Type=notify
+User=ubuntu
+Group=ubuntu
+# Adjust these two paths to where you cloned the repo on the server:
+WorkingDirectory=/home/ubuntu/tiesverse-career-page/backend
+Environment="PATH=/home/ubuntu/tiesverse-career-page/backend/.venv/bin"
+# Secrets/config are read from backend/env (gitignored). See DEPLOY.md.
+ExecStart=/home/ubuntu/tiesverse-career-page/backend/.venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8011 \
+    --access-logfile - \
+    --error-logfile - \
+    tiesverse_backend.wsgi:application
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

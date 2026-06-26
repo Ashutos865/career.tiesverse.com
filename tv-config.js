@@ -1,11 +1,20 @@
-// The Django backend serves these pages AND the /api/ endpoint from the SAME
-// origin, so in the browser we always call the current origin. Only when a page
-// is opened directly from disk (file://) do we need an absolute fallback URL.
+// API base resolution.
+//
+// Production: the static frontend is hosted on career.tiesverse.com while the
+// Django API runs on its own subdomain, so we point at it explicitly.
+// Local dev: the Django app serves BOTH the pages and /api/ from one origin,
+// so we just use the current origin.
+const TV_PROD_API = "https://api.career.tiesverse.com/api/";
 const TV_FALLBACK_API = "http://127.0.0.1:8000/api/";
+
+const host = window.location.hostname;
+const isLocal = ["localhost", "127.0.0.1"].includes(host);
 
 window.TV_API_URL =
   window.location.protocol === "file:"
     ? TV_FALLBACK_API
-    : `${window.location.origin}/api/`;
+    : isLocal
+      ? `${window.location.origin}/api/`   // dev: Django serves pages + API together
+      : TV_PROD_API;                       // prod: dedicated API subdomain
 
 window.TV_APP_SCRIPT_URL = window.TV_API_URL;

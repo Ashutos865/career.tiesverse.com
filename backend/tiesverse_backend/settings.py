@@ -20,9 +20,15 @@ def load_dotenv(path):
 load_dotenv(BASE_DIR / ".env")
 load_dotenv(BASE_DIR / "env")   # also try un-dotted filename
 
-SECRET_KEY = "dev-tiesverse-career-change-me"
-DEBUG = True
-ALLOWED_HOSTS = ["*"]
+# Production overrides come from env (see backend/env). Local dev keeps the old
+# permissive defaults when these vars are unset.
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-tiesverse-career-change-me")
+DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",") if h.strip()]
+
+# When fronted by nginx over HTTPS, trust the proxy's forwarded scheme.
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
