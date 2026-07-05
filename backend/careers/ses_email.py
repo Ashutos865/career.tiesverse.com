@@ -27,8 +27,43 @@ def _is_configured():
     )
 
 
+def _render_admin_template(first_name, role_label):
+    """Fetch the admin-managed 'career_application' template from the admin panel
+    and fill its {{tokens}}. Returns (subject, html) or (None, None) if the admin
+    API is unreachable — so the built-in email below is used as a fallback."""
+    from django.conf import settings
+    import re
+    import json
+    from urllib.request import urlopen, Request
+    base = getattr(settings, "ADMIN_PUBLIC_API", "").rstrip("/")
+    if not base:
+        return None, None
+    try:
+        req = Request(
+            f"{base}/api/public/email-template/career_application/",
+            headers={"Accept": "application/json"},
+        )
+        with urlopen(req, timeout=6) as resp:
+            if resp.status != 200:
+                return None, None
+            tpl = json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        logger.info("Admin template fetch failed, using built-in email: %s", exc)
+        return None, None
+    ctx = {
+        "name": first_name or "there",
+        "role": role_label or "the team",
+        "careers_url": "https://tiesverse.com",
+    }
+    sub = lambda t: re.sub(r"{{\s*(\w+)\s*}}", lambda m: str(ctx.get(m.group(1), m.group(0))), t or "")
+    subject = sub(tpl.get("subject", "")) or None
+    html = sub(tpl.get("body_html", "")) or None
+    return subject, html
+
+
 def send_application_confirmation(to_email, first_name, department, roles):
-    """Send a 'Thank you for applying' email via AWS SES. Never raises."""
+    """Send a 'Thank you for applying' email via AWS SES. Never raises.
+    Uses the admin-managed template when available, else the built-in HTML."""
     if not _is_configured():
         logger.warning("SES not configured — skipping career confirmation email to %s", to_email)
         return False
@@ -37,9 +72,13 @@ def send_application_confirmation(to_email, first_name, department, roles):
     import boto3
 
     role_label = ROLE_LABELS.get(roles, roles) if roles else department
-    subject = "Thank you for applying to TiesVerse!"
 
-    html_body = f"""
+    # Prefer the admin-managed 'career_application' template (edited in the admin
+    # Email Designer). Fall back to the built-in HTML below if unreachable.
+    subject, html_body = _render_admin_template(first_name, role_label)
+    if not (subject and html_body):
+        subject = "Thank you for applying to TiesVerse!"
+        html_body = f"""
 <!DOCTYPE html>
 <html>
 <head>

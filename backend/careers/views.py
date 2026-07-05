@@ -205,6 +205,16 @@ def create_candidate(data, request):
 
     if created:
         save_resume(candidate, data)
+        # Send the admin-managed confirmation email (never raises).
+        try:
+            from .ses_email import send_application_confirmation
+            send_application_confirmation(
+                candidate.email, candidate.first_name,
+                candidate.department, candidate.roles,
+            )
+        except Exception as exc:  # noqa: BLE001
+            import logging
+            logging.getLogger(__name__).warning("Confirmation email failed: %s", exc)
     return {"status": "success"}
 
 
