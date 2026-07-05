@@ -108,3 +108,8 @@ AWS_SES_ACCESS_KEY_ID = os.environ.get("AWS_SES_ACCESS_KEY_ID", "")
 AWS_SES_SECRET_ACCESS_KEY = os.environ.get("AWS_SES_SECRET_ACCESS_KEY", "")
 AWS_SES_REGION = os.environ.get("AWS_SES_REGION", "us-east-1")
 SES_CAREERS_FROM_EMAIL = os.environ.get("SES_CAREERS_FROM_EMAIL", "careers@tiesverse.com")
+
+# Base URL of the admin panel's public API — used to fetch the admin-managed
+# 'career_application' email template so HR can edit the confirmation email from
+# the panel. Blank = fall back to the built-in email.
+ADMIN_PUBLIC_API = os.environ.get("ADMIN_PUBLIC_API", "http://127.0.0.1:8000")

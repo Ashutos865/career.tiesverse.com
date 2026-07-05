@@ -1,1130 +1,469 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TIESVERSE | Careers</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&family=Poppins:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-    <style>
-*,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box
-        }
-
-        :root {
-            --bg: #0a0a0a;
-            --accent: #fe7a00;
-            --text: #ffffff;
-            --text-dim: rgba(255, 255, 255, 0.55);
-            --text-muted: rgba(255, 255, 255, 0.25);
-            --border: rgba(255, 255, 255, 0.1);
-            --card-bg: rgba(255, 255, 255, 0.03);
-        }
-
-        html {
-            scroll-behavior: smooth;
-            overflow-x: hidden
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background:
-                radial-gradient(520px 900px at -12% 55%, rgba(254, 122, 0, 0.16), transparent 62%),
-                radial-gradient(520px 900px at 112% 45%, rgba(254, 122, 0, 0.10), transparent 62%),
-                var(--bg);
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            color: var(--text);
-            overflow-x: hidden;
-            position: relative;
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-            min-height: 100vh
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.08;
-            mix-blend-mode: overlay;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            background: radial-gradient(1200px 900px at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%);
-        }
-
-        ::selection {
-            background: rgba(254, 122, 0, 0.35);
-            color: var(--text);
-        }
-
-        :focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 3px;
-        }
-
-        /* -- PARTICLES -- */
-        #particles {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none
-        }
-
-        /* -- HEADER -- */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 32px 24px;
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 10;
-        }
-
-        .logo {
-            font-family: 'Inter', sans-serif;
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text);
-            text-decoration: none
-        }
-
-        .logo .dot {
-            color: var(--accent)
-        }
-
-        .logo span {
-            color: var(--accent)
-        }
-
-        .logo small {
-            font-size: 9px;
-            font-weight: 600;
-            color: var(--text-dim);
-            display: block;
-            letter-spacing: 1px;
-            margin-top: -2px
-        }
-
-        .header-cta {
-            background: var(--accent);
-            color: var(--bg);
-            padding: 10px 24px;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-            transition: 0.2s;
-        }
-
-        .header-cta:hover {
-            filter: brightness(1.15);
-            transform: translateY(-1px)
-        }
-
-        /* -- HERO -- */
-        .hero {
-            text-align: center;
-            padding: 60px 24px 80px;
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: clamp(32px, 6vw, 62px);
-            line-height: 1.1;
-            text-transform: none;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 .accent {
-            color: var(--accent)
-        }
-
-        .hero p {
-            font-size: 16px;
-            color: var(--text-dim);
-            line-height: 1.7;
-            max-width: 560px;
-            margin: 0 auto 32px;
-        }
-
-        .hero-btn {
-            display: inline-block;
-            background: var(--accent);
-            color: var(--bg);
-            padding: 14px 32px;
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            letter-spacing: 0.5px;
-            transition: 0.2s;
-        }
-
-        .hero-btn:hover {
-            filter: brightness(1.15);
-            transform: translateY(-2px)
-        }
-
-        /* -- OPEN POSITIONS SECTION -- */
-        .positions-section {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 60px 24px 80px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .positions-title {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 32px;
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        /* -- FILTER BAR -- */
-        .filter-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 40px;
-        }
-
-        .filter-select {
-            appearance: none;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px 40px 10px 16px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            color: var(--text);
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.2s;
-            min-width: 180px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23fe7a00' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-        }
-
-        .filter-select:hover,
-        .filter-select:focus {
-            border-color: var(--accent)
-        }
-
-        .filter-select option {
-            background: #111;
-            color: var(--text)
-        }
-
-        /* -- DEPARTMENT ACCORDION -- */
-        .dept-group {
-            border-top: 1px solid var(--border)
-        }
-
-        .dept-group:last-child {
-            border-bottom: 1px solid var(--border)
-        }
-
-        .dept-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 0;
-            cursor: pointer;
-            user-select: none;
-            transition: color 0.2s;
-        }
-
-        .dept-header:hover {
-            color: var(--accent)
-        }
-
-        .dept-header h3 {
-            font-family: 'Inter', sans-serif;
-            font-size: 18px;
-            font-weight: 700
-        }
-
-        .dept-chevron {
-            width: 20px;
-            height: 20px;
-            transition: transform 0.3s;
-            color: var(--text-dim);
-        }
-
-        .dept-group.open .dept-chevron {
-            transform: rotate(180deg)
-        }
-
-        .dept-roles {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-        }
-
-        .dept-group.open .dept-roles {
-            max-height: 2000px
-        }
-
-        /* -- ROLE ROW -- */
-        .role-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 0 16px 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background 0.15s;
-            cursor: pointer;
-        }
-
-        .role-row:hover {
-            background: rgba(254, 122, 0, 0.03)
-        }
-
-        .role-row .role-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 10px
-        }
-
-        .role-badge {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            padding: 5px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: var(--text-dim);
-            background: rgba(255, 255, 255, 0.03);
-            white-space: nowrap
-        }
-
-        .role-badge.closed {
-            border-color: rgba(255, 255, 255, 0.12);
-            color: rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.02)
-        }
-
-        .role-row .role-meta {
-            font-size: 11px;
-            color: var(--text-dim);
-            letter-spacing: 0.3px
-        }
-
-        .role-row.closed {
-            opacity: 0.55;
-            cursor: not-allowed
-        }
-
-        .role-row.closed:hover {
-            background: transparent
-        }
-
-        .apply-btn.disabled {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-dim);
-            cursor: not-allowed;
-            pointer-events: none
-        }
-
-        .role-row .role-meta span {
-            margin: 0 6px;
-            opacity: 0.4
-        }
-
-        .apply-btn {
-            background: var(--accent);
-            color: var(--bg);
-            padding: 8px 20px;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.2s;
-            text-decoration: none;
-        }
-
-        .apply-btn:hover {
-            filter: brightness(1.15)
-        }
-
-        /* -- SWIPER CAROUSEL -- */
-        .swiper {
-            width: 90%;
-            max-width: 800px;
-            margin: 0 auto 60px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            height: clamp(220px, 38vw, 420px);
-            position: relative;
-        }
-
-        .swiper-slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .swiper::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background:
-                linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0) 40%),
-                linear-gradient(0deg, rgba(0,0,0,0.30), rgba(0,0,0,0) 55%);
-            z-index: 2;
-        }
-
-        .swiper .swiper-pagination {
-            bottom: 14px !important;
-            z-index: 3;
-        }
-
-        .swiper .swiper-pagination-bullet {
-            width: 8px;
-            height: 8px;
-            opacity: 0.55;
-            background: rgba(255, 255, 255, 0.6);
-        }
-
-        .swiper .swiper-pagination-bullet-active {
-            opacity: 1;
-            background: var(--accent);
-        }
-/* -- FOOTER -- */
-        .footer {
-            text-align: center;
-            padding: 80px 24px 60px;
-            position: relative;
-            z-index: 2;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .footer-glow {
-            position: absolute;
-            bottom: -150px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 800px;
-            height: 300px;
-            background: radial-gradient(ellipse at center, rgba(254, 122, 0, 0.15) 0%, transparent 60%);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .footer .logo {
-            margin-bottom: 32px;
-        }
-
-        .footer-socials {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .social-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-dim);
-            transition: 0.3s ease;
-        }
-
-        .social-icon:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            transform: translateY(-2px);
-        }
-
-        .social-icon svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .footer-links {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 32px;
-            margin-bottom: 32px;
-        }
-
-        .footer-links a {
-            color: var(--text-dim);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer-links a:hover {
-            color: var(--text);
-        }
-
-        .footer-copyright {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 0.5px;
-        }
-
-        /* -- RESPONSIVE -- */
-        @media(max-width:768px) {
-            .header {
-                padding: 16px 20px
-            }
-
-            .header-cta {
-                padding: 8px 16px;
-                font-size: 12px
-            }
-
-            .hero {
-                padding: 40px 20px 60px
-            }
-
-            .positions-section {
-                padding: 40px 16px 60px
-            }
-
-            .filter-bar {
-                flex-direction: column;
-                gap: 10px
-            }
-
-            .filter-select {
-                width: 100%;
-                min-width: 0
-            }
-
-            .role-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-                padding: 16px 0 16px 16px
-            }
-
-            .apply-btn {
-                align-self: flex-start
-            }
-
-        }
-    </style>
-    <link rel="stylesheet" href="tiesverse-theme.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apply · Tiesverse Internships</title>
+  <script src="tv-config.js"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=Manrope:wght@400;500;600;700;800&display=swap");
+
+    :root{
+      --orange:#FE7A00; --orange-d:#e56d00; --orange-ink:#9a4b00;
+      --ink:#1d160d; --muted:#6f6656; --faint:rgba(29,22,13,.48);
+      --rule:#eadfce; --hair:rgba(29,22,13,.08);
+      --paper:#fdf9f2; --card:#ffffff; --field:#fbf8f3;
+      --radius:16px; --shadow:0 22px 55px rgba(70,40,0,.09);
+      --serif:"Fraunces",Georgia,serif;
+      --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box}
+    html{background:var(--paper)}
+    body{
+      margin:0;color:var(--ink);font-family:var(--sans);line-height:1.55;letter-spacing:-.01em;
+      background:
+        radial-gradient(680px 460px at 12% -10%, rgba(254,122,0,.10), transparent 66%),
+        radial-gradient(720px 520px at 100% 6%, rgba(255,209,148,.16), transparent 68%),
+        linear-gradient(180deg,#fdf9f2 0%,#fff7eb 52%,#fdf9f2 100%);
+      background-attachment:fixed;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap{max-width:620px;margin:0 auto;padding:44px 20px 84px}
+
+    /* header */
+    .brand{display:inline-flex;align-items:center;font-weight:800;font-size:20px;letter-spacing:-.04em;color:var(--ink)}
+    .brand .dot,.brand .verse{color:var(--orange)}
+    h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,5.6vw,46px);letter-spacing:-.02em;line-height:1.03;margin:20px 0 10px;text-wrap:balance}
+    .lede{color:var(--muted);font-size:16px;line-height:1.6;margin:0;max-width:52ch}
+    .meta{font-size:13px;color:var(--faint);margin:16px 0 26px}
+    .meta .req{color:var(--orange)}
+
+    /* card + sections (single card, hairline-divided — no nested boxes) */
+    .card{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);box-shadow:var(--shadow);padding:2px 24px}
+    .sec{padding:22px 0}
+    .divider{height:1px;background:var(--hair)}
+    .sec-eyebrow{display:block;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:16px}
+    .sec-eyebrow em{font-style:normal;color:var(--faint);font-weight:600;letter-spacing:.01em;text-transform:none;font-size:12px;margin-left:7px}
+
+    /* fields */
+    .field{margin-bottom:13px}
+    .field:last-child{margin-bottom:0}
+    label{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .req{color:var(--orange)}
+    .hint{font-weight:400;color:var(--faint)}
+    input,textarea{
+      width:100%;padding:9px 12px;border:1px solid var(--rule);border-radius:9px;
+      font:inherit;font-size:14px;background:var(--field);color:var(--ink);
+      transition:border-color .18s,box-shadow .18s,background .18s;
+    }
+    input:hover,textarea:hover{border-color:#d9cbb4}
+    input:focus,textarea:focus{outline:none;border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(254,122,0,.14)}
+    input::placeholder,textarea::placeholder{color:var(--faint)}
+    textarea{resize:vertical;min-height:72px;line-height:1.5}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:13px}
+    .grid2 .field{margin-bottom:0}
+    @media(max-width:520px){.grid2{grid-template-columns:1fr;gap:0}.grid2 .field{margin-bottom:13px}}
+
+    /* custom dropdown */
+    .tvselect{position:relative}
+    .tvselect-btn{
+      width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:9px 12px;border:1px solid var(--rule);border-radius:9px;background:var(--field);
+      color:var(--ink);font:inherit;font-size:14px;text-align:left;cursor:pointer;
+      transition:border-color .18s,box-shadow .18s,background .18s;
+    }
+    .tvselect-btn:hover{border-color:#d9cbb4}
+    .tvselect.open .tvselect-btn,.tvselect-btn:focus-visible{outline:none;border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(254,122,0,.14)}
+    .tvselect-value.placeholder{color:var(--faint)}
+    .tvselect-chev{flex:none;display:grid;color:var(--muted);transition:transform .22s ease}
+    .tvselect.open .tvselect-chev{transform:rotate(180deg)}
+    .tvselect-panel{
+      position:absolute;z-index:40;top:calc(100% + 6px);left:0;right:0;
+      background:#fff;border:1px solid var(--rule);border-radius:12px;
+      box-shadow:0 20px 46px rgba(70,40,0,.16);padding:6px;max-height:296px;overflow:auto;
+      display:none;animation:selIn .16s ease;
+    }
+    .tvselect.open .tvselect-panel{display:block}
+    @keyframes selIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+    .tvselect-opt{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:10px 12px;border-radius:8px;cursor:pointer;
+    }
+    .tvselect-opt .opt-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .tvselect-opt .opt-label{font-size:14.5px;font-weight:500}
+    .tvselect-opt .opt-sub{font-size:11px;color:var(--faint);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .tvselect-opt .opt-check{flex:none;color:var(--orange);font-weight:800;opacity:0;transition:opacity .12s}
+    .tvselect-opt.active{background:rgba(254,122,0,.10)}
+    .tvselect-opt.selected .opt-label{color:var(--orange-ink);font-weight:700}
+    .tvselect-opt.selected .opt-check{opacity:1}
+    .tvselect-empty{padding:12px;color:var(--faint);font-size:14px;text-align:center}
+
+    #roleQuestions{margin-top:16px}
+    .role-empty{color:var(--faint);font-size:14px;padding:16px;border:1px dashed var(--rule);border-radius:10px;text-align:center;background:rgba(255,255,255,.4)}
+
+    /* file upload */
+    .file{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+    .file-btn{
+      display:inline-flex;align-items:center;gap:9px;padding:9px 14px;border:1px solid var(--rule);
+      border-radius:9px;background:var(--field);font:inherit;font-size:13.5px;font-weight:600;color:var(--ink);
+      cursor:pointer;transition:border-color .16s,background .16s,color .16s;
+    }
+    .file-btn:hover{border-color:var(--orange);background:rgba(254,122,0,.07);color:var(--orange-ink)}
+    .file-btn svg{width:16px;height:16px}
+    .file-name{font-size:13px;color:var(--faint)}
+    .file-name.has{color:var(--ink);font-weight:600}
+
+    /* acknowledgement */
+    .ack{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--muted);line-height:1.5;margin:22px 2px 0;cursor:pointer}
+    .ack input{position:absolute;opacity:0;width:0;height:0}
+    .ack .box{flex:none;width:20px;height:20px;border:1.6px solid var(--rule);border-radius:6px;background:var(--field);display:grid;place-items:center;margin-top:1px;transition:background .16s,border-color .16s,box-shadow .16s}
+    .ack .box svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0;transition:opacity .12s}
+    .ack input:checked + .box{background:var(--orange);border-color:var(--orange)}
+    .ack input:checked + .box svg{opacity:1}
+    .ack input:focus-visible + .box{box-shadow:0 0 0 3px rgba(254,122,0,.22)}
+
+    /* submit + messages */
+    .submit{
+      width:100%;margin-top:22px;padding:15px;border:none;border-radius:12px;background:var(--orange);
+      color:#fff;font:inherit;font-size:16px;font-weight:800;letter-spacing:.01em;cursor:pointer;
+      box-shadow:0 12px 26px rgba(254,122,0,.24);transition:background .2s,transform .1s,box-shadow .2s;
+    }
+    .submit:hover{background:var(--orange-d);transform:translateY(-1px)}
+    .submit:active{transform:translateY(0)}
+    .submit:disabled{opacity:.6;cursor:wait;transform:none}
+    .msg{padding:13px 15px;border-radius:11px;font-size:14px;font-weight:600;margin-bottom:16px;display:none}
+    .msg.err{background:#fdecec;color:#a7141f;border:1px solid #f5c2c2;display:block}
+    .msg.ok{background:#e8faf2;color:#065f46;border:1px solid #a7e8cd;display:block}
+
+    /* success */
+    .done{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);box-shadow:var(--shadow);padding:50px 28px;text-align:center}
+    .done .tick{width:66px;height:66px;border-radius:50%;background:#e8faf2;color:#16a34a;display:grid;place-items:center;font-size:32px;margin:0 auto 20px}
+    .done h2{font-family:var(--serif);font-weight:500;font-size:26px;margin:0 0 10px}
+    .done p{color:var(--muted);font-size:15px;line-height:1.6;margin:0 auto;max-width:44ch}
+    .done strong{color:var(--ink)}
+
+    @media(max-width:520px){
+      .wrap{padding:28px 14px 64px}
+      .card{padding:0 16px;border-radius:14px}
+      .sec{padding:20px 0}
+    }
+    @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+  </style>
 </head>
-
 <body>
-    <canvas id="particles"></canvas>
+  <div class="wrap">
+    <span class="brand"><span class="dot">.</span>ties<span class="verse">verse</span></span>
+    <h1>Apply for an internship</h1>
+    <p class="lede">One short form — pick your role, answer a few quick questions, and you're in.</p>
+    <p class="meta">Fields marked <span class="req">*</span> are required.</p>
 
-    <!-- Header -->
-    <header class="header">
-        <a href="#" class="logo">
-            <div><span class="dot">.</span>ties<span>verse</span><small>Foundation</small></div>
-        </a>
-    </header>
+    <div id="formHost">
+      <div id="msg" class="msg"></div>
+      <form id="applyForm" novalidate>
+        <div class="card">
+          <!-- Your details -->
+          <section class="sec">
+            <span class="sec-eyebrow">Your details</span>
+            <div class="grid2">
+              <div class="field"><label>First name <span class="req">*</span></label><input name="first_name" required /></div>
+              <div class="field"><label>Last name <span class="req">*</span></label><input name="last_name" required /></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Email <span class="req">*</span></label><input name="email" type="email" required /></div>
+              <div class="field"><label>WhatsApp number <span class="req">*</span></label><input name="phone" required placeholder="+91…" /></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>LinkedIn profile URL <span class="req">*</span></label><input name="linkedin" required placeholder="https://linkedin.com/in/…" /></div>
+              <div class="field"><label>Current city <span class="req">*</span></label><input name="city" required /></div>
+            </div>
+            <div class="field"><label>Portfolio / GitHub / Behance <span class="hint">(if any)</span></label><input name="portfolio" placeholder="https://…" /></div>
+            <div class="field"><label>Why do you want to join us? <span class="req">*</span></label><textarea name="why_join" required placeholder="A few sentences."></textarea></div>
+          </section>
 
-    <!-- Hero -->
-    <section class="hero">
-        <h1>Join us in<br>building <span class="accent">.</span>ties<span class="accent">verse</span></h1>
-        <p>We're building impactful research, media, and tech projects. Join us to work on real challenges and shape the
-            future of digital media in India.</p>
-        <a href="#positions" class="hero-btn">See Open Positions</a>
-    </section>
+          <div class="divider"></div>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
-    <div class="swiper" aria-label="Tiesverse highlights carousel">
-        <div class="swiper-wrapper">
-            <div class="swiper-slide"><img src="main.jpg" alt="Tiesverse highlight 1" loading="lazy" decoding="async" /></div>
-            <div class="swiper-slide"><img src="main2.jpg" alt="Tiesverse highlight 2" loading="lazy" decoding="async" /></div>
-            <div class="swiper-slide"><img src="main3.jpg" alt="Tiesverse highlight 3" loading="lazy" decoding="async" /></div>
+          <!-- Role -->
+          <section class="sec">
+            <span class="sec-eyebrow">Role</span>
+            <div class="field">
+              <label>Which role are you applying for? <span class="req">*</span></label>
+              <div id="roleMount"></div>
+            </div>
+            <div id="roleQuestions"><div class="role-empty">Pick a role above to see its questions.</div></div>
+          </section>
+
+          <div class="divider"></div>
+
+          <!-- Resume -->
+          <section class="sec">
+            <span class="sec-eyebrow">Resume <em>optional · PDF</em></span>
+            <input id="resumeInput" type="file" accept="application/pdf,.pdf" hidden />
+            <div class="file">
+              <button type="button" class="file-btn" id="fileBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Choose PDF file
+              </button>
+              <span class="file-name" id="fileName">No file chosen</span>
+            </div>
+          </section>
         </div>
-        <div class="swiper-pagination"></div>
+
+        <label class="ack">
+          <input type="checkbox" id="ack" required />
+          <span class="box"><svg viewBox="0 0 14 14"><path d="M2 7l3.5 3.5L12 3.5"/></svg></span>
+          <span>I confirm the information above is accurate and agree to be contacted about my application.</span>
+        </label>
+
+        <button type="submit" class="submit" id="submitBtn">Submit application</button>
+      </form>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
-    <script>
-        new Swiper('.swiper', {
-            loop: true,
-            speed: 650,
-            grabCursor: true,
-            keyboard: { enabled: true },
-            autoplay: { delay: 7000, disableOnInteraction: false, pauseOnMouseEnter: true },
-            pagination: { el: '.swiper-pagination', clickable: true },
+  <script>
+    // ── Roles → department gate + role-specific questions (from Career page.md) ──
+    const ROLES = [
+      { key:'content_editor', dept:'Content', label:'Content Editor', q:[
+        'Link to 2–3 editing or writing samples (if any).',
+        'Which topics are you most comfortable editing/fact-checking (e.g., Tech, Geopolitics, Business)?',
+        'On a scale of 1–10, how would you rate your attention to detail regarding grammar and formatting?',
+        'What is your process for verifying a fact before publishing?',
+        'Are you comfortable using AI tools like Grammarly or Hemingway to refine content?' ] },
+      { key:'content_writer_upsc', dept:'Content', label:'Content Writer', q:[
+        'Link to a folder or blog of your previous writing (if any).',
+        'Do you prefer writing long-form deep dives or short, catchy social media copy?',
+        'How do you use AI tools (like ChatGPT) to improve your writing without losing your "human voice"?',
+        'Can you turn around a 500-word article within 4 hours if a news story breaks?',
+        'Which niche are you most passionate about writing for?' ] },
+      { key:'graphic_designer_canva', dept:'Content', label:'Graphics Designer', q:[
+        'Link to your Behance, Dribbble, or Drive portfolio (if any).',
+        'Which software do you use for daily design work (Figma, Photoshop, Canva, etc.)?',
+        'Briefly describe your design style (Minimalist, Bold, Corporate, etc.).',
+        'How long does it usually take you to create a high-quality LinkedIn carousel?',
+        'Are you comfortable following strict brand guidelines (colors, fonts)?' ] },
+      { key:'uiux_designer', dept:'Content', label:'UI/UX Designer', q:[
+        'Link to a UI/UX project or Figma prototype (if any).',
+        'What is the first thing you consider when designing a landing page for a tech product?',
+        'Are you proficient in Figma, Adobe XD, or Framer?',
+        'Have you ever worked directly with developers to hand off designs?',
+        'Do you have experience creating design systems (components, buttons, etc.)?' ] },
+      { key:'video_editor_reels_yt', dept:'Media', label:'Video Editor', q:[
+        'Link to your best edited video or a YouTube playlist (if any).',
+        'Which software do you use (Premiere Pro, After Effects, CapCut Desktop, etc.)?',
+        'How comfortable are you with sound design and background music leveling?',
+        'Do you keep up with the latest transition trends on Reels/Shorts?',
+        'What is your typical turnaround time for a 60-second edited reel?' ] },
+      { key:'social_media_manager_ig', dept:'Media', label:'Social Media Management', q:[
+        'Link to any social media page you have managed or grown (if any).',
+        'Which platforms do you understand the algorithm for best (Instagram, X, LinkedIn)?',
+        'Do you know how to read platform insights to improve reach?',
+        'Write a 1-sentence "hook" to promote an AI internship on X (Twitter).',
+        'How do you stay updated with daily social media trends?' ] },
+      { key:'hr', dept:'Operations', label:'Human Resource (HR)', q:[
+        'Do you have experience using LinkedIn, Discord, or Telegram for talent sourcing?',
+        'How would you handle a situation where an intern is consistently missing deadlines?',
+        'What is one thing you would do to keep a remote team of interns motivated?',
+        'Are you comfortable conducting 15-minute initial screening calls?',
+        'How do you manage and organize candidate data (Sheets, Notion, etc.)?' ] },
+      { key:'marketing_outreach', dept:'Operations', label:'Marketing and Outreach', q:[
+        'How would you approach a potential partner for a collaboration or event?',
+        'Do you prefer "Cold DMing" on LinkedIn or "Cold Emailing"?',
+        'Have you ever handled event promotions or campus ambassadorships (if any)?',
+        'How do you track your leads or outreach messages?',
+        'What is your strategy for getting people to register for an online webinar?' ] },
+      { key:'management_coordination', dept:'Operations', label:'Management / Team Co-ordination', q:[
+        'Which tools do you use to manage tasks (Notion, Trello, WhatsApp, etc.)?',
+        'Describe a time you had to lead a group project or a small team.',
+        'If a project is stuck because of a technical bug, what is your first step?',
+        'Are you comfortable creating SOPs (Standard Operating Procedures) for other interns?',
+        'How do you handle multiple projects with overlapping deadlines?' ] },
+      { key:'tech_roles', dept:'Tech', label:'Tech Role (Developer)', hasSub:true, q:[
+        'Link to your GitHub profile or hosted sites (if any).',
+        'Which stack / languages are you most comfortable with?',
+        'Can you build a pixel-perfect page from a Figma design, or design robust APIs?',
+        'Describe a project you have built and deployed.' ] },
+    ];
+    const TECH_SUB = ['Frontend Developer','Backend Developer','Automation Engineer','Python Developer','Full Stack Developer'];
+
+    // ── Reusable custom dropdown (accessible: click, keyboard, outside-close) ──
+    function TVSelect(mount, cfg){
+      const state = { value:'', open:false, active:-1, options:(cfg.options||[]).slice(), disabled:false };
+      mount.classList.add('tvselect'); mount.innerHTML='';
+      const btn = document.createElement('button');
+      btn.type='button'; btn.className='tvselect-btn';
+      btn.setAttribute('aria-haspopup','listbox'); btn.setAttribute('aria-expanded','false');
+      const val = document.createElement('span'); val.className='tvselect-value placeholder'; val.textContent = cfg.placeholder||'Select…';
+      const chev = document.createElement('span'); chev.className='tvselect-chev';
+      chev.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+      btn.append(val, chev);
+      const panel = document.createElement('div'); panel.className='tvselect-panel'; panel.setAttribute('role','listbox');
+      const hidden = document.createElement('input'); hidden.type='hidden';
+      if (cfg.dataQ) hidden.setAttribute('data-q', cfg.dataQ);
+      mount.append(btn, panel, hidden);
+
+      const labelOf = () => { const o = state.options.find(o => o.value===state.value); return o ? o.label : ''; };
+      function renderVal(){
+        if (state.value){ val.textContent = labelOf(); val.classList.remove('placeholder'); }
+        else { val.textContent = cfg.placeholder||'Select…'; val.classList.add('placeholder'); }
+      }
+      function renderOpts(){
+        panel.innerHTML='';
+        if (!state.options.length){ const e=document.createElement('div'); e.className='tvselect-empty'; e.textContent=cfg.emptyText||'No options'; panel.appendChild(e); return; }
+        state.options.forEach((o,i) => {
+          const el = document.createElement('div');
+          el.className = 'tvselect-opt' + (o.value===state.value?' selected':'') + (i===state.active?' active':'');
+          el.setAttribute('role','option'); el.setAttribute('aria-selected', o.value===state.value?'true':'false');
+          el.innerHTML = '<span class="opt-main"><span class="opt-label"></span>' + (o.sub?'<span class="opt-sub"></span>':'') + '</span><span class="opt-check">✓</span>';
+          el.querySelector('.opt-label').textContent = o.label;
+          if (o.sub) el.querySelector('.opt-sub').textContent = o.sub;
+          el.addEventListener('mousemove', () => { if (state.active!==i){ state.active=i; syncActive(); } });
+          el.addEventListener('click', () => choose(i));
+          panel.appendChild(el);
         });
-    </script>
+      }
+      function syncActive(){
+        [...panel.children].forEach((c,i) => c.classList && c.classList.toggle('active', i===state.active));
+        const a = panel.children[state.active]; if (a && a.scrollIntoView) a.scrollIntoView({ block:'nearest' });
+      }
+      function open(){
+        if (state.disabled || state.open) return;
+        state.open=true; mount.classList.add('open'); btn.setAttribute('aria-expanded','true');
+        const sel = state.options.findIndex(o => o.value===state.value); state.active = sel<0?0:sel;
+        renderOpts(); syncActive();
+      }
+      function close(){ if(!state.open) return; state.open=false; mount.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+      function choose(i){
+        const o = state.options[i]; if(!o) return;
+        state.value=o.value; hidden.value=o.value; renderVal(); close(); btn.focus();
+        if (cfg.onChange) cfg.onChange(o.value);
+      }
+      btn.addEventListener('click', () => state.open ? close() : open());
+      btn.addEventListener('keydown', (e) => {
+        if (!state.open && (e.key==='ArrowDown'||e.key==='ArrowUp'||e.key==='Enter'||e.key===' ')){ e.preventDefault(); open(); return; }
+        if (e.key==='Escape'){ close(); return; }
+        if (!state.open) return;
+        if (e.key==='ArrowDown'){ e.preventDefault(); state.active=Math.min(state.options.length-1,state.active+1); syncActive(); }
+        else if (e.key==='ArrowUp'){ e.preventDefault(); state.active=Math.max(0,state.active-1); syncActive(); }
+        else if (e.key==='Home'){ e.preventDefault(); state.active=0; syncActive(); }
+        else if (e.key==='End'){ e.preventDefault(); state.active=state.options.length-1; syncActive(); }
+        else if (e.key==='Enter'||e.key===' '){ e.preventDefault(); choose(state.active); }
+      });
+      document.addEventListener('click', (e) => { if(!mount.contains(e.target)) close(); });
 
-    <!-- Open Positions -->
-    <section class="positions-section" id="positions">
-        <h2 class="positions-title">Open Positions</h2>
+      renderVal();
+      return {
+        setOptions(opts){ state.options=(opts||[]).slice(); state.value=''; hidden.value=''; renderVal(); if(state.open) renderOpts(); },
+        get value(){ return state.value; },
+      };
+    }
 
-        <div class="filter-bar">
-            <select class="filter-select" id="deptFilter" onchange="filterByDept()">
-                <option value="all">All departments</option>
-                <option value="content">Content</option>
-                <option value="design">Design</option>
-                <option value="media">Media</option>
-                <option value="operations">Operations</option>
-                <option value="tech">Tech</option>
-            </select>
-        </div>
+    // ── Role dropdown ──
+    let current = null;
+    const qHost = document.getElementById('roleQuestions');
+    const roleSelect = TVSelect(document.getElementById('roleMount'), {
+      placeholder:'Select a role…',
+      emptyText:'No roles are open right now',
+      onChange:(v) => { current = ROLES.find(r => r.key===v) || null; renderQuestions(current); },
+    });
+    function populateRoles(gates){
+      // A role shows only if its own gate AND its category gate are open.
+      const opts = ROLES
+        .filter(r => gates ? (gates[r.key] !== false && gates[r.dept] !== false) : true)
+        .map(r => ({ value:r.key, label:r.label, sub:r.dept }));
+      roleSelect.setOptions(opts);
+    }
+    // Fetch which roles are open; if the API is unreachable, show all (server re-checks on submit).
+    (async () => {
+      try {
+        const r = await fetch(`${window.TV_API_URL}?action=GET_PUBLIC_FORM_GATES`);
+        const j = await r.json().catch(() => null);
+        populateRoles(j && j.status === 'success' ? j.gates : null);
+      } catch { populateRoles(null); }
+    })();
 
-        <div id="deptList">
-
-            <!-- Content -->
-            <div class="dept-group open" data-dept="content">
-                <div class="dept-header" onclick="toggleDept(this)">
-                    <h3>Content</h3>
-                    <svg class="dept-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="dept-roles">
-                    <div class="role-row" data-role-id="content_editor" onclick="navigate('content-portal.html')">
-                        <div>
-                            <div class="role-title">Content Editor</div>
-                            <div class="role-meta">Content<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="content-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                    <div class="role-row" data-role-id="content_writer_upsc" onclick="navigate('content-portal.html')">
-                        <div>
-                            <div class="role-title">Content Writer (UPSC)</div>
-                            <div class="role-meta">Content<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="content-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                    <div class="role-row" data-role-id="upsc_strategist" onclick="navigate('content-portal.html')">
-                        <div>
-                            <div class="role-title">UPSC Content Researcher and Strategist</div>
-	                            <div class="role-meta">Content<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="content-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Design -->
-            <div class="dept-group" data-dept="design">
-                <div class="dept-header" onclick="toggleDept(this)">
-                    <h3>Design</h3>
-                    <svg class="dept-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="dept-roles">
-                    <div class="role-row" data-role-id="graphic_designer_canva" onclick="navigate('content-portal.html')">
-                        <div>
-                            <div class="role-title">Graphic Designer (Canva)</div>
-                            <div class="role-meta">Design<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="content-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                    <div class="role-row" data-role-id="uiux_designer" onclick="navigate('content-portal.html')">
-                        <div>
-                            <div class="role-title">UI/UX Designer</div>
-                            <div class="role-meta">Design<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="content-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Media -->
-            <div class="dept-group" data-dept="media">
-                <div class="dept-header" onclick="toggleDept(this)">
-                    <h3>Media</h3>
-                    <svg class="dept-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="dept-roles">
-                    <div class="role-row" data-role-id="video_editor_reels_yt" onclick="navigate('youtube-portal.html')">
-                        <div>
-                            <div class="role-title">Video Editor (Reels + YouTube)</div>
-                            <div class="role-meta">Media<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="youtube-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                    <div class="role-row" data-role-id="social_media_manager_ig" onclick="navigate('youtube-portal.html')">
-                        <div>
-                            <div class="role-title">Social Media Manager (Instagram)</div>
-                            <div class="role-meta">Media<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="youtube-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                    <div class="role-row" data-role-id="youtube_manager" onclick="navigate('youtube-portal.html')">
-                        <div>
-                            <div class="role-title">YouTube Manager</div>
-                            <div class="role-meta">Media<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="youtube-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Operations -->
-            <div class="dept-group" data-dept="operations">
-                <div class="dept-header" onclick="toggleDept(this)">
-                    <h3>Operations</h3>
-                    <svg class="dept-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="dept-roles">
-                    <div class="role-row" data-role-id="hr" onclick="navigate('hr-portal.html')">
-                        <div>
-                            <div class="role-title">Human Resource (HR)</div>
-                            <div class="role-meta">Operations<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="hr-portal.html" class="apply-btn" onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                    <div class="role-row" data-role-id="marketing_outreach" onclick="navigate('hr-portal.html')">
-                        <div>
-                            <div class="role-title">Marketing & Outreach</div>
-                            <div class="role-meta">Operations<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="hr-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                    <div class="role-row" data-role-id="management_coordination" onclick="navigate('hr-portal.html')">
-                        <div>
-                            <div class="role-title">Management / Team Co-ordination</div>
-                            <div class="role-meta">Operations<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-	                        <a href="hr-portal.html" class="apply-btn"
-	                            onclick="event.stopPropagation()">Apply Now</a>
-	                    </div>
-	                    <div class="role-row" data-role-id="collab_outreach" onclick="navigate('hr-portal.html')">
-	                        <div>
-	                            <div class="role-title">Collaboration &amp; Outreach Manager</div>
-	                            <div class="role-meta">Operations<span>•</span>Remote,
-	                                India<span>•</span>Internship<span>•</span>Remote</div>
-	                        </div>
-	                        <a href="hr-portal.html" class="apply-btn"
-	                            onclick="event.stopPropagation()">Apply Now</a>
-	                    </div>
-	                </div>
-	            </div>
-
-            <!-- Tech -->
-            <div class="dept-group" data-dept="tech">
-                <div class="dept-header" onclick="toggleDept(this)">
-                    <h3>Tech</h3>
-                    <svg class="dept-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-                <div class="dept-roles">
-                    <div class="role-row" data-role-id="tech_roles" onclick="navigate('tech-portal.html')">
-                        <div>
-                            <div class="role-title">Tech Roles</div>
-                            <div class="role-meta">Tech<span>•</span>Remote,
-                                India<span>•</span>Internship<span>•</span>Remote</div>
-                        </div>
-                        <a href="tech-portal.html" class="apply-btn"
-                            onclick="event.stopPropagation()">Apply Now</a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-glow"></div>
-
-        <a href="#" class="logo">
-            <div><span class="dot">.</span>ties<span>verse</span><small>Foundation</small></div>
-        </a>
-
-        <div class="footer-socials">
-            <a href="https://x.com/TiesIndia?s=20" target="_blank" class="social-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-            </a>
-            <a href="https://www.instagram.com/tiesverse?igsh=bGIwZGVvYjhybXhj" target="_blank" class="social-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm3.98-10.169a1.44 1.44 0 11-2.88 0 1.44 1.44 0 012.88 0z" />
-                </svg>
-            </a>
-            <a href="https://tiesindia.substack.com" target="_blank" class="social-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M22.539 8.242H1.46V21.026l10.539-4.526 10.54 4.526V8.242zM1.46 2.972h21.08V6.9H1.46V2.972z" />
-                </svg>
-            </a>
-            <a href="https://discord.gg/fpfKFwxa" target="_blank" class="social-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.05.05 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
-                </svg>
-            </a>
-            <a href="https://youtube.com/@tiesindia?si=o8xr1TJgM4Teoprs" target="_blank" class="social-icon">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.5 12 3.5 12 3.5s-7.505 0-9.377.55a3.015 3.015 0 0 0-2.122 2.136C0 8.148 0 12 0 12s0 3.852.501 5.814a3.015 3.015 0 0 0 2.122 2.136c1.871.55 9.377.55 9.377.55s7.505 0 9.377-.55a3.015 3.015 0 0 0 2.122-2.136C24 15.852 24 12 24 12s0-3.852-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                </svg>
-            </a>
-        </div>
-
-        <p class="footer-copyright">&copy; 2026 Tiesverse Foundation. All rights reserved.</p>
-    </footer>
-
-    <script src="tv-config.js"></script>
-
-    <script>
-        function navigate(url) { location.href = url; }
-
-        function toggleDept(header) {
-            header.parentElement.classList.toggle('open');
-        }
-
-        function filterByDept() {
-            const val = document.getElementById('deptFilter').value;
-            document.querySelectorAll('.dept-group').forEach(g => {
-                if (val === 'all' || g.dataset.dept === val) {
-                    g.style.display = '';
-                } else {
-                    g.style.display = 'none';
-                }
-            });
-        }
-
-        /* Open/Closed flags (loaded from Django API) */
-        const SHEET_URL = window.TV_APP_SCRIPT_URL;
-        const ROLE_OPEN = {};
-
-        function jsonp(url, params, timeoutMs = 15000) {
-            return new Promise((resolve, reject) => {
-                const cb = `__tv_jsonp_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-                const query = new URLSearchParams({ ...(params || {}), callback: cb }).toString();
-                const src = `${url}${url.includes("?") ? "&" : "?"}${query}`;
-
-                const script = document.createElement("script");
-                let done = false;
-
-                function cleanup() {
-                    if (done) return;
-                    done = true;
-                    try { delete window[cb]; } catch (_) {}
-                    try { script.remove(); } catch (_) {}
-                }
-
-                const t = setTimeout(() => {
-                    cleanup();
-                    reject(new Error("JSONP timeout"));
-                }, timeoutMs);
-
-                window[cb] = (data) => {
-                    clearTimeout(t);
-                    cleanup();
-                    resolve(data);
-                };
-
-                script.onerror = () => {
-                    clearTimeout(t);
-                    cleanup();
-                    reject(new Error("JSONP load failed"));
-                };
-                script.src = src;
-                document.head.appendChild(script);
-            });
-        }
-
-        async function loadRoleFlagsFromServer() {
-            if (!SHEET_URL) return;
-            try {
-                const res = await jsonp(SHEET_URL, { action: "GET_PUBLIC_FORM_GATES" });
-                const gates = (res && res.status === "success" && res.gates) ? res.gates : {};
-
-                const deptToGateKey = {
-                    content: "Content",
-                    design: "Content",
-                    media: "Media",
-                    operations: "Operations",
-                    tech: "Tech",
-                };
-
-                document.querySelectorAll(".dept-group[data-dept]").forEach((group) => {
-                    const dept = group.getAttribute("data-dept");
-                    const gateKey = deptToGateKey[String(dept || "").toLowerCase()];
-                    const deptOpen = gates && gateKey ? gates[gateKey] !== false : true;
-                    group.querySelectorAll(".role-row[data-role-id]").forEach((row) => {
-                        const id = row.getAttribute("data-role-id");
-                        if (!id) return;
-                        const hasRoleGate =
-                            gates && Object.prototype.hasOwnProperty.call(gates, id);
-                        const roleOpen = hasRoleGate ? gates[id] !== false : true;
-                        ROLE_OPEN[id] = deptOpen && roleOpen;
-                    });
-                });
-            } catch (_) {}
-        }
-
-        function captureRoleDefaults() {
-            document.querySelectorAll(".role-row[data-role-id]").forEach((row) => {
-                if (!row.dataset.defaultOnclick) {
-                    const oc = row.getAttribute("onclick");
-                    if (oc) row.dataset.defaultOnclick = oc;
-                }
-                const apply = row.querySelector("a.apply-btn");
-                if (apply) {
-                    if (!apply.dataset.defaultHref) {
-                        const href = apply.getAttribute("href");
-                        if (href) apply.dataset.defaultHref = href;
-                    }
-                    if (!apply.dataset.defaultText) {
-                        apply.dataset.defaultText = (apply.textContent || "").trim() || "Apply Now";
-                    }
-                }
-            });
-        }
-
-        function setRoleClosed(row) {
-            row.classList.add('closed');
-
-            const title = row.querySelector('.role-title');
-            if (title && !title.querySelector('.role-badge')) {
-                const badge = document.createElement('span');
-                badge.className = 'role-badge closed';
-                badge.textContent = 'Closed Now';
-                title.appendChild(badge);
-            }
-
-            row.removeAttribute('onclick');
-
-            const apply = row.querySelector('a.apply-btn');
-            if (apply) {
-                apply.classList.add('disabled');
-                apply.textContent = 'Closed';
-                apply.removeAttribute('href');
-                apply.setAttribute('aria-disabled', 'true');
-                apply.setAttribute('tabindex', '-1');
-            }
-        }
-
-        function setRoleOpen(row) {
-            row.classList.remove("closed");
-
-            const title = row.querySelector(".role-title");
-            const badge = title ? title.querySelector(".role-badge.closed") : null;
-            if (badge) badge.remove();
-
-            if (!row.getAttribute("onclick") && row.dataset.defaultOnclick) {
-                row.setAttribute("onclick", row.dataset.defaultOnclick);
-            }
-
-            const apply = row.querySelector("a.apply-btn");
-            if (apply) {
-                apply.classList.remove("disabled");
-                apply.textContent = apply.dataset.defaultText || "Apply Now";
-                if (!apply.getAttribute("href") && apply.dataset.defaultHref) {
-                    apply.setAttribute("href", apply.dataset.defaultHref);
-                }
-                apply.removeAttribute("aria-disabled");
-                apply.removeAttribute("tabindex");
-            }
-        }
-
-        function applyRoleFlags() {
-            document.querySelectorAll('.role-row[data-role-id]').forEach((row) => {
-                const id = row.getAttribute('data-role-id');
-                if (ROLE_OPEN[id] === false) setRoleClosed(row);
-                else setRoleOpen(row);
-            });
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            captureRoleDefaults();
-            const refresh = () => loadRoleFlagsFromServer().finally(applyRoleFlags);
-            refresh();
-            setInterval(refresh, 20000);
+    // ── Role-specific questions ──
+    function renderQuestions(role){
+      if (!role){ qHost.innerHTML = '<div class="role-empty">Pick a role above to see its questions.</div>'; return; }
+      let html = '';
+      if (role.hasSub){
+        html += '<div class="field"><label>Developer specialisation <span class="req">*</span></label><div id="subMount"></div></div>';
+      }
+      role.q.forEach((q) => {
+        const isLink = /link|url|github|portfolio|folder|blog/i.test(q);
+        html += `<div class="field"><label>${q}</label>${isLink
+          ? `<input data-q="${q.replace(/"/g,'&quot;')}" placeholder="https://…" />`
+          : `<textarea data-q="${q.replace(/"/g,'&quot;')}" rows="2"></textarea>`}</div>`;
+      });
+      qHost.innerHTML = html;
+      if (role.hasSub){
+        TVSelect(document.getElementById('subMount'), {
+          options: TECH_SUB.map(s => ({ value:s, label:s })),
+          placeholder:'Select specialisation…',
+          dataQ:'Specialisation',
         });
+      }
+    }
 
-        /* Particles (performance-friendly) */
-        const canvas = document.getElementById('particles');
-        if (canvas) {
-        const ctx = canvas.getContext('2d', { alpha: true });
+    // ── Resume file picker ──
+    const resumeInput = document.getElementById('resumeInput');
+    const fileName = document.getElementById('fileName');
+    document.getElementById('fileBtn').addEventListener('click', () => resumeInput.click());
+    resumeInput.addEventListener('change', () => {
+      const f = resumeInput.files[0];
+      if (f){ fileName.textContent = f.name; fileName.classList.add('has'); }
+      else { fileName.textContent = 'No file chosen'; fileName.classList.remove('has'); }
+    });
 
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
-        const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-        const enableParticles = !prefersReducedMotion && !(isSmallScreen && isCoarsePointer);
+    // ── Submit ──
+    const form = document.getElementById('applyForm');
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('submitBtn');
+    const showMsg = (t, ok) => { msg.className = 'msg ' + (ok ? 'ok' : 'err'); msg.textContent = t; window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
-        let particles = [];
-        let rafId = null;
-        let lastFrameTs = 0;
-        const targetFps = isSmallScreen ? 22 : 30;
-        const frameInterval = 1000 / targetFps;
+    const readResume = () => new Promise((res) => {
+      const f = resumeInput.files[0];
+      if (!f) return res({ name:'', data:'' });
+      const r = new FileReader();
+      r.onload = () => res({ name: f.name, data: String(r.result).split(',')[1] || '' });
+      r.onerror = () => res({ name:'', data:'' });
+      r.readAsDataURL(f);
+    });
 
-        function resizeCanvas() {
-            const dprCap = isSmallScreen ? 1 : 1.5;
-            const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
-            const w = Math.floor(window.innerWidth);
-            const h = Math.floor(window.innerHeight);
-            canvas.width = Math.floor(w * dpr);
-            canvas.height = Math.floor(h * dpr);
-            canvas.style.width = w + 'px';
-            canvas.style.height = h + 'px';
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        }
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!current) return showMsg('Please select a role.', false);
+      const fd = new FormData(form);
+      const answers = {};
+      qHost.querySelectorAll('[data-q]').forEach(el => { if (el.value.trim()) answers[el.getAttribute('data-q')] = el.value.trim(); });
+      if (current.hasSub && !answers['Specialisation']) return showMsg('Please choose your developer specialisation.', false);
+      if (!document.getElementById('ack').checked) return showMsg('Please confirm your details are accurate to continue.', false);
 
-        function createParticles() {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            particles = [];
+      const roleName = current.hasSub ? `${current.label} — ${answers['Specialisation'] || ''}` : current.label;
 
-            const base = Math.floor((w * h) / 22000);
-            const maxCount = isSmallScreen ? 70 : 140;
-            const count = Math.max(24, Math.min(maxCount, base));
-
-            for (let i = 0; i < count; i++) {
-                particles.push({
-                    x: Math.random() * w,
-                    y: Math.random() * h,
-                    r: Math.random() * 1 + 0.3,
-                    a: Math.random() * 0.28 + 0.05,
-                    dx: (Math.random() - 0.5) * 0.08,
-                    dy: (Math.random() - 0.5) * 0.08,
-                    ph: Math.random() * Math.PI * 2
-                });
-            }
-        }
-
-        function tick(ts) {
-            rafId = requestAnimationFrame(tick);
-            if (ts - lastFrameTs < frameInterval) return;
-            lastFrameTs = ts;
-
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            ctx.clearRect(0, 0, w, h);
-            const t = ts * 0.001;
-
-            for (const p of particles) {
-                p.x += p.dx; p.y += p.dy;
-                if (p.x < 0) p.x = w;
-                if (p.x > w) p.x = 0;
-                if (p.y < 0) p.y = h;
-                if (p.y > h) p.y = 0;
-
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255,255,255,${p.a * (0.6 + 0.4 * Math.sin(t + p.ph))})`;
-                ctx.fill();
-            }
-        }
-
-        function startParticles() {
-            if (!enableParticles || window.getComputedStyle(canvas).display === 'none') {
-                canvas.style.display = 'none';
-                return;
-            }
-            resizeCanvas();
-            createParticles();
-            if (rafId) cancelAnimationFrame(rafId);
-            lastFrameTs = 0;
-            rafId = requestAnimationFrame(tick);
-        }
-
-        let resizeTimer = null;
-        window.addEventListener('resize', () => {
-            if (!enableParticles) return;
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                resizeCanvas();
-                createParticles();
-            }, 120);
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (!enableParticles) return;
-            if (document.hidden) {
-                if (rafId) cancelAnimationFrame(rafId);
-                rafId = null;
-            } else {
-                startParticles();
-            }
-        });
-
-        startParticles();
-        }
-    </script>
-
-    <script src="tv-guard.js"></script>
+      btn.disabled = true; btn.textContent = 'Submitting…';
+      const resume = await readResume();
+      const payload = {
+        action: 'CREATE',
+        department: current.dept, roles: roleName,
+        first_name: fd.get('first_name'), last_name: fd.get('last_name'),
+        email: fd.get('email'), phone: fd.get('phone'), city: fd.get('city'),
+        linkedin: fd.get('linkedin'), portfolio: fd.get('portfolio'), why_join: fd.get('why_join'),
+        answers, resume_name: resume.name, resume_data: resume.data,
+      };
+      try {
+        const r = await fetch(window.TV_API_URL, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+        const out = await r.json().catch(() => ({}));
+        const status = out.status || (r.ok ? 'success' : 'error');
+        if (status === 'success') {
+          document.getElementById('formHost').innerHTML = `<div class="done"><div class="tick">✓</div><h2>Application received!</h2><p>Thanks for applying as <strong>${roleName}</strong>. We've noted your details and will be in touch by email — do check your inbox (and spam).</p></div>`;
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else if (status === 'CLOSED') { showMsg('Applications for this role are currently closed. Please try another role or check back soon.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
+        else if (status === 'DUPLICATE_30D') { showMsg('You have already applied for this role in the last 30 days.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
+        else { showMsg('Something went wrong. Please try again.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
+      } catch (err) {
+        showMsg('Network error — please check your connection and try again.', false);
+        btn.disabled = false; btn.textContent = 'Submit application';
+      }
+    });
+  </script>
 </body>
-
 </html>
