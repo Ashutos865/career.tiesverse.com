@@ -38,7 +38,7 @@
     .meta{font-size:13px;color:var(--faint);margin:16px 0 26px}
     .meta .req{color:var(--orange)}
 
-    /* card + sections (single card, hairline-divided — no nested boxes) */
+    /* card + sections (single card, hairline-divided - no nested boxes) */
     .card{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);box-shadow:var(--shadow);padding:2px 24px}
     .sec{padding:22px 0}
     .divider{height:1px;background:var(--hair)}
@@ -154,7 +154,7 @@
   <div class="wrap">
     <span class="brand"><span class="dot">.</span>ties<span class="verse">verse</span></span>
     <h1>Apply for an internship</h1>
-    <p class="lede">One short form — pick your role, answer a few quick questions, and you're in.</p>
+    <p class="lede">One short form - pick your role, answer a few quick questions, and you're in.</p>
     <p class="meta">Fields marked <span class="req">*</span> are required.</p>
 
     <div id="formHost">
@@ -437,7 +437,7 @@
       if (current.hasSub && !answers['Specialisation']) return showMsg('Please choose your developer specialisation.', false);
       if (!document.getElementById('ack').checked) return showMsg('Please confirm your details are accurate to continue.', false);
 
-      const roleName = current.hasSub ? `${current.label} — ${answers['Specialisation'] || ''}` : current.label;
+      const roleName = current.hasSub ? `${current.label} - ${answers['Specialisation'] || ''}` : current.label;
 
       btn.disabled = true; btn.textContent = 'Submitting…';
       const resume = await readResume();
@@ -454,13 +454,13 @@
         const out = await r.json().catch(() => ({}));
         const status = out.status || (r.ok ? 'success' : 'error');
         if (status === 'success') {
-          document.getElementById('formHost').innerHTML = `<div class="done"><div class="tick">✓</div><h2>Application received!</h2><p>Thanks for applying as <strong>${roleName}</strong>. We've noted your details and will be in touch by email — do check your inbox (and spam).</p></div>`;
+          document.getElementById('formHost').innerHTML = `<div class="done"><div class="tick">✓</div><h2>Application received!</h2><p>Thanks for applying as <strong>${roleName}</strong>. We've noted your details and will be in touch by email - do check your inbox (and spam).</p></div>`;
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (status === 'CLOSED') { showMsg('Applications for this role are currently closed. Please try another role or check back soon.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
         else if (status === 'DUPLICATE_30D') { showMsg('You have already applied for this role in the last 30 days.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
         else { showMsg('Something went wrong. Please try again.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
       } catch (err) {
-        showMsg('Network error — please check your connection and try again.', false);
+        showMsg('Network error - please check your connection and try again.', false);
         btn.disabled = false; btn.textContent = 'Submit application';
       }
     });
