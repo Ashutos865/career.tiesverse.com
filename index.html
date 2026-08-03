@@ -137,7 +137,9 @@
 
     /* success */
     .done{background:var(--card);border:1px solid var(--hair);border-radius:var(--radius);box-shadow:var(--shadow);padding:50px 28px;text-align:center}
-    .done .tick{width:66px;height:66px;border-radius:50%;background:#e8faf2;color:#16a34a;display:grid;place-items:center;font-size:32px;margin:0 auto 20px}
+    /* A PNG, not the 🎉 character: every device then shows the Apple artwork
+       rather than its own — Android and Windows draw quite different poppers. */
+    .done .tick{width:66px;height:66px;display:block;margin:0 auto 20px}
     .done h2{font-family:var(--serif);font-weight:500;font-size:26px;margin:0 0 10px}
     .done p{color:var(--muted);font-size:15px;line-height:1.6;margin:0 auto;max-width:44ch}
     .done strong{color:var(--ink)}
@@ -154,7 +156,7 @@
   <div class="wrap">
     <span class="brand"><span class="dot">.</span>ties<span class="verse">verse</span></span>
     <h1>Apply for an internship</h1>
-    <p class="lede">One short form - pick your role, answer a few quick questions, and you're in.</p>
+    <p class="lede">One short form. Pick your role, answer a few quick questions, and you're in.</p>
     <p class="meta">Fields marked <span class="req">*</span> are required.</p>
 
     <div id="formHost">
@@ -454,7 +456,7 @@
         const out = await r.json().catch(() => ({}));
         const status = out.status || (r.ok ? 'success' : 'error');
         if (status === 'success') {
-          document.getElementById('formHost').innerHTML = `<div class="done"><div class="tick">✓</div><h2>Application received!</h2><p>Thanks for applying as <strong>${roleName}</strong>. We've noted your details and will be in touch by email - do check your inbox (and spam).</p></div>`;
+          document.getElementById('formHost').innerHTML = `<div class="done"><img class="tick" src="emoji/1f389.png" alt="" width="66" height="66"><h2>Application received!</h2><p>Thanks for applying as <strong>${roleName}</strong>. We've noted your details and will be in touch by email, do check your inbox (and spam).</p></div>`;
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (status === 'CLOSED') { showMsg('Applications for this role are currently closed. Please try another role or check back soon.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
         else if (status === 'DUPLICATE_30D') { showMsg('You have already applied for this role in the last 30 days.', false); btn.disabled = false; btn.textContent = 'Submit application'; }

@@ -77,7 +77,7 @@ def send_application_confirmation(to_email, first_name, department, roles):
     # Email Designer). Fall back to the built-in HTML below if unreachable.
     subject, html_body = _render_admin_template(first_name, role_label)
     if not (subject and html_body):
-        subject = "Thank you for applying to TiesVerse!"
+        subject = "Thank you for applying to Tiesverse!"
         html_body = f"""
 <!DOCTYPE html>
 <html>
@@ -103,7 +103,7 @@ def send_application_confirmation(to_email, first_name, department, roles):
 <body>
   <div class="container">
     <div class="header">
-      <h1>Ties<span>Verse</span></h1>
+      <h1>Ties<span>verse</span></h1>
     </div>
     <div class="body">
       <h2>Thanks for applying, {first_name}!</h2>
@@ -113,7 +113,7 @@ def send_application_confirmation(to_email, first_name, department, roles):
         <p><strong>Role:</strong> {role_label}</p>
       </div>
       <p>In the meantime, feel free to explore our work at <a href="https://tiesverse.com">tiesverse.com</a>.</p>
-      <p>— The TiesVerse Team</p>
+      <p>The Tiesverse Team</p>
     </div>
     <div class="footer">
       <p>You're receiving this because you applied at tiesverse.com &nbsp;·&nbsp; <a href="https://tiesverse.com">tiesverse.com</a></p>
@@ -125,11 +125,11 @@ def send_application_confirmation(to_email, first_name, department, roles):
 
     text_body = (
         f"Hi {first_name},\n\n"
-        f"Thanks for applying to TiesVerse!\n\n"
+        f"Thanks for applying to Tiesverse!\n\n"
         f"Department: {department}\nRole: {role_label}\n\n"
         "We've received your application and will review it carefully. "
         "We'll reach out if your profile is a good fit.\n\n"
-        "— The TiesVerse Team\nhttps://tiesverse.com"
+        "The Tiesverse Team\nhttps://tiesverse.com"
     )
 
     try:
