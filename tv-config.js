@@ -4,7 +4,9 @@
 // Django API runs on its own subdomain, so we point at it explicitly.
 // Local dev: the Django app serves BOTH the pages and /api/ from one origin,
 // so we just use the current origin.
-const TV_PROD_API = "https://api.career.tiesverse.com/api/";
+// career-api, not api.career: Cloudflare's universal certificate covers only
+// first-level subdomains, so api.career.tiesverse.com fails TLS in browsers.
+const TV_PROD_API = "https://career-api.tiesverse.com/api/";
 const TV_FALLBACK_API = "http://127.0.0.1:8000/api/";
 
 const host = window.location.hostname;
