@@ -1,5 +1,6 @@
 import base64
 import json
+import math
 import mimetypes
 import re
 import uuid
@@ -132,10 +133,14 @@ def handle_get(action, params):
         department = (params.get("department") or "").strip()
         email = normalize_email(params.get("email"))
         phone = normalize_phone(params.get("phone"))
+        # The cooldowns follow the person, not the department, so they are
+        # checked whether or not a department was named.
+        block = check_cooldown(email, phone, params.get("roles") or "")
         return {
             "status": "success",
             "open": is_form_open(department) if department else True,
-            "duplicate": has_recent_duplicate(department, email, phone) if department else False,
+            "duplicate": block is not None,
+            "cooldown": cooldown_payload(block),
             "department": department,
         }
 
@@ -182,8 +187,16 @@ def create_candidate(data, request):
 
     if department and not is_form_open(department):
         return {"status": "CLOSED"}
-    if department and has_recent_duplicate(department, email, phone):
-        return {"status": "DUPLICATE_30D"}
+
+    # The real gate. The portals check before submitting too, but that is a
+    # courtesy to the applicant: a request that reaches here is refused on its
+    # own merits, so the rule holds even if the page is bypassed.
+    block = check_cooldown(email, phone, data.get("roles") or "")
+    if block:
+        payload = cooldown_payload(block)
+        # DUPLICATE_30D is what the deployed portals already recognise; the
+        # cooldown object carries which rule fired and when to return.
+        return {"status": "DUPLICATE_30D", "cooldown": payload, "message": payload["message"]}
 
     candidate, created = Candidate.objects.get_or_create(
         request_id=request_id,
@@ -264,18 +277,114 @@ def is_form_open(department):
     return gates.get(department, True) is not False
 
 
-def has_recent_duplicate(department, email, phone):
+def split_roles(value):
+    """The role field is a comma-joined list ("Video Editor, Graphics Designer"),
+    so a repeat application has to be compared role by role: applying for two
+    roles and later for one of them is still a repeat of that one."""
+    return {r.strip().casefold() for r in str(value or "").split(",") if r.strip()}
+
+
+def recent_applications(email, phone, days):
+    """Applications from this person in the last `days`, newest first.
+
+    A person is matched on either identifier: a second email address with the
+    same phone number is the same applicant, which is the point of checking
+    both.
+    """
     if not email and not phone:
-        return False
-    since = timezone.now() - timedelta(days=settings.DEDUP_WINDOW_DAYS)
-    qs = Candidate.objects.filter(department=department, created_at__gte=since)
-    if email and qs.filter(email__iexact=email).exists():
-        return True
-    if phone:
-        for candidate_phone in qs.values_list("phone", flat=True):
-            if normalize_phone(candidate_phone) == phone:
-                return True
-    return False
+        return []
+    since = timezone.now() - timedelta(days=days)
+    rows = Candidate.objects.filter(created_at__gte=since).order_by("-created_at")
+    matched = []
+    for row in rows:
+        if email and normalize_email(row.email) == email:
+            matched.append(row)
+        elif phone and normalize_phone(row.phone) == phone:
+            matched.append(row)
+    return matched
+
+
+def check_cooldown(email, phone, roles=""):
+    """The two waiting periods between applications.
+
+    - 15 days before the same person may apply again at all, to any role.
+    - 30 days before they may re-apply to a role they have already applied for.
+
+    The role window is the longer of the two, so a candidate turned down for
+    one role can try a different one after 15 days without waiting out the
+    month, while re-submitting the same role still waits the full 30.
+
+    Returns None when the application may proceed, otherwise a dict naming
+    which rule applied and the date the applicant may return — the applicant
+    is told when to come back, not merely that they were refused.
+    """
+    if not email and not phone:
+        return None
+
+    now = timezone.now()
+    wanted = split_roles(roles)
+
+    # The longer window first: re-applying to the same role is the stricter
+    # rule, so it should be the one reported when both would fire.
+    if wanted:
+        for row in recent_applications(email, phone, settings.ROLE_COOLDOWN_DAYS):
+            repeated = wanted & split_roles(row.roles)
+            if repeated:
+                available = row.created_at + timedelta(days=settings.ROLE_COOLDOWN_DAYS)
+                if available > now:
+                    return {
+                        "rule": "role",
+                        "days": settings.ROLE_COOLDOWN_DAYS,
+                        "role": sorted(repeated)[0],
+                        "last_applied": row.created_at,
+                        "available_on": available,
+                    }
+
+    recent = recent_applications(email, phone, settings.APPLICANT_COOLDOWN_DAYS)
+    if recent:
+        row = recent[0]
+        available = row.created_at + timedelta(days=settings.APPLICANT_COOLDOWN_DAYS)
+        if available > now:
+            return {
+                "rule": "applicant",
+                "days": settings.APPLICANT_COOLDOWN_DAYS,
+                "role": "",
+                "last_applied": row.created_at,
+                "available_on": available,
+            }
+    return None
+
+
+def cooldown_payload(block):
+    """The blocked response, shaped so the portal can say when to come back."""
+    if not block:
+        return None
+    available = block["available_on"]
+    remaining = max(1, math.ceil((available - timezone.now()).total_seconds() / 86400))
+    if block["rule"] == "role":
+        message = (
+            f"You applied for {block['role'].title()} on "
+            f"{block['last_applied'].strftime('%d %b %Y')}. The same role can be "
+            f"applied for again after {block['days']} days."
+        )
+    else:
+        message = (
+            f"You applied on {block['last_applied'].strftime('%d %b %Y')}. "
+            f"A new application can be submitted after {block['days']} days."
+        )
+    return {
+        "rule": block["rule"],
+        "role": block["role"],
+        "days": block["days"],
+        "days_remaining": remaining,
+        "available_on": available.date().isoformat(),
+        "message": message + f" Please apply again on {available.strftime('%d %b %Y')}.",
+    }
+
+
+def has_recent_duplicate(department, email, phone, roles=""):
+    """Kept for callers that only need a yes/no."""
+    return check_cooldown(email, phone, roles) is not None
 
 
 def stringify_answers(value):

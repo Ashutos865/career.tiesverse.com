@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS candidates (
 );
 
 CREATE INDEX IF NOT EXISTS idx_candidates_department_created ON candidates (department, created_at);
+-- The application cooldowns scan by recency across every department, so the
+-- department-first index above cannot serve them.
+CREATE INDEX IF NOT EXISTS idx_candidates_created ON candidates (created_at);
 CREATE INDEX IF NOT EXISTS idx_candidates_email ON candidates (email);
 CREATE INDEX IF NOT EXISTS idx_candidates_request_id ON candidates (request_id);
 

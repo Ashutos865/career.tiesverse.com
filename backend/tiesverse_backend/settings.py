@@ -90,7 +90,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 ADMIN_PASSWORD = "TIESVERSE2025"
 ADMIN_SESSION_DAYS = 7
-DEDUP_WINDOW_DAYS = 30
+# Waiting periods between applications (see careers.views.check_cooldown):
+# the same person may not re-apply at all inside APPLICANT_COOLDOWN_DAYS, nor
+# re-apply to a role they already applied for inside ROLE_COOLDOWN_DAYS.
+APPLICANT_COOLDOWN_DAYS = 15
+ROLE_COOLDOWN_DAYS = 30
+DEDUP_WINDOW_DAYS = ROLE_COOLDOWN_DAYS  # legacy name, still read by the portals
 
 DATA_PROVIDER = os.environ.get("TV_DATA_PROVIDER", "cloudflare")
 APPSCRIPT_BACKEND_URL = os.environ.get(

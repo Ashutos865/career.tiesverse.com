@@ -459,7 +459,7 @@
           document.getElementById('formHost').innerHTML = `<div class="done"><img class="tick" src="emoji/1f389.png" alt="" width="66" height="66"><h2>Application received!</h2><p>Thanks for applying as <strong>${roleName}</strong>. We've noted your details and will be in touch by email, do check your inbox (and spam).</p></div>`;
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else if (status === 'CLOSED') { showMsg('Applications for this role are currently closed. Please try another role or check back soon.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
-        else if (status === 'DUPLICATE_30D') { showMsg('You have already applied for this role in the last 30 days.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
+        else if (status === 'DUPLICATE_30D') { showMsg((out.cooldown && out.cooldown.message) || out.message || 'You have applied recently. Please try again later.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
         else { showMsg('Something went wrong. Please try again.', false); btn.disabled = false; btn.textContent = 'Submit application'; }
       } catch (err) {
         showMsg('Network error - please check your connection and try again.', false);

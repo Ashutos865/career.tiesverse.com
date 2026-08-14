@@ -546,13 +546,14 @@
                 });
             }
 
-            async function fetchDeptStatus(email, phone) {
+            async function fetchDeptStatus(email, phone, roles) {
                 try {
                     return await jsonp(SHEET_URL, {
                         action: "FORM_STATUS",
                         department: DEPARTMENT_ID,
                         email: email || "",
                         phone: phone || "",
+                        roles: roles || "",
                     });
                 } catch (_) {
                     return null;
@@ -865,7 +866,14 @@
                             try { data = JSON.parse(xhr.responseText || "{}"); }
                             catch (_) { data = { status: "success" }; }
                             if (data.status && data.status !== "success") {
-                                reject(new Error(data.status));
+                                // Carry the server's explanation with the rejection:
+                                // a refused application is not a network failure and
+                                // should not be reported as one.
+                                const err = new Error(data.status);
+                                err.serverStatus = data.status;
+                                err.serverMessage =
+                                    (data.cooldown && data.cooldown.message) || data.message || "";
+                                reject(err);
                                 return;
                             }
                             resolve(data);
@@ -930,7 +938,7 @@ async function deploy() {
 
                 let serverStatus = null;
                 try {
-                    serverStatus = await fetchDeptStatus(emailNorm, phoneNorm);
+                    serverStatus = await fetchDeptStatus(emailNorm, phoneNorm, document.getElementById("roleInput").value);
                 } catch (_) {}
                 if (serverStatus && serverStatus.status === "success") {
                     if (serverStatus.open === false) {
@@ -941,10 +949,14 @@ async function deploy() {
                     }
                     if (serverStatus.duplicate === true) {
                         resetSubmitState();
+                        // The server decides which waiting period applies and
+                        // when it ends, so its message is shown as given rather
+                        // than restated here with a hardcoded number of days.
                         tvNotify(
                             "warn",
                             "Already applied",
-                            `Looks like you already applied for this role in the last ${DEDUP_WINDOW_DAYS} days. Please try again later.`,
+                            (serverStatus.cooldown && serverStatus.cooldown.message)
+                                || "You have applied recently. Please try again later.",
                         );
                         return;
                     }
@@ -993,9 +1005,23 @@ async function deploy() {
                     setUploadProgress(100, "Application submitted.");
                     window.scrollTo(0, 0);
                 } catch (e) {
-                    alert("Couldn’t submit right now. Please try again.");
                     hideUploadProgress();
                     resetSubmitState();
+                    if (e && e.serverStatus === "DUPLICATE_30D") {
+                        tvNotify(
+                            "warn",
+                            "Already applied",
+                            e.serverMessage || "You have applied recently. Please try again later.",
+                        );
+                    } else if (e && e.serverStatus === "CLOSED") {
+                        tvNotify(
+                            "warn",
+                            "Applications closed",
+                            "Applications for this department are currently closed.",
+                        );
+                    } else {
+                        alert("Couldn’t submit right now. Please try again.");
+                    }
                 }
             }
 

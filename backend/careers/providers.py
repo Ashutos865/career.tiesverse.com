@@ -1,5 +1,6 @@
 import base64
 import json
+import math
 import mimetypes
 import re
 import secrets
@@ -107,10 +108,14 @@ class CloudflareD1Provider:
             department = str(params.get("department") or "").strip()
             email = normalize_email(params.get("email"))
             phone = normalize_phone(params.get("phone"))
+            # The cooldowns follow the person, not the department, so they are
+            # checked whether or not a department was named.
+            block = self.check_cooldown(email, phone, params.get("roles") or "")
             return {
                 "status": "success",
                 "open": self.is_form_open(department) if department else True,
-                "duplicate": self.has_recent_duplicate(department, email, phone) if department else False,
+                "duplicate": block is not None,
+                "cooldown": cooldown_payload(block),
                 "department": department,
             }
         if action == "CHECK_REQUEST":
@@ -192,8 +197,14 @@ class CloudflareD1Provider:
 
         if department and not self.is_form_open(department):
             return {"status": "CLOSED"}
-        if department and self.has_recent_duplicate(department, email, phone):
-            return {"status": "DUPLICATE_30D"}
+
+        # The real gate. The portals check before submitting too, but that is a
+        # courtesy to the applicant: a request that reaches here is refused on
+        # its own merits, so the rule holds even if the page is bypassed.
+        block = self.check_cooldown(email, phone, data.get("roles") or "")
+        if block:
+            payload = cooldown_payload(block)
+            return {"status": "DUPLICATE_30D", "cooldown": payload, "message": payload["message"]}
         if self.find_request(request_id):
             return {"status": "success"}
 
@@ -297,23 +308,81 @@ class CloudflareD1Provider:
     def is_form_open(self, department):
         return self.read_form_gates().get(department, True) is not False
 
-    def has_recent_duplicate(self, department, email, phone):
+    def recent_applications(self, email, phone, days):
+        """This person's applications in the last `days`, newest first.
+
+        Matched on either identifier, so a second email address with the same
+        phone number is still the same applicant.
+        """
         if not email and not phone:
-            return False
-        since = (datetime.now(timezone.utc) - timedelta(days=settings.DEDUP_WINDOW_DAYS)).isoformat()
+            return []
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
         rows = self.query_rows(
             """
-            SELECT email, phone FROM candidates
-            WHERE department = ? AND created_at >= ?
+            SELECT email, phone, roles, created_at FROM candidates
+            WHERE created_at >= ?
+            ORDER BY created_at DESC
             """,
-            [department, since],
+            [since],
         )
+        matched = []
         for row in rows:
             if email and normalize_email(row.get("email")) == email:
-                return True
-            if phone and normalize_phone(row.get("phone")) == phone:
-                return True
-        return False
+                matched.append(row)
+            elif phone and normalize_phone(row.get("phone")) == phone:
+                matched.append(row)
+        return matched
+
+    def check_cooldown(self, email, phone, roles=""):
+        """The two waiting periods between applications — see
+        careers.views.check_cooldown, which this mirrors for the Cloudflare
+        backend. Both paths have to agree, since either may serve a request.
+        """
+        if not email and not phone:
+            return None
+
+        now = datetime.now(timezone.utc)
+        wanted = split_roles(roles)
+
+        # The longer, stricter window first, so it is the one reported when
+        # both would fire.
+        if wanted:
+            for row in self.recent_applications(email, phone, settings.ROLE_COOLDOWN_DAYS):
+                repeated = wanted & split_roles(row.get("roles"))
+                if not repeated:
+                    continue
+                applied = parse_iso(row.get("created_at"))
+                if applied is None:
+                    continue
+                available = applied + timedelta(days=settings.ROLE_COOLDOWN_DAYS)
+                if available > now:
+                    return {
+                        "rule": "role",
+                        "days": settings.ROLE_COOLDOWN_DAYS,
+                        "role": sorted(repeated)[0],
+                        "last_applied": applied,
+                        "available_on": available,
+                    }
+
+        recent = self.recent_applications(email, phone, settings.APPLICANT_COOLDOWN_DAYS)
+        for row in recent:
+            applied = parse_iso(row.get("created_at"))
+            if applied is None:
+                continue
+            available = applied + timedelta(days=settings.APPLICANT_COOLDOWN_DAYS)
+            if available > now:
+                return {
+                    "rule": "applicant",
+                    "days": settings.APPLICANT_COOLDOWN_DAYS,
+                    "role": "",
+                    "last_applied": applied,
+                    "available_on": available,
+                }
+        return None
+
+    def has_recent_duplicate(self, department, email, phone, roles=""):
+        """Kept for callers that only need a yes/no."""
+        return self.check_cooldown(email, phone, roles) is not None
 
     def find_request(self, request_id):
         rows = self.query_rows("SELECT id FROM candidates WHERE request_id = ? LIMIT 1", [request_id])
@@ -507,3 +576,55 @@ def sanitize_filename(value):
 
 def now_iso():
     return datetime.now(timezone.utc).isoformat()
+
+
+def split_roles(value):
+    """The role field is a comma-joined list, so a repeat application has to be
+    compared role by role: applying for two roles and later for one of them is
+    still a repeat of that one."""
+    return {r.strip().casefold() for r in str(value or "").split(",") if r.strip()}
+
+
+def parse_iso(value):
+    """Read a stored timestamp. Rows written before the cooldowns existed may
+    carry a naive timestamp or none at all, so anything unreadable returns None
+    and is skipped rather than being treated as "just applied"."""
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    if raw.endswith("Z"):
+        raw = raw[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def cooldown_payload(block):
+    """The blocked response, shaped so the portal can say when to come back."""
+    if not block:
+        return None
+    available = block["available_on"]
+    remaining = max(1, math.ceil((available - datetime.now(timezone.utc)).total_seconds() / 86400))
+    if block["rule"] == "role":
+        message = (
+            f"You applied for {block['role'].title()} on "
+            f"{block['last_applied'].strftime('%d %b %Y')}. The same role can be "
+            f"applied for again after {block['days']} days."
+        )
+    else:
+        message = (
+            f"You applied on {block['last_applied'].strftime('%d %b %Y')}. "
+            f"A new application can be submitted after {block['days']} days."
+        )
+    return {
+        "rule": block["rule"],
+        "role": block["role"],
+        "days": block["days"],
+        "days_remaining": remaining,
+        "available_on": available.date().isoformat(),
+        "message": message + f" Please apply again on {available.strftime('%d %b %Y')}.",
+    }
